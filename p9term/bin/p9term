@@ -1,0 +1,168 @@
+#!/usr/bin/ruby -w
+
+class P9Term
+    def initialize()
+        require "fileutils.rb"
+        require "pathname.rb"
+        
+        # Cope with symbolic links to this script.
+        @p9term_home = Pathname.new(__FILE__).realpath().dirname().dirname()
+	# FIXME: ../../ won't work if/when p9term is packaged.
+        @salma_hayek = Pathname.new("#{@p9term_home}/../../salma-hayek").realpath()
+        #@salma_hayek = Pathname.new("#{@p9term_home}/../salma-hayek").realpath()
+        
+        require "#{@salma_hayek}/bin/invoke-java.rb"
+        require "#{@salma_hayek}/bin/show-alert.rb"
+        require "#{@salma_hayek}/bin/target-os.rb"
+    end
+    
+    def launch()
+        report_exceptions("p9term") { launch0() }
+    end
+    
+    def launch0()
+        # Allow different instances to have different options (and logging).
+        dot_directory = ENV["P9TERM_DOT_DIRECTORY"]
+        if dot_directory == nil
+            home = ENV["HOME"]
+            dot_directory = "#{home}/.p9term"
+        end
+        # Make sure we have a directory for our private files and another for the logs.
+        log_directory = File.join(dot_directory, "logs")
+        make_directory(dot_directory, true)
+        make_directory(log_directory, false)
+        options_pathname = File.join(dot_directory, "options")
+        
+        server_port_file_stem = File.join(dot_directory, "p9term-server-port")
+        # Colons have a special meaning on Windows file systems.
+        display = ENV["DISPLAY"]
+        display_suffix = ""
+        if display != nil
+            display_suffix = display.gsub(/[:\/]/, "_")
+        end
+        server_port_file_name = "#{server_port_file_stem}#{display_suffix}"
+        tryInAppServer(server_port_file_name)
+        
+        selectShellIfNoDefault()
+        
+        invoker = Java.new("p9term", "org/jessies/p9term/P9Term")
+        invoker.log_filename = "#{log_directory}/p9term-#{$$}.log"
+        # The "user.home" system property won't necessarily point at $HOME.
+        # We arranged above for a log directory to be available, so we need to stick to it.
+        # (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
+        invoker.add_pathname_property("org.jessies.p9term.dotDirectory", dot_directory)
+        invoker.add_pathname_property("org.jessies.p9term.logDirectory", log_directory)
+        invoker.add_pathname_property("org.jessies.p9term.serverPortFileName", server_port_file_name)
+        invoker.add_pathname_property("org.jessies.p9term.optionsFile", options_pathname)
+        
+        # Ruby knows the mapping from signal number to signal name, but Java doesn't and POSIX doesn't either.
+        # So pass the information along to Java in a way that won't leak through to our children.
+        signalMap = Signal.list().map() {
+            | signal_name, signal_number |
+            "#{signal_number}:#{signal_name}"
+        }
+	invoker.add_property("org.jessies.p9term.signalMap", signalMap.join(" "))
+        
+        invoker.invoke()
+    end
+    
+    def make_directory(pathname, make_safe)
+        directory_exists = false
+        directory_safe = ! make_safe
+        begin
+            if test(?d, pathname) == false
+                FileUtils.rm_f(pathname)
+                Dir.mkdir(pathname)
+            end
+            directory_exists = true
+            if make_safe
+                if File.stat(pathname).mode != 0700
+                    FileUtils.chmod(0700, pathname)
+                end
+            end
+            directory_safe = true
+        rescue SystemCallError
+            if directory_exists == false
+                show_alert("p9term had trouble starting.", "p9term was unable to create the directory \"#{pathname}\".")
+                exit(1)
+            elsif directory_safe == false
+                show_alert("p9term had trouble starting.", "p9term was unable to change the permissions on \"#{pathname}\" to make it safe. Others may be able to read your logs or cause new terminals to open on your display.")
+            end
+        end
+    end
+    
+    def tryInAppServer(serverPortPathname)
+        # InAppClient's constructor stops anyone else from reading the .secret file.
+        client = InAppClient.new(serverPortPathname)
+        if ENV["DEBUGGING_P9TERM"]
+            return
+        end
+        # We should start a new instance if the client (this script) is newer than the server (the currently-running instance).
+        # Checking just the modification time of just the script is only an approximation, but it's close enough for users who'll install all the files at once anyway.
+        if FileUtils.uptodate?(serverPortPathname, [__FILE__]) == false
+            return
+        end
+        # We only support the simple "new shell" case.
+        # Allowing the execution of arbitrary commands would be a security hole.
+        # This is, as explained below, simply a performance optimization.
+        # It also stops existing terminals from having their options changed when someone starts a new terminal.
+        # It should also mean that my "runtitan" commands always block, like an xterm would, rather than sometimes exiting immediately.
+        workingDirectory = Dir.getwd()
+        if ARGV.length() == 2 && ARGV[0] == "--working-directory"
+            workingDirectory = ARGV[1]
+        elsif ARGV.empty?() == false
+            return
+        end
+        # See if there's already a server running that can open us a new window.
+        # This lets us emulate the Mac OS behavior when clicking on the Dock icon on Linux (from gnome-panel or whatever).
+        # In particular, using this trick we can open a new window quicker than xterm(1), from the user's point of view.
+        
+        # If you use p9term on two machines, you don't want new terminals to appear arbitrarily on one of them.
+        # (If you call the evergreen script on two machines, by contrast, you are likely to want the files to be opened on just one machine.)
+        # p9term's InAppServer only listens on the loopback address.
+        # If the host running p9term isn't the same as localhost, then we are unlikely to be able to make a connection and should fall back to the unoptimized code path.
+        client.overrideHost("localhost")
+        if client.trySendCommand("newShell #{workingDirectory}") == false
+            return
+        end
+        
+        # Job done, so finish any GNOME startup notification and exit.
+        # We need to do this here because the normal-case code when the existing instance opens a new window won't have the right DESKTOP_STARTUP_ID.
+        desktop_startup_id = ENV['DESKTOP_STARTUP_ID']
+        if desktop_startup_id != nil
+            system("#{@salma_hayek}/.generated/#{target_directory()}/bin/gnome-startup", "stop", desktop_startup_id)
+        end
+        exit(0)
+    end
+    
+    def have_same_content(file1, file2)
+        # Even in 1.9, Ruby's string equality is a memcmp of the underlying byte array.
+        return IO.read(file1) == IO.read(file2)
+    end
+    
+    def selectShellIfNoDefault()
+        if ENV.include?("SHELL")
+            return
+        end
+        # cygwin.bat runs bash --login -i, which behaves differently from bash started as /bin/sh.
+        # In particular, tab completion is disabled in this "posix" mode if "vi" line editing is requested.
+        # Everyone(?) else probably has SHELL=/bin/bash already in the environment.
+        candidateShells = []
+        candidateShells << "/bin/bash"
+        # There couldn't be a Unix without /bin/sh, though POSIX doesn't mandate it.
+        # POSIX explicitly recommends rewriting your shell scripts at install-time by calling getconf(1) and sed(1).
+        # It doesn't mandate locations for them either.
+        # See http://www.opengroup.org/onlinepubs/009695399/utilities/sh.html.
+        candidateShells << "/bin/sh"
+        candidateShells.each() {
+            |candidateShell|
+            # We can't do this test in the Java on Cygwin.
+            if File.executable?(candidateShell)
+                ENV["SHELL"] = candidateShell
+                return
+            end
+        }
+    end
+end
+
+P9Term.new().launch()
