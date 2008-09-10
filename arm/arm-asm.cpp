@@ -327,7 +327,7 @@ public:
 private:
   // FIXME: throw exceptions and use something like InplaceString.
   void writeBytes(const std::string& path, const uint8_t* begin, const uint8_t* end) {
-    int fd = TEMP_FAILURE_RETRY(open(path.c_str(), O_CREAT | O_WRONLY, 0666));
+    int fd = TEMP_FAILURE_RETRY(open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0666));
     if (fd == -1) {
       error("couldn't open output file: " + std::string(strerror(errno)));
     }
