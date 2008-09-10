@@ -72,13 +72,13 @@ static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t 
     const int opCode = (instruction >> 21) & 0xf;
     os << opCodes[opCode];
     disassembleCondition(os, instruction);
-    if ((instruction & (1 << 20)) != 0) {
-      os << "s";
-    }
     const int rd = ((instruction >> 12) & 0xf);
     const int rn = ((instruction >> 16) & 0xf);
     if ((opCode & 0x8) == 0 || opCode == 0xc || opCode == 0xe) {
       // and, eor, sub, rsb, add, adc, sbc, rsc || orr || bic.
+      if ((instruction & (1 << 20)) != 0) {
+        os << "s";
+      }
       os << " r" << rd << ",r" << rn;
     } else if ((opCode & 0xc) == 0x8) {
       // tst, teq, cmp, cmn.
@@ -87,6 +87,9 @@ static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t 
     } else {
       // mov, mvn.
       // FIXME: rn should be 0.
+      if ((instruction & (1 << 20)) != 0) {
+        os << "s";
+      }
       os << " r" << rd;
     }
     if (immediate) {

@@ -219,16 +219,15 @@ public:
         instruction_ |= (mnemonic << 21) | (rd << 12);
       } else if (mnemonic == OP_CMN || mnemonic == OP_CMP ||
                  mnemonic == OP_TEQ || mnemonic == OP_TST) {
-        // (CMN|CMP|TEQ|TST)<cond>S?P? rn,<rhs>
+        // (CMN|CMP|TEQ|TST)<cond>P? rn,<rhs>
         parseCondition(line, 3);
-        parseS(line);
         // FIXME: P?
         trimLeft(line);
         const int rn = parseRegister(line);
         expectComma(line);
         parseRhs(line);
         
-        instruction_ |= (mnemonic << 21) | (rn << 16);
+        instruction_ |= (mnemonic << 21) | (1 << 20) | (rn << 16);
       } else if (mnemonic == M_B || mnemonic == M_BL) {
         // (B|BL)<cond> label
         if (mnemonic == M_BL) {
