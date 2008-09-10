@@ -1,6 +1,6 @@
 CXXFLAGS=-W -Wall -Werror -O2
 
-BINARIES=arm-sim arm-asm arm-dump
+BINARIES=arm-emu arm-asm arm-dump
 
 .PHONY: all
 all: $(BINARIES)
