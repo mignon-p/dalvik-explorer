@@ -140,6 +140,7 @@ enum Mnemonic {
   // FIXME: document that these don't matter.
   M_BL, M_B,
   M_MUL, M_MLA,
+  M_LDR, M_STR,
   M_SWI,
 };
 
@@ -274,6 +275,37 @@ public:
           instruction_ |= (1 << 21) | (rn << 12);
         }
         instruction_ |= (rd << 16) | (rs << 8) | (9 << 4) | (rm << 0);
+      } else if (mnemonic == M_LDR || mnemonic == M_STR) {
+        // (LDR|STR){cond}{B} <dest>,[<base>{,#<imm>}]{!}
+        // (LDR|STR){cond}{B} <dest>,[<base>,{+|-}<off>{,<shift>}]{!}
+        // (LDR|STR){cond}{B} <dest>,<expression>
+        // (LDR|STR){cond}{B} <dest>,[<base>],#<imm>
+        // (LDR|STR){cond}{B} <dest>,[<base>],{+|-}<off>{,<shift>}
+        
+        // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
+        // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
+        parseCondition(line, 3);
+        if (mnemonic == M_LDR) {
+          instruction_ |= (0x2 << 24) | (1 << 20);
+        } else {
+          instruction_ |= (0x3 << 24) | (0 << 20);
+        }
+        parseSuffixAndSetBit(line, 'b', (1 << 22));
+        // FIXME: P == pre-indexed
+        // FIXME: U == positive offset
+        // FIXME: W == write-back/translate
+        trimLeft(line);
+        const int rd = parseRegister(line);
+        instruction_ |= (rd << 12);
+        expectComma(line);
+        // FIXME: implement the other addressing modes.
+        expect(line, '[');
+        const int rn = parseRegister(line);
+        instruction_ |= (rn << 16);
+        expectComma(line);
+        const int rm = parseRegister(line);
+        instruction_ |= (rm << 0);
+        expect(line, ']');
       } else if (mnemonic == M_SWI) {
         parseCondition(line, 3);
         trimLeft(line);
@@ -285,11 +317,6 @@ public:
       }
       
       /*
-       * (LDR|STR){cond}{B} <dest>,[<base>{,#<imm>}]{!}
-       * (LDR|STR){cond}{B} <dest>,[<base>,{+|-}<off>{,<shift>}]{!}
-       * (LDR|STR){cond}{B} <dest>,<expression>
-       * (LDR|STR){cond}{B} <dest>,[<base>],#<imm>
-       * (LDR|STR){cond}{B} <dest>,[<base>],{+|-}<off>{,<shift>}
        * 
        * (LDM|STM){cond}<type1> <base>{!},<registers>{^}
        * (LDM|STM){cond}<type2> <base>{!},<registers>{^}
@@ -389,6 +416,10 @@ private:
       return M_MUL;
     } else if (startsWith(s, "mla")) {
       return M_MLA;
+    } else if (startsWith(s, "ldr")) {
+      return M_LDR;
+    } else if (startsWith(s, "str")) {
+      return M_STR;
     } else if (startsWith(s, "swi")) {
       return M_SWI;
     } else {
@@ -414,8 +445,12 @@ private:
   // Handles the "s" suffix by setting the S bit in the instruction word,
   // causing the instruction to alter the condition codes.
   void parseS(std::string& s) {
-    if (!s.empty() && s[0] == 's') {
-      instruction_ |= (1 << 20);
+    parseSuffixAndSetBit(s, 's', (1 << 20));
+  }
+  
+  void parseSuffixAndSetBit(std::string& s, char suffix, int mask) {
+    if (!s.empty() && s[0] == suffix) {
+      instruction_ |= mask;
       s.erase(0, 1);
     }
   }
@@ -436,8 +471,12 @@ private:
   }
   
   void expectComma(std::string& s) {
-    if (s.empty() || s[0] != ',') {
-      error("expected ','");
+    expect(s, ',');
+  }
+  
+  void expect(std::string& s, char ch) {
+    if (s.empty() || s[0] != ch) {
+      error("expected '" + std::string(ch, 1) + "'");
     }
     s.erase(0, 1);
   }
