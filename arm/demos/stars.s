@@ -2,7 +2,9 @@
 # Outputs 20 '*' characters.
 
   mov r1,42 # character
-  mov r2,20 # loop count
+  # compute a loop count of 20 (just to exercise more instructions)
+  mov r2,5
+  mov r2,r2 lsl 2
 .loop
   mov r0,r1
   swi 0x00

@@ -99,7 +99,18 @@ static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t 
       uint32_t result = (barrel & 0xffffffff) | (barrel >> 32);
       os << "," << result;
     } else {
-      os << ",r" << ((instruction >> 0) & 0xf); // FIXME: apply shift!
+      os << ",r" << ((instruction >> 0) & 0xf);
+      // If there's a shift other than "lsl 0" (which is the preferred way to
+      // assemble no shift), decode it.
+      if ((instruction & 0x00000ff0) != 0) {
+        static const char* shiftMnemonic[] = { "lsl", "lsr", "asr", "ror" };
+        os << " " << shiftMnemonic[(instruction >> 5) & 0x3] << " ";
+        if (((instruction >> 4) & 1) != 0) {
+          os << "r" << ((instruction >> 8) & 0xf);
+        } else {
+          os << ((instruction >> 8) & 0xf);
+        }
+      }
     }
   } else if (high3 == 0x2 || high3 == 0x3) {
     // Single data transfer.

@@ -459,15 +459,46 @@ private:
     if (s.empty()) {
       error("expected immediate or register");
     } else if (isdigit(s[0])) {
+      // Immediate.
+      // xxxx001a aaaSnnnn ddddrrrr bbbbbbbb
       instruction_ |= (1 << 25);
       // FIXME: translate to value and shift!
       // FIXME: check representable!
       // FIXME: automatically translate negative MOVs/CMPs?
       instruction_ |= parseInt(s);
     } else {
+      // Register.
+      // xxxx000a aaaSnnnn ddddcccc 0tttmmmm
       instruction_ |= parseRegister(s);
-      // FIXME: implement register and shift!
+      if (s.empty() || s[0] != ' ') {
+        return;
+      }
+      s.erase(0, 1);
+      if (!parseShift(s)) {
+        error("expected lsl, lsr, asr, or ror");
+      }
+      if (s.empty() || s[0] != ' ') {
+        error("expected shift constant");
+      }
+      s.erase(0, 1);
+      const int c = parseInt(s);
+      if (c > 0xffff) {
+        error("shift constant too large");
+      }
+      instruction_ |= (c << 8);
     }
+  }
+  
+  bool parseShift(std::string& s) {
+    static const char* shifts[] = { "lsl", "lsr", "asr", "ror" };
+    for (int i = 0; i < 4; ++i) {
+      if (startsWith(s, shifts[i])) {
+        s.erase(0, 3);
+        instruction_ |= (i << 5);
+        return true;
+      }
+    }
+    return false;
   }
   
   void expectComma(std::string& s) {

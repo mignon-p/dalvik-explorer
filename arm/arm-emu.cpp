@@ -165,17 +165,48 @@ int main(int argc, char* argv[]) {
             continue;
         }
         
-        if (((instruction >> 26) & 0x3) == 0) {
-            // Data processing instruction.
-            const bool immediate = (instruction >> 25) & 0x1;
+        // The three bits immediately below the condition bits are good
+        // discriminators.
+        const int high3 = (instruction & 0x0e000000) >> 25;
+        if (high3 == 0x5) {
+            // Branches.
+            const bool link = (instruction >> 24) & 0x1; // FIXME: or use 0b1010 and 0b1011 as separate B/BL cases.
+            const uint32_t offset = ((instruction & 0x00ffffff) << 8) >> 8;
+            if (link) {
+                r[lr] = r[pc] & 0x03ffffff;
+            }
+            //printf("branching by %i instructions from %x\n", offset, r[pc]);
+            r[pc] += offset * 4 + 4;
+        } else if ((instruction & 0x0f000000) == 0x0f000000) {
+            // Software interrupt.
+            // xxxx1111 yyyyyyyy yyyyyyyy yyyyyyyy
+            swi(instruction & 0x00ffffff);
+        } else if (high3 == 0x0 || high3 == 0x1) {
+            // Data processing instructions.
+            // xxxx000a aaaSnnnn ddddcccc ctttmmmm  Register form
+            // xxxx001a aaaSnnnn ddddrrrr bbbbbbbb  Immediate form
+            const bool immediate = (high3 == 0x1);
             const int opCode = (instruction >> 21) & 0xf;
             //const bool set_cc = (instruction >> 20) & 0x1;
-            const int rn = (instruction >> 16) & 0xf;
             const int rd = (instruction >> 12) & 0xf;
-            const int op2 = instruction & 0xfff;
+            const int rn = (instruction >> 16) & 0xf;
+            int op2;
+            if (immediate) {
+                op2 = instruction & 0xfff;
+            } else {
+                const int rm = (instruction >> 0) & 0xf;
+                op2 = r[rm];
+                const int shiftType = ((instruction >> 5) & 0x3);
+                if (shiftType == 0x0) {
+                    // lsl
+                    op2 <<= ((instruction >> 8) & 0xf);
+                } else {
+                    panic("unimplemented shift", true);
+                }
+            }
             if (opCode == 0xd) {
                 // MOV.
-                r[rd] = immediate ? op2 : r[op2];
+                r[rd] = op2;
             } else if (opCode == 0xa) {
                 // CMP.
                 int result = (r[rn] - op2);
@@ -195,18 +226,6 @@ int main(int argc, char* argv[]) {
             } else {
                 panic("unknown data processing instruction", true);
             }
-        } else if (((instruction >> 25) & 0x7) == 0x5) {
-            // Branch.
-            const bool link = (instruction >> 24) & 0x1; // FIXME: or use 0b1010 and 0b1011 as separate B/BL cases.
-            const uint32_t offset = ((instruction & 0x00ffffff) << 8) >> 8;
-            if (link) {
-                r[lr] = r[pc] & 0x03ffffff;
-            }
-            //printf("branching by %i instructions from %x\n", offset, r[pc]);
-            r[pc] += offset * 4 + 4;
-        } else if (((instruction >> 24) & 0xf) == 0xf) {
-            // Software interrupt.
-            swi(instruction & 0x00ffffff);
         } else {
             panic("unknown instruction", true);
         }
