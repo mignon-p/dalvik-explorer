@@ -226,7 +226,6 @@ public:
         const int rn = parseRegister(line);
         expectComma(line);
         parseRhs(line);
-        
         instruction_ |= (mnemonic << 21) | (1 << 20) | (rn << 16);
       } else if (mnemonic == M_B || mnemonic == M_BL) {
         // (B|BL)<cond> label
@@ -250,9 +249,8 @@ public:
         
         instruction_ |= (0x5 << 25) | offset;
       } else if (mnemonic == M_MUL || mnemonic == M_MLA) {
-        // FIXME: i'm not sure these registers are right.
-        // MUL<cond>S? rd,rn,rm
-        // MLA<cond>S? rd,rn,rm,rc
+        // MUL<cond>S? rd,rm,rs
+        // MLA<cond>S? rd,rm,rs,rn
         parseCondition(line, 3);
         parseS(line);
         trimLeft(line);
@@ -261,6 +259,9 @@ public:
         const int rm = parseRegister(line);
         expectComma(line);
         const int rs = parseRegister(line);
+        if (rd == rm) {
+          error("destination register and first operand register must differ");
+        }
         if (rd == 15 || rs == 15 || rm == 15) {
           error("can't multiply using r15");
         }
