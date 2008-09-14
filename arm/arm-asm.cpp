@@ -161,205 +161,202 @@ public:
       exit(EXIT_FAILURE);
     }
     
-    int address = 0;
-    std::string line;
-    while (getline(in, line)) {
+    while (getline(in, line_)) {
       ++lineNumber_;
-      
-      const std::string originalLine(line);
-      
-      // Skip empty lines.
-      if (line.empty()) {
-        continue;
-      }
-      
-      // Handle directives.
-      if (line[0] == '.') {
-        error("directive not understood");
-      }
+      originalLine_ = line_;
       
       // Handle labels.
-      if (!isspace(line[0]) && line[0] != '#') {
-        size_t colon = line.find(':');
-        if (colon == std::string::npos) {
-          error("labels must be terminated with ':'");
-        }
-        std::string label(line.substr(0, colon));
-        if (labels_.find(label) != labels_.end()) {
-          error("duplicate definitions of label '" + label + "'");
-        }
-        labels_[label] = address;
-        continue;
-      }
-      
-      // Trim leading whitespace.
-      trimLeft(line);
-      
-      // Skip blank or comment lines.
-      if (line.empty() || line[0] == '#') {
-        continue;
-      }
-      
-      // Assemble this line's instruction.
-      instruction_ = 0;
-      const Mnemonic mnemonic = parseMnemonic(line);
-      if (mnemonic == OP_ADD || mnemonic == OP_ADC || mnemonic == OP_AND ||
-          mnemonic == OP_BIC || mnemonic == OP_EOR || mnemonic == OP_ORR ||
-          mnemonic == OP_RSB || mnemonic == OP_RSC || mnemonic == OP_SBC ||
-          mnemonic == OP_SUB) {
-        // (ADD|ADC|AND|BIC|EOR|ORR|RSB|RSC|SBC|SUB)<cond>S? rd,rn,<rhs>
-        parseCondition(line, 3);
-        parseS(line);
-        trimLeft(line);
-        const int rd = parseRegister(line);
-        expectComma(line);
-        const int rn = parseRegister(line);
-        expectComma(line);
-        parseRhs(line);
-        instruction_ |= (mnemonic << 21) | (rn << 16) | (rd << 12);
-      } else if (mnemonic == OP_MOV || mnemonic == OP_MVN) {
-        // (MOV|MVN)<cond>S? rd,<rhs>
-        parseCondition(line, 3);
-        parseS(line);
-        trimLeft(line);
-        const int rd = parseRegister(line);
-        expectComma(line);
-        parseRhs(line);
-        instruction_ |= (mnemonic << 21) | (rd << 12);
-      } else if (mnemonic == OP_CMN || mnemonic == OP_CMP ||
-                 mnemonic == OP_TEQ || mnemonic == OP_TST) {
-        // (CMN|CMP|TEQ|TST)<cond>P? rn,<rhs>
-        parseCondition(line, 3);
-        // FIXME: P?
-        trimLeft(line);
-        const int rn = parseRegister(line);
-        expectComma(line);
-        parseRhs(line);
-        instruction_ |= (mnemonic << 21) | (1 << 20) | (rn << 16);
-      } else if (mnemonic == M_B || mnemonic == M_BL) {
-        // (B|BL)<cond> label
-        if (mnemonic == M_BL) {
-          instruction_ |= (1 << 24);
-          parseCondition(line, 2);
-        } else {
-          parseCondition(line, 1);
-        }
-        trimLeft(line);
-        
-        Fixup fixup;
-        fixup.address = address;
-        fixup.label = line;
-        line.clear();
-        
-        uint32_t offset = 0;
-        if (!resolveLabel(fixup, offset)) {
-          fixups_.push_back(fixup);
-        }
-        
-        instruction_ |= (0x5 << 25) | offset;
-      } else if (mnemonic == M_MUL || mnemonic == M_MLA) {
-        // MUL<cond>S? rd,rm,rs
-        // MLA<cond>S? rd,rm,rs,rn
-        parseCondition(line, 3);
-        parseS(line);
-        trimLeft(line);
-        const int rd = parseRegister(line);
-        expectComma(line);
-        const int rm = parseRegister(line);
-        expectComma(line);
-        const int rs = parseRegister(line);
-        if (rd == rm) {
-          error("destination register and first operand register must differ");
-        }
-        if (rd == 15 || rs == 15 || rm == 15) {
-          error("can't multiply using r15");
-        }
-        if (mnemonic == M_MLA) {
-          expectComma(line);
-          const int rn = parseRegister(line);
-          if (rn == 15) {
-            error("can't multiply using r15");
-          }
-          instruction_ |= (1 << 21) | (rn << 12);
-        }
-        instruction_ |= (rd << 16) | (rs << 8) | (9 << 4) | (rm << 0);
-      } else if (mnemonic == M_LDR || mnemonic == M_STR) {
-        // (LDR|STR){cond}{B} <dest>,[<base>{,#<imm>}]{!}
-        // (LDR|STR){cond}{B} <dest>,[<base>,{+|-}<off>{,<shift>}]{!}
-        // (LDR|STR){cond}{B} <dest>,<expression>
-        // (LDR|STR){cond}{B} <dest>,[<base>],#<imm>
-        // (LDR|STR){cond}{B} <dest>,[<base>],{+|-}<off>{,<shift>}
-        
-        // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
-        // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
-        parseCondition(line, 3);
-        if (mnemonic == M_LDR) {
-          instruction_ |= (0x2 << 24) | (1 << 20);
-        } else {
-          instruction_ |= (0x3 << 24) | (0 << 20);
-        }
-        parseSuffixAndSetBit(line, 'b', (1 << 22));
-        // FIXME: P == pre-indexed
-        // FIXME: U == positive offset
-        // FIXME: W == write-back/translate
-        trimLeft(line);
-        const int rd = parseRegister(line);
-        instruction_ |= (rd << 12);
-        expectComma(line);
-        // FIXME: implement the other addressing modes.
-        expect(line, '[');
-        const int rn = parseRegister(line);
-        instruction_ |= (rn << 16);
-        expectComma(line);
-        const int rm = parseRegister(line);
-        instruction_ |= (rm << 0);
-        expect(line, ']');
-      } else if (mnemonic == M_SWI) {
-        parseCondition(line, 3);
-        trimLeft(line);
-        const int comment = parseInt(line);
-        // FIXME: check 'comment' fits in 24 bits.
-        instruction_ |= (0xf << 24) | comment;
+      if (!line_.empty() && isalnum(line_[0])) {
+        handleLabel();
       } else {
-        error("internal error: unimplemented mnemonic");
+        // Trim leading whitespace.
+        trimLeft(line_);
+        if (line_.empty() || line_[0] == '#') {
+          // Skip blank or comment lines.
+        } else if (line_[0] == '.') {
+          handleDirective();
+        } else {
+          handleInstruction();
+        }
       }
-      
-      /*
-       * 
-       * (LDM|STM){cond}<type1> <base>{!},<registers>{^}
-       * (LDM|STM){cond}<type2> <base>{!},<registers>{^}
-       * <type1> is F|E A|D
-       * <type2> is I|D B|A
-       * <base> is a register
-       * <registers> is open-brace comma-separated-list close-brace
-       */
-      
-      // The only thing left should be whitespace or an end-of-line comment.
-      trimLeft(line);
-      if (!line.empty() && line[0] != '#') {
-        error("junk at end of line: '" + line + "'");
-      }
-      
-      printf("%4i : 0x%08x : 0x%08x : %s", lineNumber_, address, instruction_, originalLine.c_str());
-      if (!line.empty()) {
-        printf("    --'%s'", line.c_str());
-      }
-      printf("\n");
-      
-      code_.push_back((instruction_ >> 24) & 0xff);
-      code_.push_back((instruction_ >> 16) & 0xff);
-      code_.push_back((instruction_ >> 8) & 0xff);
-      code_.push_back((instruction_ >> 0) & 0xff);
-      
-      address += 4;
     }
     
     fixForwardBranches();
-    
     writeBytes("a.out", &code_[0], &code_[code_.size()]);
   }
   
 private:
+  int address() {
+    return code_.size();
+  }
+  
+  void handleLabel() {
+    size_t colon = line_.find(':');
+    if (colon == std::string::npos) {
+      error("labels must be terminated with ':'");
+    }
+    std::string label(line_.substr(0, colon));
+    if (labels_.find(label) != labels_.end()) {
+      error("duplicate definitions of label '" + label + "'");
+    }
+    labels_[label] = address();
+  }
+  
+  void handleInstruction() {
+    instruction_ = 0;
+    const Mnemonic mnemonic = parseMnemonic(line_);
+    if (mnemonic == OP_ADD || mnemonic == OP_ADC || mnemonic == OP_AND ||
+        mnemonic == OP_BIC || mnemonic == OP_EOR || mnemonic == OP_ORR ||
+        mnemonic == OP_RSB || mnemonic == OP_RSC || mnemonic == OP_SBC ||
+        mnemonic == OP_SUB) {
+      // (ADD|ADC|AND|BIC|EOR|ORR|RSB|RSC|SBC|SUB)<cond>S? rd,rn,<rhs>
+      parseCondition(line_, 3);
+      parseS(line_);
+      trimLeft(line_);
+      const int rd = parseRegister(line_);
+      expectComma(line_);
+      const int rn = parseRegister(line_);
+      expectComma(line_);
+      parseRhs(line_);
+      instruction_ |= (mnemonic << 21) | (rn << 16) | (rd << 12);
+    } else if (mnemonic == OP_MOV || mnemonic == OP_MVN) {
+      // (MOV|MVN)<cond>S? rd,<rhs>
+      parseCondition(line_, 3);
+      parseS(line_);
+      trimLeft(line_);
+      const int rd = parseRegister(line_);
+      expectComma(line_);
+      parseRhs(line_);
+      instruction_ |= (mnemonic << 21) | (rd << 12);
+    } else if (mnemonic == OP_CMN || mnemonic == OP_CMP || mnemonic == OP_TEQ || mnemonic == OP_TST) {
+      // (CMN|CMP|TEQ|TST)<cond>P? rn,<rhs>
+      parseCondition(line_, 3);
+      // FIXME: P?
+      trimLeft(line_);
+      const int rn = parseRegister(line_);
+      expectComma(line_);
+      parseRhs(line_);
+      instruction_ |= (mnemonic << 21) | (1 << 20) | (rn << 16);
+    } else if (mnemonic == M_B || mnemonic == M_BL) {
+      // (B|BL)<cond> label
+      if (mnemonic == M_BL) {
+        instruction_ |= (1 << 24);
+        parseCondition(line_, 2);
+      } else {
+        parseCondition(line_, 1);
+      }
+      trimLeft(line_);
+      
+      Fixup fixup;
+      fixup.address = address();
+      fixup.label = line_;  // FIXME: should be allowed comments after labels.
+      line_.clear();
+      
+      uint32_t offset = 0;
+      if (!resolveLabel(fixup, offset)) {
+        fixups_.push_back(fixup);
+      }
+      
+      instruction_ |= (0x5 << 25) | offset;
+    } else if (mnemonic == M_MUL || mnemonic == M_MLA) {
+      // MUL<cond>S? rd,rm,rs
+      // MLA<cond>S? rd,rm,rs,rn
+      parseCondition(line_, 3);
+      parseS(line_);
+      trimLeft(line_);
+      const int rd = parseRegister(line_);
+      expectComma(line_);
+      const int rm = parseRegister(line_);
+      expectComma(line_);
+      const int rs = parseRegister(line_);
+      if (rd == rm) {
+        error("destination register and first operand register must differ");
+      }
+      if (rd == 15 || rs == 15 || rm == 15) {
+        error("can't multiply using r15");
+      }
+      if (mnemonic == M_MLA) {
+        expectComma(line_);
+        const int rn = parseRegister(line_);
+        if (rn == 15) {
+          error("can't multiply using r15");
+        }
+        instruction_ |= (1 << 21) | (rn << 12);
+      }
+      instruction_ |= (rd << 16) | (rs << 8) | (9 << 4) | (rm << 0);
+    } else if (mnemonic == M_LDR || mnemonic == M_STR) {
+      // (LDR|STR){cond}{B} <dest>,[<base>{,#<imm>}]{!}
+      // (LDR|STR){cond}{B} <dest>,[<base>,{+|-}<off>{,<shift>}]{!}
+      // (LDR|STR){cond}{B} <dest>,<expression>
+      // (LDR|STR){cond}{B} <dest>,[<base>],#<imm>
+      // (LDR|STR){cond}{B} <dest>,[<base>],{+|-}<off>{,<shift>}
+      
+      // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
+      // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
+      parseCondition(line_, 3);
+      if (mnemonic == M_LDR) {
+        instruction_ |= (0x2 << 24) | (1 << 20);
+      } else {
+        instruction_ |= (0x3 << 24) | (0 << 20);
+      }
+      parseSuffixAndSetBit(line_, 'b', (1 << 22));
+      // FIXME: P == pre-indexed
+      // FIXME: U == positive offset
+      // FIXME: W == write-back/translate
+      trimLeft(line_);
+      const int rd = parseRegister(line_);
+      instruction_ |= (rd << 12);
+      expectComma(line_);
+      // FIXME: implement the other addressing modes.
+      expect(line_, '[');
+      const int rn = parseRegister(line_);
+      instruction_ |= (rn << 16);
+      expectComma(line_);
+      const int rm = parseRegister(line_);
+      instruction_ |= (rm << 0);
+      expect(line_, ']');
+    } else if (mnemonic == M_SWI) {
+      parseCondition(line_, 3);
+      trimLeft(line_);
+      const int comment = parseInt(line_);
+      // FIXME: check 'comment' fits in 24 bits.
+      instruction_ |= (0xf << 24) | comment;
+    } else {
+      error("internal error: unimplemented mnemonic");
+    }
+    
+    /*
+     * 
+     * (LDM|STM){cond}<type1> <base>{!},<registers>{^}
+     * (LDM|STM){cond}<type2> <base>{!},<registers>{^}
+     * <type1> is F|E A|D
+     * <type2> is I|D B|A
+     * <base> is a register
+     * <registers> is open-brace comma-separated-list close-brace
+     */
+    
+    // The only thing left should be whitespace or an end-of-line comment.
+    trimLeft(line_);
+    if (!line_.empty() && line_[0] != '#') {
+      error("junk at end of line: '" + line_ + "'");
+    }
+    
+    printf("%4i : 0x%08x : 0x%08x : %s", lineNumber_, address(), instruction_, originalLine_.c_str());
+    if (!line_.empty()) {
+      printf("    --'%s'", line_.c_str());
+    }
+    printf("\n");
+    
+    code_.push_back((instruction_ >> 24) & 0xff);
+    code_.push_back((instruction_ >> 16) & 0xff);
+    code_.push_back((instruction_ >> 8) & 0xff);
+    code_.push_back((instruction_ >> 0) & 0xff);
+  }
+  
+  void handleDirective() {
+    error("directive not understood");
+  }
+  
   // FIXME: throw exceptions and use something like InplaceString.
   void writeBytes(const std::string& path, const uint8_t* begin, const uint8_t* end) {
     int fd = TEMP_FAILURE_RETRY(open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0666));
@@ -554,6 +551,8 @@ private:
   std::string path_;
   
   int lineNumber_;
+  std::string line_;
+  std::string originalLine_;
   
   typedef std::map<std::string, uint32_t> Labels;
   Labels labels_;
