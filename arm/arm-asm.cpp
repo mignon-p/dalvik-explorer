@@ -21,40 +21,6 @@ static bool startsWith(const std::string& s, const std::string& prefix) {
   return true;
 }
 
-enum ConditionCode {
-  COND_EQ, COND_NE, COND_CS, COND_CC,
-  COND_MI, COND_PL, COND_VS, COND_VC,
-  COND_HI, COND_LS, COND_GE, COND_LT,
-  COND_GT, COND_LE, COND_AL, COND_NV,
-};
-
-typedef std::pair<std::string, ConditionCode> Condition;
-typedef std::vector<Condition> Conditions;
-
-static const Conditions& getConditions() {
-  static Conditions conditions;
-  static bool initialized = false;
-  if (!initialized) {
-    conditions.push_back(std::make_pair("al", COND_AL));
-    conditions.push_back(std::make_pair("cc", COND_CC));
-    conditions.push_back(std::make_pair("cs", COND_CS));
-    conditions.push_back(std::make_pair("eq", COND_EQ));
-    conditions.push_back(std::make_pair("ge", COND_GE));
-    conditions.push_back(std::make_pair("gt", COND_GT));
-    conditions.push_back(std::make_pair("hi", COND_HI));
-    conditions.push_back(std::make_pair("ls", COND_LS));
-    conditions.push_back(std::make_pair("lt", COND_LT));
-    conditions.push_back(std::make_pair("mi", COND_MI));
-    conditions.push_back(std::make_pair("ne", COND_NE));
-    conditions.push_back(std::make_pair("nv", COND_NV));
-    conditions.push_back(std::make_pair("pl", COND_PL));
-    conditions.push_back(std::make_pair("vc", COND_VC));
-    conditions.push_back(std::make_pair("vs", COND_VS));
-    initialized = true;
-  }
-  return conditions;
-}
-
 static int indexOf(const char* s, char ch) {
   for (const char* p = s; *p != 0; ++p) {
     if (*p == ch) {
@@ -427,17 +393,19 @@ private:
   
   void parseCondition(int charsToSkip) {
     line_.erase(0, charsToSkip);
-    const Conditions& conditions(getConditions());
-    int result = COND_AL;
-    for (size_t i = 0; i < conditions.size(); ++i) {
-      const Condition& cond(conditions[i]);
-      if (startsWith(line_, cond.first)) {
+    // "al" is the default, and "nv" is deprecated, so we stop when we hit "al".
+    static const char* conditions[] = {
+      "eq", "ne", "cs", "cc", "mi", "pl", "vs", "vc",
+      "hi", "ls", "ge", "lt", "gt", "le", 0, // al, nv.
+    };
+    int condition = 0;
+    for (; conditions[condition]; ++condition) {
+      if (startsWith(line_, conditions[condition])) {
         line_.erase(0, 2);
-        result = cond.second;
         break;
       }
     }
-    instruction_ |= (result << 28);
+    instruction_ |= (condition << 28);
   }
   
   // Handles the "s" suffix by setting the S bit in the instruction word,
