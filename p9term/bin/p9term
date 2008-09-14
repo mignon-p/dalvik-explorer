@@ -21,16 +21,14 @@ class P9Term
     end
     
     def launch0()
-        # Allow different instances to have different options (and logging).
+        # Allow different instances to have different options.
         dot_directory = ENV["P9TERM_DOT_DIRECTORY"]
         if dot_directory == nil
             home = ENV["HOME"]
             dot_directory = "#{home}/.p9term"
         end
-        # Make sure we have a directory for our private files and another for the logs.
-        log_directory = File.join(dot_directory, "logs")
+        # Make sure we have a directory for our private files.
         make_directory(dot_directory, true)
-        make_directory(log_directory, false)
         options_pathname = File.join(dot_directory, "options")
         
         server_port_file_stem = File.join(dot_directory, "p9term-server-port")
@@ -46,12 +44,9 @@ class P9Term
         selectShellIfNoDefault()
         
         invoker = Java.new("p9term", "org/jessies/p9term/P9Term")
-        invoker.log_filename = "#{log_directory}/p9term-#{$$}.log"
         # The "user.home" system property won't necessarily point at $HOME.
-        # We arranged above for a log directory to be available, so we need to stick to it.
         # (We didn't used to be able to getenv("HOME") from Java on Cygwin.)
         invoker.add_pathname_property("org.jessies.p9term.dotDirectory", dot_directory)
-        invoker.add_pathname_property("org.jessies.p9term.logDirectory", log_directory)
         invoker.add_pathname_property("org.jessies.p9term.serverPortFileName", server_port_file_name)
         invoker.add_pathname_property("org.jessies.p9term.optionsFile", options_pathname)
         
@@ -86,7 +81,7 @@ class P9Term
                 show_alert("p9term had trouble starting.", "p9term was unable to create the directory \"#{pathname}\".")
                 exit(1)
             elsif directory_safe == false
-                show_alert("p9term had trouble starting.", "p9term was unable to change the permissions on \"#{pathname}\" to make it safe. Others may be able to read your logs or cause new terminals to open on your display.")
+                show_alert("p9term had trouble starting.", "p9term was unable to change the permissions on \"#{pathname}\" to make it safe. Others may be able to cause new terminals to open on your display.")
             end
         end
     end
