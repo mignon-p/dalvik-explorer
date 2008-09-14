@@ -1,0 +1,10 @@
+#!/usr/bin/ruby -w
+
+# Cope with symbolic links to this script.
+require "pathname.rb"
+app_root = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
+salma_hayek = Pathname.new("#{app_root}/../salma-hayek").realpath()
+require "#{salma_hayek}/bin/invoke-java.rb"
+
+invoker = Java.new("LittleHelper", "LittleHelper")
+invoker.invoke()
