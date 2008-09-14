@@ -192,6 +192,7 @@ private:
       error("duplicate definitions of label '" + label + "'");
     }
     labels_[label] = address();
+    // FIXME: check there's only whitespace or comment after a label.
   }
   
   void handleInstruction() {
@@ -206,10 +207,10 @@ private:
       parseS();
       trimLeft();
       const int rd = parseRegister(line_);
-      expectComma();
+      expect(',');
       const int rn = parseRegister(line_);
-      expectComma();
-      parseRhs(line_);
+      expect(',');
+      parseRhs();
       instruction_ |= (mnemonic << 21) | (rn << 16) | (rd << 12);
     } else if (mnemonic == OP_MOV || mnemonic == OP_MVN) {
       // (MOV|MVN)<cond>S? rd,<rhs>
@@ -217,8 +218,8 @@ private:
       parseS();
       trimLeft();
       const int rd = parseRegister(line_);
-      expectComma();
-      parseRhs(line_);
+      expect(',');
+      parseRhs();
       instruction_ |= (mnemonic << 21) | (rd << 12);
     } else if (mnemonic == OP_CMN || mnemonic == OP_CMP || mnemonic == OP_TEQ || mnemonic == OP_TST) {
       // (CMN|CMP|TEQ|TST)<cond>P? rn,<rhs>
@@ -226,8 +227,8 @@ private:
       // FIXME: P?
       trimLeft();
       const int rn = parseRegister(line_);
-      expectComma();
-      parseRhs(line_);
+      expect(',');
+      parseRhs();
       instruction_ |= (mnemonic << 21) | (1 << 20) | (rn << 16);
     } else if (mnemonic == M_B || mnemonic == M_BL) {
       // (B|BL)<cond> label
@@ -257,9 +258,9 @@ private:
       parseS();
       trimLeft();
       const int rd = parseRegister(line_);
-      expectComma();
+      expect(',');
       const int rm = parseRegister(line_);
-      expectComma();
+      expect(',');
       const int rs = parseRegister(line_);
       if (rd == rm) {
         error("destination register and first operand register must differ");
@@ -268,7 +269,7 @@ private:
         error("can't multiply using r15");
       }
       if (mnemonic == M_MLA) {
-        expectComma();
+        expect(',');
         const int rn = parseRegister(line_);
         if (rn == 15) {
           error("can't multiply using r15");
@@ -291,22 +292,22 @@ private:
       } else {
         instruction_ |= (0x3 << 24) | (0 << 20);
       }
-      parseSuffixAndSetBit(line_, 'b', (1 << 22));
+      parseSuffixAndSetBit('b', (1 << 22));
       // FIXME: P == pre-indexed
       // FIXME: U == positive offset
       // FIXME: W == write-back/translate
       trimLeft();
       const int rd = parseRegister(line_);
       instruction_ |= (rd << 12);
-      expectComma();
+      expect(',');
       // FIXME: implement the other addressing modes.
-      expect(line_, '[');
+      expect('[');
       const int rn = parseRegister(line_);
       instruction_ |= (rn << 16);
-      expectComma();
+      expect(',');
       const int rm = parseRegister(line_);
       instruction_ |= (rm << 0);
-      expect(line_, ']');
+      expect(']');
     } else if (mnemonic == M_SWI) {
       parseCondition(3);
       trimLeft();
@@ -442,43 +443,43 @@ private:
   // Handles the "s" suffix by setting the S bit in the instruction word,
   // causing the instruction to alter the condition codes.
   void parseS() {
-    parseSuffixAndSetBit(line_, 's', (1 << 20));
+    parseSuffixAndSetBit('s', (1 << 20));
   }
   
-  void parseSuffixAndSetBit(std::string& s, char suffix, int mask) {
-    if (!s.empty() && s[0] == suffix) {
+  void parseSuffixAndSetBit(char suffix, int mask) {
+    if (!line_.empty() && line_[0] == suffix) {
       instruction_ |= mask;
-      s.erase(0, 1);
+      line_.erase(0, 1);
     }
   }
   
-  void parseRhs(std::string& s) {
-    if (s.empty()) {
+  void parseRhs() {
+    if (line_.empty()) {
       error("expected immediate or register");
-    } else if (isdigit(s[0])) {
+    } else if (isdigit(line_[0])) {
       // Immediate.
       // xxxx001a aaaSnnnn ddddrrrr bbbbbbbb
       instruction_ |= (1 << 25);
       // FIXME: translate to value and shift!
       // FIXME: check representable!
       // FIXME: automatically translate negative MOVs/CMPs?
-      instruction_ |= parseInt(s);
+      instruction_ |= parseInt(line_);
     } else {
       // Register.
       // xxxx000a aaaSnnnn ddddcccc 0tttmmmm
-      instruction_ |= parseRegister(s);
-      if (s.empty() || s[0] != ' ') {
+      instruction_ |= parseRegister(line_);
+      if (line_.empty() || line_[0] != ' ') {
         return;
       }
-      s.erase(0, 1);
-      if (!parseShift(s)) {
+      line_.erase(0, 1);
+      if (!parseShift(line_)) {
         error("expected lsl, lsr, asr, or ror");
       }
-      if (s.empty() || s[0] != ' ') {
+      if (line_.empty() || line_[0] != ' ') {
         error("expected shift constant");
       }
-      s.erase(0, 1);
-      const int c = parseInt(s);
+      line_.erase(0, 1);
+      const int c = parseInt(line_);
       if (c > 0xffff) {
         error("shift constant too large");
       }
@@ -498,15 +499,11 @@ private:
     return false;
   }
   
-  void expectComma() {
-    expect(line_, ',');
-  }
-  
-  void expect(std::string& s, char ch) {
-    if (s.empty() || s[0] != ch) {
+  void expect(char ch) {
+    if (line_.empty() || line_[0] != ch) {
       error("expected '" + std::string(ch, 1) + "'");
     }
-    s.erase(0, 1);
+    line_.erase(0, 1);
   }
   
   void trimLeft() {
