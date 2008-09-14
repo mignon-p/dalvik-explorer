@@ -438,7 +438,7 @@ private:
         return;
       }
       line_.erase(0, 1);
-      if (!parseShift(line_)) {
+      if (!parseShift()) {
         error("expected lsl, lsr, asr, or ror");
       }
       if (line_.empty() || line_[0] != ' ') {
@@ -453,11 +453,11 @@ private:
     }
   }
   
-  bool parseShift(std::string& s) {
+  bool parseShift() {
     static const char* shifts[] = { "lsl", "lsr", "asr", "ror" };
     for (int i = 0; i < 4; ++i) {
-      if (startsWith(s, shifts[i])) {
-        s.erase(0, 3);
+      if (startsWith(line_, shifts[i])) {
+        line_.erase(0, 3);
         instruction_ |= (i << 5);
         return true;
       }
