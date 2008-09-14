@@ -21,14 +21,6 @@ static bool startsWith(const std::string& s, const std::string& prefix) {
   return true;
 }
 
-static void trimLeft(std::string& s) {
-  uint i = 0;
-  while (i < s.length() && (s[i] == ' ' || s[i] == '\t')) {
-    ++i;
-  }
-  s.erase(0, i);
-}
-
 enum ConditionCode {
   COND_EQ, COND_NE, COND_CS, COND_CC,
   COND_MI, COND_PL, COND_VS, COND_VC,
@@ -170,7 +162,7 @@ public:
         handleLabel();
       } else {
         // Trim leading whitespace.
-        trimLeft(line_);
+        trimLeft();
         if (line_.empty() || line_[0] == '#') {
           // Skip blank or comment lines.
         } else if (line_[0] == '.') {
@@ -210,42 +202,42 @@ private:
         mnemonic == OP_RSB || mnemonic == OP_RSC || mnemonic == OP_SBC ||
         mnemonic == OP_SUB) {
       // (ADD|ADC|AND|BIC|EOR|ORR|RSB|RSC|SBC|SUB)<cond>S? rd,rn,<rhs>
-      parseCondition(line_, 3);
-      parseS(line_);
-      trimLeft(line_);
+      parseCondition(3);
+      parseS();
+      trimLeft();
       const int rd = parseRegister(line_);
-      expectComma(line_);
+      expectComma();
       const int rn = parseRegister(line_);
-      expectComma(line_);
+      expectComma();
       parseRhs(line_);
       instruction_ |= (mnemonic << 21) | (rn << 16) | (rd << 12);
     } else if (mnemonic == OP_MOV || mnemonic == OP_MVN) {
       // (MOV|MVN)<cond>S? rd,<rhs>
-      parseCondition(line_, 3);
-      parseS(line_);
-      trimLeft(line_);
+      parseCondition(3);
+      parseS();
+      trimLeft();
       const int rd = parseRegister(line_);
-      expectComma(line_);
+      expectComma();
       parseRhs(line_);
       instruction_ |= (mnemonic << 21) | (rd << 12);
     } else if (mnemonic == OP_CMN || mnemonic == OP_CMP || mnemonic == OP_TEQ || mnemonic == OP_TST) {
       // (CMN|CMP|TEQ|TST)<cond>P? rn,<rhs>
-      parseCondition(line_, 3);
+      parseCondition(3);
       // FIXME: P?
-      trimLeft(line_);
+      trimLeft();
       const int rn = parseRegister(line_);
-      expectComma(line_);
+      expectComma();
       parseRhs(line_);
       instruction_ |= (mnemonic << 21) | (1 << 20) | (rn << 16);
     } else if (mnemonic == M_B || mnemonic == M_BL) {
       // (B|BL)<cond> label
       if (mnemonic == M_BL) {
         instruction_ |= (1 << 24);
-        parseCondition(line_, 2);
+        parseCondition(2);
       } else {
-        parseCondition(line_, 1);
+        parseCondition(1);
       }
-      trimLeft(line_);
+      trimLeft();
       
       Fixup fixup;
       fixup.address = address();
@@ -261,13 +253,13 @@ private:
     } else if (mnemonic == M_MUL || mnemonic == M_MLA) {
       // MUL<cond>S? rd,rm,rs
       // MLA<cond>S? rd,rm,rs,rn
-      parseCondition(line_, 3);
-      parseS(line_);
-      trimLeft(line_);
+      parseCondition(3);
+      parseS();
+      trimLeft();
       const int rd = parseRegister(line_);
-      expectComma(line_);
+      expectComma();
       const int rm = parseRegister(line_);
-      expectComma(line_);
+      expectComma();
       const int rs = parseRegister(line_);
       if (rd == rm) {
         error("destination register and first operand register must differ");
@@ -276,7 +268,7 @@ private:
         error("can't multiply using r15");
       }
       if (mnemonic == M_MLA) {
-        expectComma(line_);
+        expectComma();
         const int rn = parseRegister(line_);
         if (rn == 15) {
           error("can't multiply using r15");
@@ -293,7 +285,7 @@ private:
       
       // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
       // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
-      parseCondition(line_, 3);
+      parseCondition(3);
       if (mnemonic == M_LDR) {
         instruction_ |= (0x2 << 24) | (1 << 20);
       } else {
@@ -303,21 +295,21 @@ private:
       // FIXME: P == pre-indexed
       // FIXME: U == positive offset
       // FIXME: W == write-back/translate
-      trimLeft(line_);
+      trimLeft();
       const int rd = parseRegister(line_);
       instruction_ |= (rd << 12);
-      expectComma(line_);
+      expectComma();
       // FIXME: implement the other addressing modes.
       expect(line_, '[');
       const int rn = parseRegister(line_);
       instruction_ |= (rn << 16);
-      expectComma(line_);
+      expectComma();
       const int rm = parseRegister(line_);
       instruction_ |= (rm << 0);
       expect(line_, ']');
     } else if (mnemonic == M_SWI) {
-      parseCondition(line_, 3);
-      trimLeft(line_);
+      parseCondition(3);
+      trimLeft();
       const int comment = parseInt(line_);
       // FIXME: check 'comment' fits in 24 bits.
       instruction_ |= (0xf << 24) | comment;
@@ -336,7 +328,7 @@ private:
      */
     
     // The only thing left should be whitespace or an end-of-line comment.
-    trimLeft(line_);
+    trimLeft();
     if (!line_.empty() && line_[0] != '#') {
       error("junk at end of line: '" + line_ + "'");
     }
@@ -432,14 +424,14 @@ private:
     }
   }
   
-  void parseCondition(std::string& s, int charsToSkip) {
-    s.erase(0, charsToSkip);
+  void parseCondition(int charsToSkip) {
+    line_.erase(0, charsToSkip);
     const Conditions& conditions(getConditions());
     int result = COND_AL;
     for (size_t i = 0; i < conditions.size(); ++i) {
       const Condition& cond(conditions[i]);
-      if (startsWith(s, cond.first)) {
-        s.erase(0, 2);
+      if (startsWith(line_, cond.first)) {
+        line_.erase(0, 2);
         result = cond.second;
         break;
       }
@@ -449,8 +441,8 @@ private:
   
   // Handles the "s" suffix by setting the S bit in the instruction word,
   // causing the instruction to alter the condition codes.
-  void parseS(std::string& s) {
-    parseSuffixAndSetBit(s, 's', (1 << 20));
+  void parseS() {
+    parseSuffixAndSetBit(line_, 's', (1 << 20));
   }
   
   void parseSuffixAndSetBit(std::string& s, char suffix, int mask) {
@@ -506,8 +498,8 @@ private:
     return false;
   }
   
-  void expectComma(std::string& s) {
-    expect(s, ',');
+  void expectComma() {
+    expect(line_, ',');
   }
   
   void expect(std::string& s, char ch) {
@@ -515,6 +507,14 @@ private:
       error("expected '" + std::string(ch, 1) + "'");
     }
     s.erase(0, 1);
+  }
+  
+  void trimLeft() {
+    uint i = 0;
+    while (i < line_.length() && (line_[i] == ' ' || line_[i] == '\t')) {
+      ++i;
+    }
+    line_.erase(0, i);
   }
   
   bool resolveLabel(const Fixup& fixup, uint32_t& offset) {
