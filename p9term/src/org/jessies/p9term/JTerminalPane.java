@@ -205,10 +205,6 @@ public class JTerminalPane extends JPanel {
         return control;
     }
     
-    public LogWriter getLogWriter() {
-        return control.getLogWriter();
-    }
-    
     public boolean shouldHoldOnExit(int status) {
         // bash (and probably other shells) return as their own exit status that of the last command executed.
         // The user will already have seen any failure in a shell window, so we ignore them.
@@ -626,7 +622,6 @@ public class JTerminalPane extends JPanel {
     
     public void doCloseAction() {
         destroyProcess();
-        getLogWriter().close();
         getTerminalFrame().closeTerminalPane(this);
     }
     
