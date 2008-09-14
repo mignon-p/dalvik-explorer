@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-static bool startsWith(const std::string& s, const char* prefix, size_t prefixLength) {
+static bool startsWith(const char* s, const char* prefix, size_t prefixLength) {
   int charsLeft = prefixLength;
   int i = 0;
   while (--charsLeft >= 0) {
@@ -62,17 +62,17 @@ public:
     
     while (getline(in, line_)) {
       ++lineNumber_;
-      originalLine_ = line_;
+      p_ = line_.c_str();
       
       // Handle labels.
-      if (!line_.empty() && isalnum(line_[0])) {
+      if (isalnum(*p_)) {
         handleLabel();
       } else {
         // Trim leading whitespace.
         trimLeft();
-        if (line_.empty() || line_[0] == '#') {
+        if (*p_ == 0 || *p_ == '#') {
           // Skip blank or comment lines.
-        } else if (line_[0] == '.') {
+        } else if (*p_ == '.') {
           handleDirective();
         } else {
           handleInstruction();
@@ -90,15 +90,17 @@ private:
   }
   
   void handleLabel() {
-    size_t colon = line_.find(':');
-    if (colon == std::string::npos) {
+    const char* colon = strchr(p_, ':');
+    if (colon == 0) {
       error("labels must be terminated with ':'");
     }
-    std::string label(line_.substr(0, colon));
+    std::string label(p_, colon);
     if (labels_.find(label) != labels_.end()) {
       error("duplicate definitions of label '" + label + "'");
     }
     labels_[label] = address();
+    p_ = colon;
+    expect(':');
     // FIXME: check there's only whitespace or comment after a label.
   }
   
@@ -147,10 +149,16 @@ private:
       }
       trimLeft();
       
+      const char* labelStart = p_;
+      const char* labelEnd = labelStart + 1;
+      while (isalnum(*labelEnd)) {
+        ++labelEnd;
+      }
+      p_ = labelEnd;
+      
       Fixup fixup;
       fixup.address = address();
-      fixup.label = line_;  // FIXME: should be allowed comments after labels.
-      line_.clear();
+      fixup.label = std::string(labelStart, labelEnd);
       
       uint32_t offset = 0;
       if (!resolveLabel(fixup, offset)) {
@@ -237,15 +245,12 @@ private:
     
     // The only thing left should be whitespace or an end-of-line comment.
     trimLeft();
-    if (!line_.empty() && line_[0] != '#') {
-      error("junk at end of line: '" + line_ + "'");
+    if (*p_ != 0 && *p_ != '#') {
+      error("junk at end of line: '" + std::string(p_) + "'");
     }
     
-    printf("%4i : 0x%08x : 0x%08x : %s", lineNumber_, address(), instruction_, originalLine_.c_str());
-    if (!line_.empty()) {
-      printf("    --'%s'", line_.c_str());
-    }
-    printf("\n");
+    printf("%4i : 0x%08x : 0x%08x : %s\n",
+           lineNumber_, address(), instruction_, line_.c_str());
     
     code_.push_back((instruction_ >> 24) & 0xff);
     code_.push_back((instruction_ >> 16) & 0xff);
@@ -281,51 +286,51 @@ private:
   }
   
   Mnemonic parseMnemonic() {
-    if (startsWith(line_, "and", 3)) {
+    if (startsWith(p_, "and", 3)) {
       return OP_AND;
-    } else if (startsWith(line_, "eor", 3)) {
+    } else if (startsWith(p_, "eor", 3)) {
       return OP_EOR;
-    } else if (startsWith(line_, "sub", 3)) {
+    } else if (startsWith(p_, "sub", 3)) {
       return OP_SUB;
-    } else if (startsWith(line_, "rsb", 3)) {
+    } else if (startsWith(p_, "rsb", 3)) {
       return OP_RSB;
-    } else if (startsWith(line_, "add", 3)) {
+    } else if (startsWith(p_, "add", 3)) {
       return OP_ADD;
-    } else if (startsWith(line_, "adc", 3)) {
+    } else if (startsWith(p_, "adc", 3)) {
       return OP_ADC;
-    } else if (startsWith(line_, "sbc", 3)) {
+    } else if (startsWith(p_, "sbc", 3)) {
       return OP_SBC;
-    } else if (startsWith(line_, "rsc", 3)) {
+    } else if (startsWith(p_, "rsc", 3)) {
       return OP_RSC;
-    } else if (startsWith(line_, "tst", 3)) {
+    } else if (startsWith(p_, "tst", 3)) {
       return OP_TST;
-    } else if (startsWith(line_, "teq", 3)) {
+    } else if (startsWith(p_, "teq", 3)) {
       return OP_TEQ;
-    } else if (startsWith(line_, "cmp", 3)) {
+    } else if (startsWith(p_, "cmp", 3)) {
       return OP_CMP;
-    } else if (startsWith(line_, "cmn", 3)) {
+    } else if (startsWith(p_, "cmn", 3)) {
       return OP_CMN;
-    } else if (startsWith(line_, "orr", 3)) {
+    } else if (startsWith(p_, "orr", 3)) {
       return OP_ORR;
-    } else if (startsWith(line_, "mov", 3)) {
+    } else if (startsWith(p_, "mov", 3)) {
       return OP_MOV;
-    } else if (startsWith(line_, "bic", 3)) {
+    } else if (startsWith(p_, "bic", 3)) {
       return OP_BIC;
-    } else if (startsWith(line_, "mvn", 3)) {
+    } else if (startsWith(p_, "mvn", 3)) {
       return OP_MVN;
-    } else if (startsWith(line_, "bl", 2)) {
+    } else if (startsWith(p_, "bl", 2)) {
       return M_BL;
-    } else if (startsWith(line_, "b", 1)) {
+    } else if (startsWith(p_, "b", 1)) {
       return M_B;
-    } else if (startsWith(line_, "mul", 3)) {
+    } else if (startsWith(p_, "mul", 3)) {
       return M_MUL;
-    } else if (startsWith(line_, "mla", 3)) {
+    } else if (startsWith(p_, "mla", 3)) {
       return M_MLA;
-    } else if (startsWith(line_, "ldr", 3)) {
+    } else if (startsWith(p_, "ldr", 3)) {
       return M_LDR;
-    } else if (startsWith(line_, "str", 3)) {
+    } else if (startsWith(p_, "str", 3)) {
       return M_STR;
-    } else if (startsWith(line_, "swi", 3)) {
+    } else if (startsWith(p_, "swi", 3)) {
       return M_SWI;
     } else {
       error("unknown mnemonic");
@@ -333,7 +338,7 @@ private:
   }
   
   void parseCondition(int charsToSkip) {
-    line_.erase(0, charsToSkip);
+    p_ += charsToSkip;
     // "al" is the default, and "nv" is deprecated, so we stop when we hit "al".
     static const char* conditions[] = {
       "eq", "ne", "cs", "cc", "mi", "pl", "vs", "vc",
@@ -341,8 +346,8 @@ private:
     };
     int condition = 0;
     for (; conditions[condition]; ++condition) {
-      if (startsWith(line_, conditions[condition], 2)) {
-        line_.erase(0, 2);
+      if (startsWith(p_, conditions[condition], 2)) {
+        p_ += 2;
         break;
       }
     }
@@ -356,17 +361,17 @@ private:
   }
   
   void parseSuffixAndSetBit(char suffix, int mask) {
-    if (!line_.empty() && line_[0] == suffix) {
+    if (*p_ == suffix) {
       instruction_ |= mask;
-      line_.erase(0, 1);
+      ++p_;
     }
   }
   
   // Parses a register name, either a numbered name r0-r15, or one of the
   // special names "sp", "lr", or "pc".
   int parseRegister() {
-    if (line_[0] == 'r') {
-      line_.erase(0, 1);
+    if (*p_ == 'r') {
+      ++p_;
       // FIXME: it's a bit weird that you can say r0b1101 or r0xf and so on ;-)
       int reg = parseInt();
       if (reg > 15) {
@@ -374,14 +379,14 @@ private:
         exit(EXIT_FAILURE);
       }
       return reg;
-    } else if (startsWith(line_, "sp", 2)) {
-      line_.erase(0, 2);
+    } else if (startsWith(p_, "sp", 2)) {
+      p_ += 2;
       return 13;
-    } else if (startsWith(line_, "lr", 2)) {
-      line_.erase(0, 2);
+    } else if (startsWith(p_, "lr", 2)) {
+      p_ += 2;
       return 14;
-    } else if (startsWith(line_, "pc", 2)) {
-      line_.erase(0, 2);
+    } else if (startsWith(p_, "pc", 2)) {
+      p_ += 2;
       return 15;
     } else {
       std::cerr << "expected register!\n";
@@ -390,9 +395,9 @@ private:
   }
   
   void parseRhs() {
-    if (line_.empty()) {
+    if (*p_ == 0) {
       error("expected immediate or register");
-    } else if (isdigit(line_[0])) {
+    } else if (isdigit(*p_)) {
       // Immediate.
       // xxxx001a aaaSnnnn ddddrrrr bbbbbbbb
       instruction_ |= (1 << 25);
@@ -404,17 +409,16 @@ private:
       // Register.
       // xxxx000a aaaSnnnn ddddcccc 0tttmmmm
       instruction_ |= parseRegister();
-      if (line_.empty() || line_[0] != ' ') {
+      if (*p_ != ' ') {
         return;
       }
-      line_.erase(0, 1);
+      ++p_;
       if (!parseShift()) {
         error("expected lsl, lsr, asr, or ror");
       }
-      if (line_.empty() || line_[0] != ' ') {
+      if (*p_++ != ' ') {
         error("expected shift constant");
       }
-      line_.erase(0, 1);
       const int c = parseInt();
       if (c > 0xffff) {
         error("shift constant too large");
@@ -426,8 +430,8 @@ private:
   bool parseShift() {
     static const char* shifts[] = { "lsl", "lsr", "asr", "ror" };
     for (int i = 0; i < 4; ++i) {
-      if (startsWith(line_, shifts[i], 3)) {
-        line_.erase(0, 3);
+      if (startsWith(p_, shifts[i], 3)) {
+        p_ += 3;
         instruction_ |= (i << 5);
         return true;
       }
@@ -440,42 +444,39 @@ private:
   int parseInt() {
     int base = 10;
     const char* digits = "0123456789";
-    if (startsWith(line_, "0x", 2)) {
-      line_.erase(0, 2);
+    if (startsWith(p_, "0x", 2)) {
+      p_ += 2;
       base = 16;
       digits = "0123456789abcdef";
-    } else if (startsWith(line_, "0o", 2)) {
-      line_.erase(0, 2);
+    } else if (startsWith(p_, "0o", 2)) {
+      p_ += 2;
       base = 8;
       digits = "01234567";
-    } else if (startsWith(line_, "0b", 2)) {
-      line_.erase(0, 2);
+    } else if (startsWith(p_, "0b", 2)) {
+      p_ += 2;
       base = 2;
       digits = "01";
     }
     // FIXME: support character literals like 'c', too?
     int result = 0;
     int digit;
-    while ((digit = indexOf(digits, line_[0])) != -1) {
+    while ((digit = indexOf(digits, *p_)) != -1) {
       result = (result * base) + digit;
-      line_.erase(0, 1);
+      ++p_;
     }
     return result;
   }
   
   void expect(char ch) {
-    if (line_.empty() || line_[0] != ch) {
+    if (*p_++ != ch) {
       error("expected '" + std::string(ch, 1) + "'");
     }
-    line_.erase(0, 1);
   }
   
   void trimLeft() {
-    uint i = 0;
-    while (i < line_.length() && (line_[i] == ' ' || line_[i] == '\t')) {
-      ++i;
+    while (isspace(*p_)) {
+      ++p_;
     }
-    line_.erase(0, i);
   }
   
   bool resolveLabel(const Fixup& fixup, uint32_t& offset) {
@@ -513,7 +514,7 @@ private:
   
   int lineNumber_;
   std::string line_;
-  std::string originalLine_;
+  const char* p_;
   
   typedef std::map<std::string, uint32_t> Labels;
   Labels labels_;
