@@ -10,10 +10,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-static bool startsWith(const std::string& s, const std::string& prefix) {
-  int prefixLength = prefix.length();
+static bool startsWith(const std::string& s, const char* prefix, size_t prefixLength) {
+  int charsLeft = prefixLength;
   int i = 0;
-  while (--prefixLength >= 0) {
+  while (--charsLeft >= 0) {
     if (s[i] != prefix[i++]) {
       return false;
     }
@@ -37,15 +37,15 @@ static int indexOf(const char* s, char ch) {
 static int parseInt(std::string& s) {
   int base = 10;
   const char* digits = "0123456789";
-  if (startsWith(s, "0x")) {
+  if (startsWith(s, "0x", 2)) {
     s.erase(0, 2);
     base = 16;
     digits = "0123456789abcdef";
-  } else if (startsWith(s, "0o")) {
+  } else if (startsWith(s, "0o", 2)) {
     s.erase(0, 2);
     base = 8;
     digits = "01234567";
-  } else if (startsWith(s, "0b")) {
+  } else if (startsWith(s, "0b", 2)) {
     s.erase(0, 2);
     base = 2;
     digits = "01";
@@ -134,7 +134,7 @@ private:
   
   void handleInstruction() {
     instruction_ = 0;
-    const Mnemonic mnemonic = parseMnemonic(line_);
+    const Mnemonic mnemonic = parseMnemonic();
     if (mnemonic == OP_ADD || mnemonic == OP_ADC || mnemonic == OP_AND ||
         mnemonic == OP_BIC || mnemonic == OP_EOR || mnemonic == OP_ORR ||
         mnemonic == OP_RSB || mnemonic == OP_RSC || mnemonic == OP_SBC ||
@@ -310,52 +310,52 @@ private:
     }
   }
   
-  Mnemonic parseMnemonic(std::string& s) {
-    if (startsWith(s, "and")) {
+  Mnemonic parseMnemonic() {
+    if (startsWith(line_, "and", 3)) {
       return OP_AND;
-    } else if (startsWith(s, "eor")) {
+    } else if (startsWith(line_, "eor", 3)) {
       return OP_EOR;
-    } else if (startsWith(s, "sub")) {
+    } else if (startsWith(line_, "sub", 3)) {
       return OP_SUB;
-    } else if (startsWith(s, "rsb")) {
+    } else if (startsWith(line_, "rsb", 3)) {
       return OP_RSB;
-    } else if (startsWith(s, "add")) {
+    } else if (startsWith(line_, "add", 3)) {
       return OP_ADD;
-    } else if (startsWith(s, "adc")) {
+    } else if (startsWith(line_, "adc", 3)) {
       return OP_ADC;
-    } else if (startsWith(s, "sbc")) {
+    } else if (startsWith(line_, "sbc", 3)) {
       return OP_SBC;
-    } else if (startsWith(s, "rsc")) {
+    } else if (startsWith(line_, "rsc", 3)) {
       return OP_RSC;
-    } else if (startsWith(s, "tst")) {
+    } else if (startsWith(line_, "tst", 3)) {
       return OP_TST;
-    } else if (startsWith(s, "teq")) {
+    } else if (startsWith(line_, "teq", 3)) {
       return OP_TEQ;
-    } else if (startsWith(s, "cmp")) {
+    } else if (startsWith(line_, "cmp", 3)) {
       return OP_CMP;
-    } else if (startsWith(s, "cmn")) {
+    } else if (startsWith(line_, "cmn", 3)) {
       return OP_CMN;
-    } else if (startsWith(s, "orr")) {
+    } else if (startsWith(line_, "orr", 3)) {
       return OP_ORR;
-    } else if (startsWith(s, "mov")) {
+    } else if (startsWith(line_, "mov", 3)) {
       return OP_MOV;
-    } else if (startsWith(s, "bic")) {
+    } else if (startsWith(line_, "bic", 3)) {
       return OP_BIC;
-    } else if (startsWith(s, "mvn")) {
+    } else if (startsWith(line_, "mvn", 3)) {
       return OP_MVN;
-    } else if (startsWith(s, "bl")) {
+    } else if (startsWith(line_, "bl", 2)) {
       return M_BL;
-    } else if (startsWith(s, "b")) {
+    } else if (startsWith(line_, "b", 1)) {
       return M_B;
-    } else if (startsWith(s, "mul")) {
+    } else if (startsWith(line_, "mul", 3)) {
       return M_MUL;
-    } else if (startsWith(s, "mla")) {
+    } else if (startsWith(line_, "mla", 3)) {
       return M_MLA;
-    } else if (startsWith(s, "ldr")) {
+    } else if (startsWith(line_, "ldr", 3)) {
       return M_LDR;
-    } else if (startsWith(s, "str")) {
+    } else if (startsWith(line_, "str", 3)) {
       return M_STR;
-    } else if (startsWith(s, "swi")) {
+    } else if (startsWith(line_, "swi", 3)) {
       return M_SWI;
     } else {
       error("unknown mnemonic");
@@ -371,7 +371,7 @@ private:
     };
     int condition = 0;
     for (; conditions[condition]; ++condition) {
-      if (startsWith(line_, conditions[condition])) {
+      if (startsWith(line_, conditions[condition], 2)) {
         line_.erase(0, 2);
         break;
       }
@@ -404,13 +404,13 @@ private:
         exit(EXIT_FAILURE);
       }
       return reg;
-    } else if (startsWith(line_, "sp")) {
+    } else if (startsWith(line_, "sp", 2)) {
       line_.erase(0, 2);
       return 13;
-    } else if (startsWith(line_, "lr")) {
+    } else if (startsWith(line_, "lr", 2)) {
       line_.erase(0, 2);
       return 14;
-    } else if (startsWith(line_, "pc")) {
+    } else if (startsWith(line_, "pc", 2)) {
       line_.erase(0, 2);
       return 15;
     } else {
@@ -456,7 +456,7 @@ private:
   bool parseShift() {
     static const char* shifts[] = { "lsl", "lsr", "asr", "ror" };
     for (int i = 0; i < 4; ++i) {
-      if (startsWith(line_, shifts[i])) {
+      if (startsWith(line_, shifts[i], 3)) {
         line_.erase(0, 3);
         instruction_ |= (i << 5);
         return true;
