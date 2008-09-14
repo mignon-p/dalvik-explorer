@@ -30,36 +30,6 @@ static int indexOf(const char* s, char ch) {
   return -1;
 }
 
-/**
- * Parses non-negative integer literals in decimal, hex (starting "0x"),
- * octal (starting "0o"), or binary (starting "0b").
- */
-static int parseInt(std::string& s) {
-  int base = 10;
-  const char* digits = "0123456789";
-  if (startsWith(s, "0x", 2)) {
-    s.erase(0, 2);
-    base = 16;
-    digits = "0123456789abcdef";
-  } else if (startsWith(s, "0o", 2)) {
-    s.erase(0, 2);
-    base = 8;
-    digits = "01234567";
-  } else if (startsWith(s, "0b", 2)) {
-    s.erase(0, 2);
-    base = 2;
-    digits = "01";
-  }
-  // FIXME: support character literals like 'c', too?
-  int result = 0;
-  int digit;
-  while ((digit = indexOf(digits, s[0])) != -1) {
-    result = (result * base) + digit;
-    s.erase(0, 1);
-  }
-  return result;
-}
-
 enum Mnemonic {
   // FIXME: document that these values are significant.
   OP_AND = 0x0, OP_EOR = 0x1, OP_SUB = 0x2, OP_RSB = 0x3,
@@ -248,7 +218,7 @@ private:
     } else if (mnemonic == M_SWI) {
       parseCondition(3);
       trimLeft();
-      const int comment = parseInt(line_);
+      const int comment = parseInt();
       // FIXME: check 'comment' fits in 24 bits.
       instruction_ |= (0xf << 24) | comment;
     } else {
@@ -398,7 +368,7 @@ private:
     if (line_[0] == 'r') {
       line_.erase(0, 1);
       // FIXME: it's a bit weird that you can say r0b1101 or r0xf and so on ;-)
-      int reg = parseInt(line_);
+      int reg = parseInt();
       if (reg > 15) {
         std::cerr << "register " << reg << " too large!\n";
         exit(EXIT_FAILURE);
@@ -429,7 +399,7 @@ private:
       // FIXME: translate to value and shift!
       // FIXME: check representable!
       // FIXME: automatically translate negative MOVs/CMPs?
-      instruction_ |= parseInt(line_);
+      instruction_ |= parseInt();
     } else {
       // Register.
       // xxxx000a aaaSnnnn ddddcccc 0tttmmmm
@@ -445,7 +415,7 @@ private:
         error("expected shift constant");
       }
       line_.erase(0, 1);
-      const int c = parseInt(line_);
+      const int c = parseInt();
       if (c > 0xffff) {
         error("shift constant too large");
       }
@@ -463,6 +433,34 @@ private:
       }
     }
     return false;
+  }
+  
+  // Parses non-negative integer literals in decimal, hex (starting "0x"),
+  // octal (starting "0o"), or binary (starting "0b").
+  int parseInt() {
+    int base = 10;
+    const char* digits = "0123456789";
+    if (startsWith(line_, "0x", 2)) {
+      line_.erase(0, 2);
+      base = 16;
+      digits = "0123456789abcdef";
+    } else if (startsWith(line_, "0o", 2)) {
+      line_.erase(0, 2);
+      base = 8;
+      digits = "01234567";
+    } else if (startsWith(line_, "0b", 2)) {
+      line_.erase(0, 2);
+      base = 2;
+      digits = "01";
+    }
+    // FIXME: support character literals like 'c', too?
+    int result = 0;
+    int digit;
+    while ((digit = indexOf(digits, line_[0])) != -1) {
+      result = (result * base) + digit;
+      line_.erase(0, 1);
+    }
+    return result;
   }
   
   void expect(char ch) {
