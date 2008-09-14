@@ -60,35 +60,6 @@ static int parseInt(std::string& s) {
   return result;
 }
 
-/**
- * Parses a register name, either a numbered name r0-r15, or one of the
- * special names "sp", "lr", or "pc".
- */
-static int parseRegister(std::string& s) {
-  if (s[0] == 'r') {
-    s.erase(0, 1);
-    // FIXME: it's a bit weird that you can say r0b1101 or r0xf and so on ;-)
-    int reg = parseInt(s);
-    if (reg > 15) {
-      std::cerr << "register " << reg << " too large!\n";
-      exit(EXIT_FAILURE);
-    }
-    return reg;
-  } else if (startsWith(s, "sp")) {
-    s.erase(0, 2);
-    return 13;
-  } else if (startsWith(s, "lr")) {
-    s.erase(0, 2);
-    return 14;
-  } else if (startsWith(s, "pc")) {
-    s.erase(0, 2);
-    return 15;
-  } else {
-    std::cerr << "expected register!\n";
-    exit(EXIT_FAILURE);
-  }
-}
-
 enum Mnemonic {
   // FIXME: document that these values are significant.
   OP_AND = 0x0, OP_EOR = 0x1, OP_SUB = 0x2, OP_RSB = 0x3,
@@ -172,9 +143,9 @@ private:
       parseCondition(3);
       parseS();
       trimLeft();
-      const int rd = parseRegister(line_);
+      const int rd = parseRegister();
       expect(',');
-      const int rn = parseRegister(line_);
+      const int rn = parseRegister();
       expect(',');
       parseRhs();
       instruction_ |= (mnemonic << 21) | (rn << 16) | (rd << 12);
@@ -183,7 +154,7 @@ private:
       parseCondition(3);
       parseS();
       trimLeft();
-      const int rd = parseRegister(line_);
+      const int rd = parseRegister();
       expect(',');
       parseRhs();
       instruction_ |= (mnemonic << 21) | (rd << 12);
@@ -192,7 +163,7 @@ private:
       parseCondition(3);
       // FIXME: P?
       trimLeft();
-      const int rn = parseRegister(line_);
+      const int rn = parseRegister();
       expect(',');
       parseRhs();
       instruction_ |= (mnemonic << 21) | (1 << 20) | (rn << 16);
@@ -223,11 +194,11 @@ private:
       parseCondition(3);
       parseS();
       trimLeft();
-      const int rd = parseRegister(line_);
+      const int rd = parseRegister();
       expect(',');
-      const int rm = parseRegister(line_);
+      const int rm = parseRegister();
       expect(',');
-      const int rs = parseRegister(line_);
+      const int rs = parseRegister();
       if (rd == rm) {
         error("destination register and first operand register must differ");
       }
@@ -236,7 +207,7 @@ private:
       }
       if (mnemonic == M_MLA) {
         expect(',');
-        const int rn = parseRegister(line_);
+        const int rn = parseRegister();
         if (rn == 15) {
           error("can't multiply using r15");
         }
@@ -263,15 +234,15 @@ private:
       // FIXME: U == positive offset
       // FIXME: W == write-back/translate
       trimLeft();
-      const int rd = parseRegister(line_);
+      const int rd = parseRegister();
       instruction_ |= (rd << 12);
       expect(',');
       // FIXME: implement the other addressing modes.
       expect('[');
-      const int rn = parseRegister(line_);
+      const int rn = parseRegister();
       instruction_ |= (rn << 16);
       expect(',');
-      const int rm = parseRegister(line_);
+      const int rm = parseRegister();
       instruction_ |= (rm << 0);
       expect(']');
     } else if (mnemonic == M_SWI) {
@@ -421,6 +392,33 @@ private:
     }
   }
   
+  // Parses a register name, either a numbered name r0-r15, or one of the
+  // special names "sp", "lr", or "pc".
+  int parseRegister() {
+    if (line_[0] == 'r') {
+      line_.erase(0, 1);
+      // FIXME: it's a bit weird that you can say r0b1101 or r0xf and so on ;-)
+      int reg = parseInt(line_);
+      if (reg > 15) {
+        std::cerr << "register " << reg << " too large!\n";
+        exit(EXIT_FAILURE);
+      }
+      return reg;
+    } else if (startsWith(line_, "sp")) {
+      line_.erase(0, 2);
+      return 13;
+    } else if (startsWith(line_, "lr")) {
+      line_.erase(0, 2);
+      return 14;
+    } else if (startsWith(line_, "pc")) {
+      line_.erase(0, 2);
+      return 15;
+    } else {
+      std::cerr << "expected register!\n";
+      exit(EXIT_FAILURE);
+    }
+  }
+  
   void parseRhs() {
     if (line_.empty()) {
       error("expected immediate or register");
@@ -435,7 +433,7 @@ private:
     } else {
       // Register.
       // xxxx000a aaaSnnnn ddddcccc 0tttmmmm
-      instruction_ |= parseRegister(line_);
+      instruction_ |= parseRegister();
       if (line_.empty() || line_[0] != ' ') {
         return;
       }
