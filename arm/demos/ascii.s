@@ -4,7 +4,7 @@
   # int i = ' ';
   mov r0,32
   # do {
-.loop
+loop:
   #   putchar(i);
   swi 0
   #   ++i;
@@ -18,12 +18,12 @@
   bl exit123
   mov pc,lr
 
-  mul r0,r0,r0
-  mla r0,r0,r1,r2
+  mul r0,r1,r2
+  mla r0,r1,r2,r3
   
-.exit0
+exit0:
   mov r2,0
   swi 0x11
-.exit123
+exit123:
   mov r2,123
   swi 0x11

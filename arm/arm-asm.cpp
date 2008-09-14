@@ -175,8 +175,16 @@ public:
       
       // Handle directives.
       if (line[0] == '.') {
-        // Currently, the only directives are labels.
-        std::string label(line.substr(1));
+        error("directive not understood");
+      }
+      
+      // Handle labels.
+      if (!isspace(line[0]) && line[0] != '#') {
+        size_t colon = line.find(':');
+        if (colon == std::string::npos) {
+          error("labels must be terminated with ':'");
+        }
+        std::string label(line.substr(0, colon));
         if (labels_.find(label) != labels_.end()) {
           error("duplicate definitions of label '" + label + "'");
         }
