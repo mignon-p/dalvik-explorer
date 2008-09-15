@@ -101,7 +101,7 @@ private:
     labels_[label] = address();
     p_ = colon;
     expect(':');
-    // FIXME: check there's only whitespace or comment after a label.
+    ensureOnlySpaceOrCommentAtEndOf("label");
   }
   
   void handleInstruction() {
@@ -130,7 +130,8 @@ private:
       expect(',');
       parseRhs();
       instruction_ |= (mnemonic << 21) | (rd << 12);
-    } else if (mnemonic == OP_CMN || mnemonic == OP_CMP || mnemonic == OP_TEQ || mnemonic == OP_TST) {
+    } else if (mnemonic == OP_CMN || mnemonic == OP_CMP ||
+               mnemonic == OP_TEQ || mnemonic == OP_TST) {
       // (CMN|CMP|TEQ|TST)<cond>P? rn,<rhs>
       parseCondition(3);
       // FIXME: P?
@@ -243,11 +244,7 @@ private:
      * <registers> is open-brace comma-separated-list close-brace
      */
     
-    // The only thing left should be whitespace or an end-of-line comment.
-    trimLeft();
-    if (*p_ != 0 && *p_ != '#') {
-      error("junk at end of line: '" + std::string(p_) + "'");
-    }
+    ensureOnlySpaceOrCommentAtEndOf("instruction");
     
     printf("%4i : 0x%08x : 0x%08x : %s\n",
            lineNumber_, address(), instruction_, line_.c_str());
@@ -259,7 +256,29 @@ private:
   }
   
   void handleDirective() {
-    error("directive not understood");
+    if (startsWith(p_, ".align", 6)) {
+      p_ += 6;
+      trimLeft();
+      int alignment = parseInt();
+      for (int i = (address() % alignment); i > 0; --i) {
+        code_.push_back(0);
+      }
+    } else if (startsWith(p_, ".byte", 5)) {
+      p_ += 5;
+      trimLeft();
+      int byte = parseInt();
+      code_.push_back(byte);
+    } else {
+      error("directive not understood");
+    }
+    ensureOnlySpaceOrCommentAtEndOf("directive");
+  }
+  
+  void ensureOnlySpaceOrCommentAtEndOf(const std::string& where) {
+    trimLeft();
+    if (*p_ != 0 && *p_ != '#') {
+      error("junk at end of " + where + ": '" + std::string(p_) + "'");
+    }
   }
   
   // FIXME: throw exceptions and use something like InplaceString.
