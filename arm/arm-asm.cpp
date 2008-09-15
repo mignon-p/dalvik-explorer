@@ -19,11 +19,6 @@ static int indexOf(const char* s, char ch) {
   return -1;
 }
 
-struct Fixup {
-  uint32_t address;
-  std::string label;
-};
-
 class ArmAssembler {
 public:
   ArmAssembler(const std::string& inPath, const std::string& outPath)
@@ -62,6 +57,13 @@ public:
   }
   
 private:
+  // If we're not able to resolve a reference to a label in our first pass, we
+  // store a Fixup in 'fixups_' and come back later in 'fixForwardBranches'.
+  struct Fixup {
+    uint32_t address;
+    std::string label;
+  };
+  
   int address() {
     return code_.size();
   }
