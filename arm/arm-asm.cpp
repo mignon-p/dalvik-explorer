@@ -19,19 +19,6 @@ static int indexOf(const char* s, char ch) {
   return -1;
 }
 
-enum Mnemonic {
-  // FIXME: document that these values are significant.
-  OP_AND = 0x0, OP_EOR = 0x1, OP_SUB = 0x2, OP_RSB = 0x3,
-  OP_ADD = 0x4, OP_ADC = 0x5, OP_SBC = 0x6, OP_RSC = 0x7,
-  OP_TST = 0x8, OP_TEQ = 0x9, OP_CMP = 0xa, OP_CMN = 0xb,
-  OP_ORR = 0xc, OP_MOV = 0xd, OP_BIC = 0xe, OP_MVN = 0xf,
-  // FIXME: document that these don't matter.
-  M_BL, M_B,
-  M_MUL, M_MLA,
-  M_LDR, M_STR,
-  M_SWI,
-};
-
 struct Fixup {
   uint32_t address;
   std::string label;
@@ -45,8 +32,7 @@ public:
   void assembleFile() {
     std::ifstream in(path_.c_str());
     if (!in) {
-      std::cerr << path_ << ": couldn't open: " << strerror(errno) << "\n";
-      exit(EXIT_FAILURE);
+      error("couldn't open: " + std::string(strerror(errno)));
     }
     
     while (getline(in, line_)) {
@@ -254,7 +240,7 @@ private:
       int byte = parseInt();
       code_.push_back(byte);
     } else {
-      error("directive not understood");
+      error("unknown directive");
     }
     ensureOnlySpaceOrCommentAtEndOf("directive");
   }
@@ -270,7 +256,7 @@ private:
   void writeBytes(const std::string& path, const uint8_t* begin, const uint8_t* end) {
     int fd = TEMP_FAILURE_RETRY(open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0666));
     if (fd == -1) {
-      error("couldn't open output file: " + std::string(strerror(errno)));
+      error("couldn't open output file '" + path + "': " + std::string(strerror(errno)));
     }
     
     const uint8_t* p = begin;
@@ -289,56 +275,33 @@ private:
     }
   }
   
+  enum Mnemonic {
+    // FIXME: document that these values are significant to the processor.
+    OP_AND = 0x0, OP_EOR = 0x1, OP_SUB = 0x2, OP_RSB = 0x3,
+    OP_ADD = 0x4, OP_ADC = 0x5, OP_SBC = 0x6, OP_RSC = 0x7,
+    OP_TST = 0x8, OP_TEQ = 0x9, OP_CMP = 0xa, OP_CMN = 0xb,
+    OP_ORR = 0xc, OP_MOV = 0xd, OP_BIC = 0xe, OP_MVN = 0xf,
+    // FIXME: document that these don't matter, but should be contiguous.
+    M_BL, M_B,
+    M_MUL, M_MLA,
+    M_LDM, M_STM,
+    M_LDR, M_STR,
+    M_SWI,
+    LAST_MNEMONIC
+  };
+  
   Mnemonic parseMnemonic() {
-    if (accept("and", 3)) {
-      return OP_AND;
-    } else if (accept("eor", 3)) {
-      return OP_EOR;
-    } else if (accept("sub", 3)) {
-      return OP_SUB;
-    } else if (accept("rsb", 3)) {
-      return OP_RSB;
-    } else if (accept("add", 3)) {
-      return OP_ADD;
-    } else if (accept("adc", 3)) {
-      return OP_ADC;
-    } else if (accept("sbc", 3)) {
-      return OP_SBC;
-    } else if (accept("rsc", 3)) {
-      return OP_RSC;
-    } else if (accept("tst", 3)) {
-      return OP_TST;
-    } else if (accept("teq", 3)) {
-      return OP_TEQ;
-    } else if (accept("cmp", 3)) {
-      return OP_CMP;
-    } else if (accept("cmn", 3)) {
-      return OP_CMN;
-    } else if (accept("orr", 3)) {
-      return OP_ORR;
-    } else if (accept("mov", 3)) {
-      return OP_MOV;
-    } else if (accept("bic", 3)) {
-      return OP_BIC;
-    } else if (accept("mvn", 3)) {
-      return OP_MVN;
-    } else if (accept("bl", 2)) {
-      return M_BL;
-    } else if (accept("b", 1)) {
-      return M_B;
-    } else if (accept("mul", 3)) {
-      return M_MUL;
-    } else if (accept("mla", 3)) {
-      return M_MLA;
-    } else if (accept("ldr", 3)) {
-      return M_LDR;
-    } else if (accept("str", 3)) {
-      return M_STR;
-    } else if (accept("swi", 3)) {
-      return M_SWI;
-    } else {
-      error("unknown mnemonic");
+    static const char* mnemonics[] = {
+      "and", "eor", "sub", "rsb", "add", "adc", "sbc", "rsc",
+      "tst", "teq", "cmp", "cmn", "orr", "mov", "bic", "mvn",
+      "bl", "b", "mul", "mla", "ldm", "stm", "ldr", "str", "swi", 0
+    };
+    for (int i = 0; i != LAST_MNEMONIC; ++i) {
+      if (accept(mnemonics[i], strlen(mnemonics[i]))) {
+        return Mnemonic(i);
+      }
     }
+    error("unknown mnemonic");
   }
   
   void parseCondition() {
@@ -377,8 +340,7 @@ private:
       // FIXME: it's a bit weird that you can say r0b1101 or r0xf and so on ;-)
       int reg = parseInt();
       if (reg > 15) {
-        std::cerr << "register " << reg << " too large!\n";
-        exit(EXIT_FAILURE);
+        error("register too large!");
       }
       return reg;
     } else if (accept("sp", 2)) {
@@ -388,8 +350,7 @@ private:
     } else if (accept("pc", 2)) {
       return 15;
     } else {
-      std::cerr << "expected register!\n";
-      exit(EXIT_FAILURE);
+      error("expected register");
     }
   }
   
@@ -453,6 +414,7 @@ private:
       digits = "01";
     }
     // FIXME: support character literals like 'c', too?
+    // FIXME: recognize when we haven't actually parsed any digits!
     int result = 0;
     int digit;
     while ((digit = indexOf(digits, *p_)) != -1) {
@@ -513,7 +475,11 @@ private:
   }
   
   void error(const std::string& msg) __attribute__((noreturn)) {
-    std::cerr << path_ << ":" << lineNumber_ << ": " << msg << std::endl;
+    std::cerr << path_ << ":";
+    if (lineNumber_ > 0) {
+      std::cerr << lineNumber_ << ":";
+    }
+    std::cerr << " " << msg << std::endl;
     exit(EXIT_FAILURE);
   }
   
