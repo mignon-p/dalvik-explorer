@@ -431,7 +431,7 @@ private:
   
   void expect(char ch) {
     if (*p_++ != ch) {
-      error("expected '" + std::string(ch, 1) + "'");
+      error("expected '" + std::string(1, ch) + "'");
     }
   }
   
