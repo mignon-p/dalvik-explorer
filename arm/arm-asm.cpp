@@ -26,13 +26,15 @@ struct Fixup {
 
 class ArmAssembler {
 public:
-  ArmAssembler(const char* path) : path_(path), lineNumber_(0) {
+  ArmAssembler(const std::string& inPath, const std::string& outPath)
+  : inPath_(inPath), outPath_(outPath), lineNumber_(0)
+  {
   }
   
   void assembleFile() {
-    std::ifstream in(path_.c_str());
+    std::ifstream in(inPath_.c_str());
     if (!in) {
-      error("couldn't open: " + std::string(strerror(errno)));
+      error("couldn't open: " + errorString());
     }
     
     while (getline(in, line_)) {
@@ -56,7 +58,7 @@ public:
     }
     
     fixForwardBranches();
-    writeBytes("a.out", &code_[0], &code_[code_.size()]);
+    writeBytes(&code_[0], &code_[code_.size()]);
   }
   
 private:
@@ -253,17 +255,18 @@ private:
   }
   
   // FIXME: throw exceptions and use something like InplaceString.
-  void writeBytes(const std::string& path, const uint8_t* begin, const uint8_t* end) {
-    int fd = TEMP_FAILURE_RETRY(open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0666));
+  void writeBytes(const uint8_t* begin, const uint8_t* end) {
+    const char* path(outPath_.c_str());
+    int fd = TEMP_FAILURE_RETRY(open(path, O_CREAT | O_TRUNC | O_WRONLY, 0666));
     if (fd == -1) {
-      error("couldn't open output file '" + path + "': " + std::string(strerror(errno)));
+      error("couldn't open output file '" + outPath_ + "': " + errorString());
     }
     
     const uint8_t* p = begin;
     while (p != end) {
       int bytesWritten = TEMP_FAILURE_RETRY(write(fd, p, end - p));
       if (bytesWritten == -1) {
-        error("write failed: " + std::string(strerror(errno)));
+        error("write failed: " + errorString());
         // FIXME: this would leak 'fd' except 'error' actually exits. need scoped_fd.
       }
       std::cerr << "bytes written: " << bytesWritten << "\n";
@@ -271,7 +274,7 @@ private:
     }
     
     if (TEMP_FAILURE_RETRY(close(fd)) == -1) {
-      error("couldn't close output file: " + std::string(strerror(errno)));
+      error("couldn't close output file: " + errorString());
     }
   }
   
@@ -474,8 +477,12 @@ private:
     std::cerr << "fixups resolved: " << fixups_.size() << "\n";
   }
   
+  static std::string errorString() {
+    return strerror(errno);
+  }
+  
   void error(const std::string& msg) __attribute__((noreturn)) {
-    std::cerr << path_ << ":";
+    std::cerr << inPath_ << ":";
     if (lineNumber_ > 0) {
       std::cerr << lineNumber_ << ":";
     }
@@ -483,7 +490,8 @@ private:
     exit(EXIT_FAILURE);
   }
   
-  std::string path_;
+  const std::string inPath_;
+  const std::string outPath_;
   
   int lineNumber_;
   std::string line_;
@@ -500,7 +508,10 @@ private:
 
 int main(int argc, char* argv[]) {
   for (int i = 1; i < argc; ++i) {
-    ArmAssembler assembler(argv[i]);
+    const std::string inPath(argv[i]);
+    // FIXME: outPath = inPath.replaceAll("\.s$", "\.bin$");
+    const std::string outPath("a.out");
+    ArmAssembler assembler(inPath, outPath);
     assembler.assembleFile();
   }
   return EXIT_SUCCESS;
