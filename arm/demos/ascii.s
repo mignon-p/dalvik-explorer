@@ -21,6 +21,10 @@ loop:
   mul r0,r1,r2
   mla r0,r1,r2,r3
   
+  ldr r0,[r2,r0]
+  ldreq r2,[r3,r4]
+  strne r3,[r4,r5]
+  
 exit0:
   mov r2,0
   swi 0x11
