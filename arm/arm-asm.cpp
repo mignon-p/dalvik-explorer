@@ -486,7 +486,8 @@ private:
   void error(const std::string& msg) __attribute__((noreturn)) {
     std::cerr << inPath_ << ":";
     if (lineNumber_ > 0) {
-      std::cerr << lineNumber_ << ":";
+      const size_t column = (p_ - line_.c_str());
+      std::cerr << lineNumber_ << ":" << column << ":";
     }
     std::cerr << " " << msg << std::endl;
     exit(EXIT_FAILURE);
