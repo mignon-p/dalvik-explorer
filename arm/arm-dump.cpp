@@ -22,6 +22,21 @@ static void disassembleCondition(std::ostream& os, uint32_t instruction) {
   os << conditions[(instruction >> 28) & 0xf];
 }
 
+static void disassembleCccccTttMmmm(std::ostream& os, uint32_t instruction) {
+  os << ",r" << ((instruction >> 0) & 0xf);
+  // If there's a shift other than "lsl 0" (which is the preferred way to
+  // assemble no shift), decode it.
+  if ((instruction & 0x00000ff0) != 0) {
+    static const char* shiftMnemonic[] = { "lsl", "lsr", "asr", "ror" };
+    os << " " << shiftMnemonic[(instruction >> 5) & 0x3] << " ";
+    if (((instruction >> 4) & 1) != 0) {
+      os << "r" << ((instruction >> 8) & 0xf);
+    } else {
+      os << ((instruction >> 8) & 0xf);
+    }
+  }
+}
+
 static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t instruction) {
   dumpHex32(os, address);
   os << " : ";
@@ -82,15 +97,18 @@ static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t 
       os << " r" << rd << ",r" << rn;
     } else if ((opCode & 0xc) == 0x8) {
       // tst, teq, cmp, cmn.
-      // FIXME: p? (rd == 15); values other than 0 or 15 are errors.
+      if (rd == 0xf) {
+        os << "p";
+      }
+      // FIXME: rd should be 0x0 or 0xf; warn if not?
       os << " r" << rn;
     } else {
       // mov, mvn.
-      // FIXME: rn should be 0.
       if ((instruction & (1 << 20)) != 0) {
         os << "s";
       }
       os << " r" << rd;
+      // FIXME: rn should be 0; warn if not?
     }
     if (immediate) {
       const uint32_t value = (instruction & 0xff);
@@ -99,24 +117,26 @@ static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t 
       uint32_t result = (barrel & 0xffffffff) | (barrel >> 32);
       os << "," << result;
     } else {
-      os << ",r" << ((instruction >> 0) & 0xf);
-      // If there's a shift other than "lsl 0" (which is the preferred way to
-      // assemble no shift), decode it.
-      if ((instruction & 0x00000ff0) != 0) {
-        static const char* shiftMnemonic[] = { "lsl", "lsr", "asr", "ror" };
-        os << " " << shiftMnemonic[(instruction >> 5) & 0x3] << " ";
-        if (((instruction >> 4) & 1) != 0) {
-          os << "r" << ((instruction >> 8) & 0xf);
-        } else {
-          os << ((instruction >> 8) & 0xf);
-        }
-      }
+      disassembleCccccTttMmmm(os, instruction);
     }
   } else if (high3 == 0x2 || high3 == 0x3) {
     // Single data transfer.
     // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
     // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
-    os << "FIXME: single data transfer";
+    os << (((instruction >> 20) & 1) ? "ldr" : "str");
+    disassembleCondition(os, instruction);
+    if ((instruction >> 22) & 1) {
+      os << "b";
+    }
+    os << " r" << ((instruction >> 12) & 0xf)
+       << ","
+       << "[r" << ((instruction >> 16) & 0xf);
+    if (((instruction >> 25) & 1) == 1) {
+      disassembleCccccTttMmmm(os, instruction);
+    } else {
+      os << "FIXME: immediate form";
+    }
+    os << "]";
   } else if (high3 == 0x4) {
     // Block data transfer.
     // xxxx100P USWLnnnn llllllll llllllll
