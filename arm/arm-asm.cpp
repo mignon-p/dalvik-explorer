@@ -180,10 +180,9 @@ private:
       // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
       // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
       parseCondition();
+      instruction_ |= (1 << 26);
       if (mnemonic == M_LDR) {
-        instruction_ |= (0x2 << 24) | (1 << 20);
-      } else {
-        instruction_ |= (0x3 << 24) | (0 << 20);
+        instruction_ |= (1 << 20);
       }
       parseSuffixAndSetBit('b', (1 << 22));
       // FIXME: P == pre-indexed
@@ -194,6 +193,7 @@ private:
       instruction_ |= (rd << 12);
       expect(',');
       // FIXME: implement the other addressing modes.
+      instruction_ |= (1 << 25);
       expect('[');
       const int rn = parseRegister();
       instruction_ |= (rn << 16);
