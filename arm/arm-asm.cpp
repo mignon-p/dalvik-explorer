@@ -10,17 +10,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-static bool startsWith(const char* s, const char* prefix, size_t prefixLength) {
-  int charsLeft = prefixLength;
-  int i = 0;
-  while (--charsLeft >= 0) {
-    if (s[i] != prefix[i++]) {
-      return false;
-    }
-  }
-  return true;
-}
-
 static int indexOf(const char* s, char ch) {
   for (const char* p = s; *p != 0; ++p) {
     if (*p == ch) {
@@ -256,14 +245,14 @@ private:
   }
   
   void handleDirective() {
-    if (startsWith(p_, ".align", 6)) {
+    if (startsWith(".align", 6)) {
       p_ += 6;
       trimLeft();
       int alignment = parseInt();
       for (int i = (address() % alignment); i > 0; --i) {
         code_.push_back(0);
       }
-    } else if (startsWith(p_, ".byte", 5)) {
+    } else if (startsWith(".byte", 5)) {
       p_ += 5;
       trimLeft();
       int byte = parseInt();
@@ -305,51 +294,51 @@ private:
   }
   
   Mnemonic parseMnemonic() {
-    if (startsWith(p_, "and", 3)) {
+    if (startsWith("and", 3)) {
       return OP_AND;
-    } else if (startsWith(p_, "eor", 3)) {
+    } else if (startsWith("eor", 3)) {
       return OP_EOR;
-    } else if (startsWith(p_, "sub", 3)) {
+    } else if (startsWith("sub", 3)) {
       return OP_SUB;
-    } else if (startsWith(p_, "rsb", 3)) {
+    } else if (startsWith("rsb", 3)) {
       return OP_RSB;
-    } else if (startsWith(p_, "add", 3)) {
+    } else if (startsWith("add", 3)) {
       return OP_ADD;
-    } else if (startsWith(p_, "adc", 3)) {
+    } else if (startsWith("adc", 3)) {
       return OP_ADC;
-    } else if (startsWith(p_, "sbc", 3)) {
+    } else if (startsWith("sbc", 3)) {
       return OP_SBC;
-    } else if (startsWith(p_, "rsc", 3)) {
+    } else if (startsWith("rsc", 3)) {
       return OP_RSC;
-    } else if (startsWith(p_, "tst", 3)) {
+    } else if (startsWith("tst", 3)) {
       return OP_TST;
-    } else if (startsWith(p_, "teq", 3)) {
+    } else if (startsWith("teq", 3)) {
       return OP_TEQ;
-    } else if (startsWith(p_, "cmp", 3)) {
+    } else if (startsWith("cmp", 3)) {
       return OP_CMP;
-    } else if (startsWith(p_, "cmn", 3)) {
+    } else if (startsWith("cmn", 3)) {
       return OP_CMN;
-    } else if (startsWith(p_, "orr", 3)) {
+    } else if (startsWith("orr", 3)) {
       return OP_ORR;
-    } else if (startsWith(p_, "mov", 3)) {
+    } else if (startsWith("mov", 3)) {
       return OP_MOV;
-    } else if (startsWith(p_, "bic", 3)) {
+    } else if (startsWith("bic", 3)) {
       return OP_BIC;
-    } else if (startsWith(p_, "mvn", 3)) {
+    } else if (startsWith("mvn", 3)) {
       return OP_MVN;
-    } else if (startsWith(p_, "bl", 2)) {
+    } else if (startsWith("bl", 2)) {
       return M_BL;
-    } else if (startsWith(p_, "b", 1)) {
+    } else if (startsWith("b", 1)) {
       return M_B;
-    } else if (startsWith(p_, "mul", 3)) {
+    } else if (startsWith("mul", 3)) {
       return M_MUL;
-    } else if (startsWith(p_, "mla", 3)) {
+    } else if (startsWith("mla", 3)) {
       return M_MLA;
-    } else if (startsWith(p_, "ldr", 3)) {
+    } else if (startsWith("ldr", 3)) {
       return M_LDR;
-    } else if (startsWith(p_, "str", 3)) {
+    } else if (startsWith("str", 3)) {
       return M_STR;
-    } else if (startsWith(p_, "swi", 3)) {
+    } else if (startsWith("swi", 3)) {
       return M_SWI;
     } else {
       error("unknown mnemonic");
@@ -365,7 +354,7 @@ private:
     };
     int condition = 0;
     for (; conditions[condition]; ++condition) {
-      if (startsWith(p_, conditions[condition], 2)) {
+      if (startsWith(conditions[condition], 2)) {
         p_ += 2;
         break;
       }
@@ -398,13 +387,13 @@ private:
         exit(EXIT_FAILURE);
       }
       return reg;
-    } else if (startsWith(p_, "sp", 2)) {
+    } else if (startsWith("sp", 2)) {
       p_ += 2;
       return 13;
-    } else if (startsWith(p_, "lr", 2)) {
+    } else if (startsWith("lr", 2)) {
       p_ += 2;
       return 14;
-    } else if (startsWith(p_, "pc", 2)) {
+    } else if (startsWith("pc", 2)) {
       p_ += 2;
       return 15;
     } else {
@@ -449,7 +438,7 @@ private:
   bool parseShift() {
     static const char* shifts[] = { "lsl", "lsr", "asr", "ror" };
     for (int i = 0; i < 4; ++i) {
-      if (startsWith(p_, shifts[i], 3)) {
+      if (startsWith(shifts[i], 3)) {
         p_ += 3;
         instruction_ |= (i << 5);
         return true;
@@ -463,15 +452,15 @@ private:
   int parseInt() {
     int base = 10;
     const char* digits = "0123456789";
-    if (startsWith(p_, "0x", 2)) {
+    if (startsWith("0x", 2)) {
       p_ += 2;
       base = 16;
       digits = "0123456789abcdef";
-    } else if (startsWith(p_, "0o", 2)) {
+    } else if (startsWith("0o", 2)) {
       p_ += 2;
       base = 8;
       digits = "01234567";
-    } else if (startsWith(p_, "0b", 2)) {
+    } else if (startsWith("0b", 2)) {
       p_ += 2;
       base = 2;
       digits = "01";
@@ -496,6 +485,17 @@ private:
     while (isspace(*p_)) {
       ++p_;
     }
+  }
+  
+  bool startsWith(const char* prefix, size_t prefixLength) {
+    int charsLeft = prefixLength;
+    int i = 0;
+    while (--charsLeft >= 0) {
+      if (p_[i] != prefix[i++]) {
+        return false;
+      }
+    }
+    return true;
   }
   
   bool resolveLabel(const Fixup& fixup, uint32_t& offset) {
