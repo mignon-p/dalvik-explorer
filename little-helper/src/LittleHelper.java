@@ -17,7 +17,7 @@ import javax.swing.*;
  * 
  * You can also use gconf-editor(1) to edit these from the GUI.
  */
-public class LittleHelper extends MainFrame {
+public class LittleHelper extends JFrame {
     private static class Verb {
         private final Pattern pattern;
         private final String urlTemplate;
@@ -44,10 +44,17 @@ public class LittleHelper extends MainFrame {
     
     public LittleHelper() {
         super("Little Helper");
+        
         setContentPane(makeUi());
         pack();
+        
         setLocationRelativeTo(null);
+        
+        // FIXME: this is a bit harsh (but effective: MainFrame doesn't seem to work right, and even when it does it's slow).
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JFrameUtilities.closeOnEsc(this);
+        
+        GuiUtilities.finishGnomeStartup();
     }
     
     private JPanel makeUi() {
@@ -98,8 +105,7 @@ public class LittleHelper extends MainFrame {
         // Convert bases.
         NumberDecoder numberDecoder = new NumberDecoder(query);
         if (numberDecoder.isValid()) {
-            java.util.List<String> items = numberDecoder.toStrings();
-            for (String item : items) {
+            for (String item : numberDecoder.toStrings()) {
                 model.addElement(item);
             }
         }
@@ -115,11 +121,12 @@ public class LittleHelper extends MainFrame {
         resultList.setModel(model);
     }
     
-    private static final Pattern TEMPERATURE = Pattern.compile("^([\\d.]+) *([CF])");
-    
     private static String convertUnits(String s) {
         // Temperature?
-        final Matcher temperatureMatcher = TEMPERATURE.matcher(s);
+        // "0C" => "32 F"
+        // "-40C" => "-40 F"
+        // "100C" => "212 F"
+        final Matcher temperatureMatcher = Pattern.compile("^(-?[\\d.]+) *([CF])").matcher(s);
         if (temperatureMatcher.matches()) {
             final double originalValue = Double.parseDouble(temperatureMatcher.group(1));
             final char originalUnit = temperatureMatcher.group(2).charAt(0);
@@ -131,34 +138,75 @@ public class LittleHelper extends MainFrame {
             }
         }
         
-        // FIXME: Length?
+        // Imperial length?
+        // First try to normalize.
+        final String maybeImperialLength = s.replaceAll("f(?:eet|oot|t)", "'").replaceAll("in(?:ch|ches)?", "\"");
+        final String maybeMetricLength = convertImperial("'", 12.0, "\"", 0.0254, "m", maybeImperialLength);
+        if (maybeMetricLength != null) {
+            return maybeMetricLength;
+        }
         // 13.3"
         // 13.3 "
         // 13.3 inches
+        // 6'
+        // 6 foot
         // 5'4"
+        // 5' 4"
         // 5'4"
-        // 5'4"
+        // 5feet 4inches
         // 5 feet 4 inches
+        // 5ft 4in
+        // 5 ft 4 in
+        
+        // FIXME: Imperial distances?
+        // 200 miles / 200 mi
+        
+        // FIXME: Metric length?
         // 1.37m
         // 1m 37cm
         // 2 meters
         // 24.3 cm
         // 90.7 mm
+        // 200 km
         
-        // FIXME: Weight?
+        // Imperial Weight?
+        // First try to normalize.
+        final String maybeImperialWeight = s.replaceAll("(?:pound|lb)s?", "lb").replaceAll("(?:ounce|ounces|oz)", "oz");
+        final String maybeMetricWeight = convertImperial("lb", 16.0, "oz", 0.0283495231, "kg", maybeImperialWeight);
+        if (maybeMetricWeight != null) {
+            return maybeMetricWeight;
+        }
+        
         // 5.0 pounds
         // 5lbs
-        // 2.27kg
         // 1.3 ounces
         // 1.3 oz
+        
+        // 2.27kg
         // 36.8 grams
         // 36.8 g
-        
-        //   ([\\d+.]+) *(pounds|lb|lbs|ounce|ounces|oz|kg|g|grams)
         
         // FIXME: Currency?
         
         return null;
+    }
+    
+    private static String convertImperial(String bigUnit, double smallUnitsPerBigUnit, String smallUnit, double toMetric, String metricUnit, String input) {
+        final Matcher imperialMatcher = Pattern.compile("^(?:([\\d.]+) *" + bigUnit + ")? *(?:(([\\d.]+)) *" + smallUnit + ")?").matcher(input);
+        if (!imperialMatcher.matches()) {
+            return null;
+        }
+        String bigValue = imperialMatcher.group(1);
+        if (bigValue == null) {
+            bigValue = "0";
+        }
+        String smallValue = imperialMatcher.group(2);
+        if (smallValue == null) {
+            smallValue = "0";
+        }
+        final double value = (smallUnitsPerBigUnit * Double.parseDouble(bigValue)) + Double.parseDouble(smallValue);
+        // FIXME: choose an appropriate SI prefix and precision based on the input.
+        return String.format("%.2f %s", toMetric * value, metricUnit);
     }
     
     private static void initVerbs() {
