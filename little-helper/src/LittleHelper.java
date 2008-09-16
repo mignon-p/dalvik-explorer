@@ -95,8 +95,8 @@ public class LittleHelper extends JFrame {
                     // bark
                 }
                 // Our work here is done.
-                setVisible(false);
-                return;
+                // FIXME: this is a bit harsh (but effective: MainFrame doesn't seem to work right, and even when it does it's slow).
+                System.exit(0);
             }
         }
         
