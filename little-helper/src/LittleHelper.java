@@ -210,8 +210,9 @@ public class LittleHelper extends JFrame {
     }
     
     private static void initVerbs() {
-        verbs.add(new Verb("^(?:i(?:mdb)?) +(.*)", "http://www.imdb.com/find?s=all&q=%s&x=0&y=0"));
         verbs.add(new Verb("^(?:g(?:oogle)?) +(.*)", "http://www.google.com/search?hl=en&q=%s&btnG=Google+Search&aq=f&oq="));
+        verbs.add(new Verb("^(?:i(?:mdb)?) +(.*)", "http://www.imdb.com/find?s=all&q=%s&x=0&y=0"));
+        verbs.add(new Verb("^(?:p(?:osix)?) +(.*)", "http://opengroup.org/cgi-bin/kman2?value=%s"));
         verbs.add(new Verb("^(?:w(?:ikipedia)?) +(.*)", "http://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go"));
     }
     
