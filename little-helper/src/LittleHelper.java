@@ -12,8 +12,8 @@ import javax.swing.*;
  * 
  * Under GNOME, to run little-helper when F4 (the Dashboard key on Apple keyboards) is pressed:
  * 
- * % gconftool-2 -s /apps/metacity/global_keybindings/run_command_4 F4
- * % gconftool-2 -s /apps/metacity/keybinding_commands/command_4 `which little-helper`
+ * % gconftool-2 -t string -s /apps/metacity/global_keybindings/run_command_4 F4
+ * % gconftool-2 -t string -s /apps/metacity/keybinding_commands/command_4 `which little-helper`
  * 
  * You can also use gconf-editor(1) to edit these from the GUI.
  */
