@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import org.jessies.test.*;
 
 /**
  * Yet another attempt at the whole Google onebox/Mac OS Spotlight/GNOME Deskbar genre.
@@ -121,11 +122,57 @@ public class LittleHelper extends JFrame {
         resultList.setModel(model);
     }
     
+    @Test private static void testTemperatureConversion() {
+        Assert.equals(convertUnits("0C"), "32.0 F");
+        Assert.equals(convertUnits("-40C"), "-40.0 F");
+        Assert.equals(convertUnits("100C"), "212.0 F");
+        Assert.equals(convertUnits("100.0C"), "212.0 F");
+        Assert.equals(convertUnits("100 C"), "212.0 F");
+        Assert.equals(convertUnits("100.0 C"), "212.0 F");
+        Assert.equals(convertUnits("32 F"), "0.0 C");
+        Assert.equals(convertUnits("78F"), "25.6 C");
+    }
+    
+    @Test private static void testImperialLengthConversion() {
+        Assert.equals(convertUnits("13.3\""), "0.34 m");
+        Assert.equals(convertUnits("13.3 \""), "0.34 m");
+        Assert.equals(convertUnits("13.3 in"), "0.34 m");
+        Assert.equals(convertUnits("13.3 inch"), "0.34 m");
+        Assert.equals(convertUnits("13.3 inches"), "0.34 m");
+        
+        Assert.equals(convertUnits("6 '"), "1.83 m");
+        Assert.equals(convertUnits("6 foot"), "1.83 m");
+        Assert.equals(convertUnits("6 feet"), "1.83 m");
+        Assert.equals(convertUnits("6 ft"), "1.83 m");
+        Assert.equals(convertUnits("6 ft 0 in"), "1.83 m");
+        
+        Assert.equals(convertUnits("5'4\""), "1.63 m");
+        Assert.equals(convertUnits("5' 4\""), "1.63 m");
+        Assert.equals(convertUnits("5 ' 4\""), "1.63 m");
+        Assert.equals(convertUnits("5 ' 4 \""), "1.63 m");
+        Assert.equals(convertUnits("5 feet 4 inches"), "1.63 m");
+        Assert.equals(convertUnits("5feet 4inches"), "1.63 m");
+        Assert.equals(convertUnits("5feet4inches"), "1.63 m");
+        Assert.equals(convertUnits("5ft 4in"), "1.63 m");
+        Assert.equals(convertUnits("5 ft 4 in"), "1.63 m");
+    }
+    
+    @Test private static void testImperialWeightConversion() {
+        Assert.equals(convertUnits("5.0 pound"), "2.27 kg");
+        Assert.equals(convertUnits("5.0pound"), "2.27 kg");
+        Assert.equals(convertUnits("5.0 pounds"), "2.27 kg");
+        Assert.equals(convertUnits("5.0pounds"), "2.27 kg");
+        Assert.equals(convertUnits("5 lb"), "2.27 kg");
+        Assert.equals(convertUnits("5lb"), "2.27 kg");
+        Assert.equals(convertUnits("5 lbs"), "2.27 kg");
+        Assert.equals(convertUnits("5lbs"), "2.27 kg");
+        
+        Assert.equals(convertUnits("1.3 ounces"), "0.04 kg");
+        Assert.equals(convertUnits("1.3 oz"), "0.04 kg");
+    }
+    
     private static String convertUnits(String s) {
         // Temperature?
-        // "0C" => "32 F"
-        // "-40C" => "-40 F"
-        // "100C" => "212 F"
         final Matcher temperatureMatcher = Pattern.compile("^(-?[\\d.]+) *([CF])").matcher(s);
         if (temperatureMatcher.matches()) {
             final double originalValue = Double.parseDouble(temperatureMatcher.group(1));
@@ -140,23 +187,11 @@ public class LittleHelper extends JFrame {
         
         // Imperial length?
         // First try to normalize.
-        final String maybeImperialLength = s.replaceAll("f(?:eet|oot|t)", "'").replaceAll("in(?:ch|ches)?", "\"");
+        final String maybeImperialLength = s.replaceAll("f(?:eet|oot|t)", "'").replaceAll("in(?:ches|ch)?", "\"");
         final String maybeMetricLength = convertImperial("'", 12.0, "\"", 0.0254, "m", maybeImperialLength);
         if (maybeMetricLength != null) {
             return maybeMetricLength;
         }
-        // 13.3"
-        // 13.3 "
-        // 13.3 inches
-        // 6'
-        // 6 foot
-        // 5'4"
-        // 5' 4"
-        // 5'4"
-        // 5feet 4inches
-        // 5 feet 4 inches
-        // 5ft 4in
-        // 5 ft 4 in
         
         // FIXME: Imperial distances?
         // 200 miles / 200 mi
@@ -171,16 +206,11 @@ public class LittleHelper extends JFrame {
         
         // Imperial Weight?
         // First try to normalize.
-        final String maybeImperialWeight = s.replaceAll("(?:pound|lb)s?", "lb").replaceAll("(?:ounce|ounces|oz)", "oz");
+        final String maybeImperialWeight = s.replaceAll("(?:pound|lb)s?", "lb").replaceAll("(?:ounces|ounce|oz)", "oz");
         final String maybeMetricWeight = convertImperial("lb", 16.0, "oz", 0.0283495231, "kg", maybeImperialWeight);
         if (maybeMetricWeight != null) {
             return maybeMetricWeight;
         }
-        
-        // 5.0 pounds
-        // 5lbs
-        // 1.3 ounces
-        // 1.3 oz
         
         // 2.27kg
         // 36.8 grams
