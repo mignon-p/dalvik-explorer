@@ -37,7 +37,22 @@ static void disassembleCccccTttMmmm(std::ostream& os, uint32_t instruction) {
   }
 }
 
-static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t instruction) {
+class ArmDisassembler {
+public:
+  ArmDisassembler(std::ostream& os);
+  
+  void disassembleFile(const std::string& path);
+  
+  void disassembleInstruction(uint32_t address, uint32_t instruction);
+  
+private:
+  std::ostream& os;
+};
+
+ArmDisassembler::ArmDisassembler(std::ostream& os) : os(os) {
+}
+
+void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruction) {
   dumpHex32(os, address);
   os << " : ";
   dumpHex32(os, instruction);
@@ -147,7 +162,7 @@ static void disassembleInstruction(std::ostream& os, uint32_t address, uint32_t 
   }
 }
 
-static void disassembleFile(std::ostream& os, const std::string& path) {
+void ArmDisassembler::disassembleFile(const std::string& path) {
   int fd = TEMP_FAILURE_RETRY(open(path.c_str(), O_RDONLY));
   if (fd == -1) {
     std::cerr << path << ": open failed: " << strerror(errno) << "\n";
@@ -160,7 +175,7 @@ static void disassembleFile(std::ostream& os, const std::string& path) {
   while ((bytesRead = TEMP_FAILURE_RETRY(read(fd, buf, sizeof(buf)))) > 0) {
     for (uint8_t* p = &buf[0]; p != &buf[bytesRead]; p += 4) {
       uint32_t instruction = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
-      disassembleInstruction(os, address, instruction);
+      disassembleInstruction(address, instruction);
       os << std::endl;
       address += 4;
     }
@@ -178,8 +193,9 @@ static void disassembleFile(std::ostream& os, const std::string& path) {
 }
 
 int main(int argc, char* argv[]) {
+  ArmDisassembler disassembler(std::cout);
   for (int i = 1; i < argc; ++i) {
-    disassembleFile(std::cout, argv[i]);
+    disassembler.disassembleFile(argv[i]);
   }
   return EXIT_SUCCESS;
 }
