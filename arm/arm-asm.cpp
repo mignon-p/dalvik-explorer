@@ -226,10 +226,18 @@ private:
     printf("%4i : 0x%08x : 0x%08x : %s\n",
            lineNumber_, address(), instruction_, line_.c_str());
     
-    code_.push_back((instruction_ >> 24) & 0xff);
-    code_.push_back((instruction_ >> 16) & 0xff);
-    code_.push_back((instruction_ >> 8) & 0xff);
-    code_.push_back((instruction_ >> 0) & 0xff);
+    append32(instruction_);
+  }
+  
+  void append32(uint32_t value) {
+    append8((value >> 24) & 0xff);
+    append8((value >> 16) & 0xff);
+    append8((value >> 8) & 0xff);
+    append8((value >> 0) & 0xff);
+  }
+  
+  void append8(uint8_t value) {
+    code_.push_back(value);
   }
   
   void handleDirective() {
@@ -242,7 +250,13 @@ private:
     } else if (accept(".byte", 5)) {
       trimLeft();
       int byte = parseInt();
-      code_.push_back(byte);
+      // FIXME: check range!
+      append8(byte);
+    } else if (accept(".word", 5)) {
+      trimLeft();
+      int word = parseInt();
+      // FIXME: check range!
+      append32(word);
     } else {
       error("unknown directive");
     }
