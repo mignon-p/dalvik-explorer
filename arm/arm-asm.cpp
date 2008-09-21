@@ -171,11 +171,11 @@ private:
       }
       instruction_ |= (rd << 16) | (rs << 8) | (9 << 4) | (rm << 0);
     } else if (mnemonic == M_LDR || mnemonic == M_STR) {
-      // (LDR|STR){cond}{B} <dest>,[<base>{,#<imm>}]{!}
-      // (LDR|STR){cond}{B} <dest>,[<base>,{+|-}<off>{,<shift>}]{!}
-      // (LDR|STR){cond}{B} <dest>,<expression>
-      // (LDR|STR){cond}{B} <dest>,[<base>],#<imm>
-      // (LDR|STR){cond}{B} <dest>,[<base>],{+|-}<off>{,<shift>}
+      // (LDR|STR)<cond>B? <dest>,[<base>{,#<imm>}]{!}
+      // (LDR|STR)<cond>B? <dest>,[<base>,{+|-}<off>{,<shift>}]{!}
+      // (LDR|STR)<cond>B? <dest>,<expression>
+      // (LDR|STR)<cond>B? <dest>,[<base>],#<imm>
+      // (LDR|STR)<cond>B? <dest>,[<base>],{+|-}<off>{,<shift>}
       
       // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
       // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
@@ -201,6 +201,36 @@ private:
       const int rm = parseRegister();
       instruction_ |= (rm << 0);
       expect(']');
+    } else if (mnemonic == M_LDM || mnemonic == M_STM) {
+      // (LDM|STM)<cond>[ID][BA] <base>!?,{<register-list>}^?
+      // xxxx100P USWLnnnn llllllll llllllll
+      parseCondition();
+      instruction_ |= (1 << 27);
+      // FIXME: better error reporting?
+      // FIXME: support for 'fd' and friends?
+      if (*p_ == 'i') {
+        instruction_ |= (1 << 23);
+        expect('i');
+      } else {
+        expect('d');
+      }
+      if (*p_ == 'b') {
+        instruction_ |= (1 << 24);
+        expect('b');
+      } else {
+        expect('a');
+      }
+      if (mnemonic == M_LDM) {
+        instruction_ |= (1 << 20);
+      }
+      
+      trimLeft();
+      const int rn = parseRegister();
+      instruction_ |= (rn << 16);
+      parseSuffixAndSetBit('!', (1 << 21));
+      expect(',');
+      parseRegisterList();
+      parseSuffixAndSetBit('^', (1 << 22));
     } else if (mnemonic == M_SWI) {
       parseCondition();
       trimLeft();
@@ -210,16 +240,6 @@ private:
     } else {
       error("internal error: unimplemented mnemonic");
     }
-    
-    /*
-     * 
-     * (LDM|STM){cond}<type1> <base>{!},<registers>{^}
-     * (LDM|STM){cond}<type2> <base>{!},<registers>{^}
-     * <type1> is F|E A|D
-     * <type2> is I|D B|A
-     * <base> is a register
-     * <registers> is open-brace comma-separated-list close-brace
-     */
     
     ensureOnlySpaceOrCommentAtEndOf("instruction");
     
@@ -371,6 +391,21 @@ private:
     } else {
       error("expected register");
     }
+  }
+  
+  void parseRegisterList() {
+    expect('{');
+    while (true) {
+      int r = parseRegister();
+      // FIXME: check for duplicates?
+      instruction_ |= (1 << r);
+      // FIXME: cope with ranges like "r0-r8"?
+      if (*p_ != ',') {
+        break;
+      }
+      expect(',');
+    }
+    expect('}');
   }
   
   void parseRhs() {
