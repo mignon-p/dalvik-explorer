@@ -139,16 +139,40 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
     if (((instruction >> 25) & 1) == 1) {
       disassembleCccccTttMmmm(os, instruction);
     } else {
-      os << "FIXME: immediate form";
+      os << "FIXME: immediate form (12-bit offset)";
     }
     os << "]";
   } else if (high3 == 0x4) {
     // Block data transfer.
     // xxxx100P USWLnnnn llllllll llllllll
-    os << "FIXME: block data transfer";
+    os << (((instruction >> 20) & 1) ? "ldm" : "stm");
+    disassembleCondition(os, instruction);
+    static const char* puBits[] = { "da", "ia", "db", "ib", };
+    os << puBits[(instruction >> 23) & 0x3];
+    os << " r" << ((instruction >> 16) & 0xf);
+    if ((instruction >> 21) & 1) {
+      os << "!";
+    }
+    os << ",{";
+    // FIXME: fancier register lists, like "{r0-r8,r12,lr,pc}".
+    int registerCount = 0;
+    for (int i = 0; i < 16; ++i) {
+      if ((instruction >> i) & 1) {
+        if (registerCount > 0) {
+          os << ",";
+        }
+        os << "r" << ((instruction >> 16) & 0xf);
+        ++registerCount;
+      }
+    }
+    os << "}";
+    if ((instruction >> 22) & 1) {
+      os << "^";
+    }
   } else {
-    // Unknown.
-    os << "unknown";
+    // Unknown instruction.
+    os << ".word ";
+    dumpHex32(os, instruction);
   }
 }
 
