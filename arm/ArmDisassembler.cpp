@@ -1,3 +1,5 @@
+#include "ArmDisassembler.h"
+
 #include <cerrno>
 #include <cstdlib>
 #include <iomanip>
@@ -36,18 +38,6 @@ static void disassembleCccccTttMmmm(std::ostream& os, uint32_t instruction) {
     }
   }
 }
-
-class ArmDisassembler {
-public:
-  ArmDisassembler(std::ostream& os);
-  
-  void disassembleFile(const std::string& path);
-  
-  void disassembleInstruction(uint32_t address, uint32_t instruction);
-  
-private:
-  std::ostream& os;
-};
 
 ArmDisassembler::ArmDisassembler(std::ostream& os) : os(os) {
 }
