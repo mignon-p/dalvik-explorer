@@ -161,7 +161,7 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
         if (registerCount > 0) {
           os << ",";
         }
-        os << "r" << ((instruction >> 16) & 0xf);
+        os << "r" << i;
         ++registerCount;
       }
     }
