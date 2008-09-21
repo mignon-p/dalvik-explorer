@@ -1,3 +1,5 @@
+#include "ArmDisassembler.h"
+
 #include <cerrno>
 #include <cstdlib>
 #include <iostream>
@@ -150,14 +152,22 @@ int main(int argc, char* argv[]) {
     // FIXME: set condition/status bits?
     r[pc] = 0;
     
+    ArmDisassembler disassembler(std::cout);
+    const bool disassemble = false;
+    
     // Process instructions!
     while (true) {
         //dumpRegisters();
         
         // Fetch.
-        const uint32_t instruction = fetch(r[pc] & 0x03ffffff);
-        //std::cout << "instruction = " << uint32_to_string(instruction) << "\n";
+        const uint32_t fetchAddress = r[pc] & 0x03ffffff;
+        const uint32_t instruction = fetch(fetchAddress);
         r[pc] += 4;
+        
+        if (disassemble) {
+            disassembler.disassembleInstruction(fetchAddress, instruction);
+            std::cout << "\n";
+        }
         
         // Skip this instruction if its condition bits require a condition
         // that isn't currently true.
