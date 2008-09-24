@@ -80,6 +80,9 @@ public class LittleHelper extends JFrame {
         resultList.setVisibleRowCount(8);
         ui.add(new JScrollPane(resultList), BorderLayout.CENTER);
         
+        // There's no point being able to "scroll" a single-line text field, but scrolling a multi-row list is useful.
+        ComponentUtilities.divertPageScrollingFromTo(textField, resultList);
+        
         return ui;
     }
     
