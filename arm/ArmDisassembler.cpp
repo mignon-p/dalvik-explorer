@@ -10,6 +10,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+static bool bit(uint32_t value, size_t index) {
+  return (value & (1 << index));
+}
+
 static void dumpHex32(std::ostream& os, uint32_t value) {
   os << std::hex << std::noshowbase << "0x" << std::setw(8) << std::setfill('0')
      << value
@@ -53,7 +57,7 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
   if (high3 == 0x5) {
     // Branches.
     // xxxx101L oooooooo oooooooo oooooooo
-    os << (((instruction & 0x01000000) != 0) ? "bl" : "b");
+    os << (bit(instruction, 24) ? "bl" : "b");
     disassembleCondition(os, instruction);
     os << " ";
     const int32_t offset = ((int32_t(instruction) & 0x00ffffff) << 8) >> 8;
@@ -62,10 +66,10 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
   } else if ((instruction & 0x0fc000f0) == 0x00000090) {
     // Multiplication.
     // xxxx0000 00ASdddd nnnnssss 1001mmmm
-    const bool mla = ((instruction & 0x00200000) != 0);
+    const bool mla = bit(instruction, 21);
     os << (mla ? "mla" : "mul");
     disassembleCondition(os, instruction);
-    if ((instruction & (1 << 20)) != 0) {
+    if (bit(instruction, 20)) {
       os << "s";
     }
     os << " r" << ((instruction >> 16) & 0xf);
@@ -96,7 +100,7 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
     const int rn = ((instruction >> 16) & 0xf);
     if ((opCode & 0x8) == 0 || opCode == 0xc || opCode == 0xe) {
       // and, eor, sub, rsb, add, adc, sbc, rsc || orr || bic.
-      if ((instruction & (1 << 20)) != 0) {
+      if (bit(instruction, 20)) {
         os << "s";
       }
       os << " r" << rd << ",r" << rn;
@@ -109,7 +113,7 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
       os << " r" << rn;
     } else {
       // mov, mvn.
-      if ((instruction & (1 << 20)) != 0) {
+      if (bit(instruction, 20)) {
         os << "s";
       }
       os << " r" << rd;
@@ -128,15 +132,15 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
     // Single data transfer.
     // xxxx010P UBWLnnnn ddddoooo oooooooo  Immediate form
     // xxxx011P UBWLnnnn ddddcccc ctt0mmmm  Register form
-    os << (((instruction >> 20) & 1) ? "ldr" : "str");
+    os << (bit(instruction, 20) ? "ldr" : "str");
     disassembleCondition(os, instruction);
-    if ((instruction >> 22) & 1) {
+    if (bit(instruction, 22)) {
       os << "b";
     }
     os << " r" << ((instruction >> 12) & 0xf)
        << ","
        << "[r" << ((instruction >> 16) & 0xf);
-    if (((instruction >> 25) & 1) == 1) {
+    if (bit(instruction, 25)) {
       disassembleCccccTttMmmm(os, instruction);
     } else {
       os << "FIXME: immediate form (12-bit offset)";
@@ -145,19 +149,19 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
   } else if (high3 == 0x4) {
     // Block data transfer.
     // xxxx100P USWLnnnn llllllll llllllll
-    os << (((instruction >> 20) & 1) ? "ldm" : "stm");
+    os << (bit(instruction, 20) ? "ldm" : "stm");
     disassembleCondition(os, instruction);
     static const char* puBits[] = { "da", "ia", "db", "ib", };
     os << puBits[(instruction >> 23) & 0x3];
     os << " r" << ((instruction >> 16) & 0xf);
-    if ((instruction >> 21) & 1) {
+    if (bit(instruction, 21)) {
       os << "!";
     }
     os << ",{";
     // FIXME: fancier register lists, like "{r0-r8,r12,lr,pc}".
     int registerCount = 0;
     for (int i = 0; i < 16; ++i) {
-      if ((instruction >> i) & 1) {
+      if (bit(instruction, i)) {
         if (registerCount > 0) {
           os << ",";
         }
@@ -166,7 +170,7 @@ void ArmDisassembler::disassembleInstruction(uint32_t address, uint32_t instruct
       }
     }
     os << "}";
-    if ((instruction >> 22) & 1) {
+    if (bit(instruction, 22)) {
       os << "^";
     }
   } else {
