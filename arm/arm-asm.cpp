@@ -113,7 +113,10 @@ private:
                mnemonic == OP_TEQ || mnemonic == OP_TST) {
       // (CMN|CMP|TEQ|TST)<cond>P? rn,<rhs>
       parseCondition();
-      // FIXME: P?
+      if (*p_ == 'p') {
+        instruction_ |= (0xf << 12);
+        ++p_;
+      }
       trimLeft();
       const int rn = parseRegister();
       expect(',');
@@ -208,15 +211,13 @@ private:
       instruction_ |= (1 << 27);
       // FIXME: better error reporting?
       // FIXME: support for 'fd' and friends?
-      if (*p_ == 'i') {
+      if (accept("i", 1)) {
         instruction_ |= (1 << 23);
-        expect('i');
       } else {
         expect('d');
       }
-      if (*p_ == 'b') {
+      if (accept("b", 1)) {
         instruction_ |= (1 << 24);
-        expect('b');
       } else {
         expect('a');
       }
