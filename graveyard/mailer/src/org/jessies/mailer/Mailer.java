@@ -884,7 +884,7 @@ public class Mailer extends MainFrame {
         
         private String headersToString(Message message) throws MessagingException {
             StringBuilder result = new StringBuilder();
-            Enumeration headers = message.getAllHeaders();
+            Enumeration<?> headers = message.getAllHeaders();
             while (headers.hasMoreElements()) {
                 Header h = (Header) headers.nextElement();
                 result.append(h.getName());
