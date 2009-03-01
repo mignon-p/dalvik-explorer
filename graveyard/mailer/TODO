@@ -1,0 +1,126 @@
+
+on-line javax.mail documentation: http://java.sun.com/javaee/5/docs/api/javax/mail/package-summary.html
+javax.mail source: https://glassfish.dev.java.net/source/browse/glassfish/mail/src/java/
+on-line official JavaMail FAQ: http://java.sun.com/products/javamail/FAQ.html
+on-line JavaMail FAQ: http://www.jguru.com/faq/printablefaq.jsp?topic=JavaMail
+
+examples of attachment handling (and other stuff): http://java.sun.com/developer/onlineTraining/JavaMail/contents.html
+more examples: http://www.cafeaulait.org/books/jnp2e/examples/19/
+
+good post that should be mentioned in the documentation, on the subject of "why another mail client?": http://daringfireball.net/2003/06/you_have_new_mail
+
+ --
+
+* choose final name.
+ + i think we should keep the code neutral and vague. "mailer" is fine internally, and shouldn't change whatever we do with the name. changing to Evergreen other than in the UI/documentation was painful and unnecessary.
+ + chris suggests Maori word "Waea".
+
+* receiving (IMAP) support.
+ + support multiple stores. (carefully remembering which SMTP server goes with which!)
+ + check at appropriate points whether we've been disconnected, and reconnect. (though you'd rather not block, in case the network's gone away.)
+ + dealing with self-signed certificates: http://blogs.sun.com/andreas/entry/no_more_unable_to_find (see InstallCert.java)
+ + should be able to "accept once" or "accept forever".
+ + start caching header information on a separate thread in the background to try to avoid locking the UI.
+ + should probably use IDLE rather than fixed-delay polling (plus the free "check on every operation").
+ + cope better with closed folders. (for some reason, Exchange has started closing folders on me. not sure why.)
+ + our insistence on caching all the header information on switching to a folder can make us very slow for a folder with 15k messages (1.5 minutes talking to Exchange on a LAN). it was obvious we'd eventually need to do this in the background, but less obvious, i think, that while bulk get takes us so far, we're going to have to "bulk" get in chunks smaller than the size of the folder. (Outlook feels like it uses a chunk size equal to the number of displayable rows in its table, with some kind of queue-jumping if the user scrolls past where it's currently got to.)
+
+* sending (SMTP) support.
+ + reply and forward should both keep attachments.
+ + replying to mail you sent should "reply" to the person you sent to, not you.
+ + display a suitable error in the UI when the user fails to authenticate with the SMTP server. this doesn't work like IMAP, where we get an obvious exception right away. SMTP tells us after we close the session.
+ + should be able to go straight from a message to the reply you wrote, as in Outlook. i guess this is implemented with some kind of X-org.jessies.mailer-Reply-Has-UID header added to the original message after the reply is added to the "sent" folder. we could check if that's what Outlook does; if so it would be worth trying to be compatible.
+
+* sensible display.
+ + it would be nice to have a little "replied to" icon rather than the old-school "R" in the table.
+ + need some kind of "header summary" component. possibly just showing full "to" details. "from", "subject", and "date" are all clearly shown (highlighted) in the table above the message. since we can't print directly anyway (afaik), it's not obvious we've anything to gain from looking like our printed form.
+ + show all times in ISO format (but use a variant more suited to mail, removing sub-second information, and using ' ' instead of 'T').
+ + for senders not in your time zone, also translate along the lines of "(04:32 your time)". or the other way round? show in your time by default, and optionally in the sender's time zone?
+ + spot those (admittedly rare) cases where the "sent" and "received" dates differ greatly, which indicate mail problems, and are confusing unless you read the raw headers and have access to the mail logs.
+ + maybe "header summary" component shows attachment summary too; maybe a separate component.
+ + maybe this all scrolls with message; maybe outside that scroll pane.
+ + i miss Mail.app's automatic highlighting of other messages in the thread when using other mailers. (i hate attempts to show threads as trees, but simple highlighting works quite well.) car and enp report that Mail.app uses a combination of message-id headers and subject lines.
+ + recognize ads from ad-supported mail providers and automatically strip them? (because, no, yahoo, i don't want "ideas for reducing my carbon footprint", and i definitely don't want them on every bloody mail i receive from a yahoo user.)
+
+* strong editing.
+ + should probably do something to stop bracket matcher complaining about all the lines starting with an "unmatched" >.
+ + could use a custom indenter so that if you insert a newline in a quoted line, the broken-off piece automatically retains its quoting. most mailers manage to make this really annoying, but i think that's because they're really using something closer to HTML under the hood. plain text, i think, would make this work sensibly.
+ + shouldn't be able to close a compose window without a warning. just automatically saving a draft, acme-style, might be even better.
+ + hitting Esc in a compose window should be equivalent to clicking close in the title bar.
+
+* keyboard-only operation.
+ + enp likes the tass(1)-like space bar behavior in Mail.app: scroll through the current message until you reach the bottom, then move to the next message (or next unread, in some implementations). shift-space goes the other way.
+ + next/previous in thread can also be useful, if we can recognize threads well enough.
+
+* account configuration.
+ + we need to read/write our List<AccountInfo> from/to disk. simplest probably ~/.org.jessies.mailer/accounts/ and then one file per account? *must* include a version number. should probably be XML, for semi-convenience.
+ + Edit > Accounts... should open a dialog with a JList of AccountInfo elements and "New", "Edit", and "Delete" buttons.
+ + "New" should create a new AccountInfo, invoke editAccount, and if that returns true, add it to the list.
+ + "Edit" should invoke editAccount.
+ + you can guess what "Delete" should do.
+
+* local caching.
+ + ram goes without saying (but doesn't come for free for message body parts; just header information).
+ + disk optionally (privacy/security and to a lesser extent performance/cost [think EDGE/3G] speak against always-on).
+ + pcn suggests read-ahead of bodies on the not unreasonable assumption that you're going to read new mail. (one problem there is that doing so will set the SEEN flag.)
+
+* fast full-text search.
+ + how fast is the IMAP server's built-in search? is it worth having as a backup anyway, even if it is slow?
+
+* attachments (read-only).
+ + save individual attachments.
+ + save all attachments.
+ + ability to open an attachment without saving it first.
+ + view image attachments in the preview area, somehow.
+ + view image attachments as a slideshow.
+ + Thunderbird (and maybe others) seem to invent an X- content-type for any unknown extension. so a "monkey.log" file, for example, has a made-up MIME type of X-LOG. this makes our current attachment-handling code look a bit stupid. i'm not sure what we should do but having a short list of common "custom" extensions (.diff, .log, .patch, and so on) and probably common source code extensions (.cpp, .java, and so on) is probably a good idea. though we might want to have our own built-in text viewer at that point, rather than just writing stuff to the file system and letting the OS "open" the file as it sees fit.
+
+* attachments (write).
+ + should be able to drag a file into a compose window, or open a file chooser.
+ + if it's an image, allow shrinking/cropping/format conversion like Mail.app.
+
+* sensible HTML handling.
+ + is GNU Classpath's javax.swing.text.html better than Sun's?
+ + Mail.app lets you manually switch between multipart/alternative choices.
+ + should favor text/plain for unknown senders. (it's probably spam anyway.)
+ + should favor text/plain for messages where the HTML adds nothing. (how to recognize?)
+ + would be nice to be able to override style information; i'm truly sick of people sending me purple Comic Sans (i kid you not) and the like. favoring text/plain might solve this.
+ + need a heuristic for recognizing when the HTML preview has something fundamentally too wide, so we can relent and allow a scroll bar.
+ + showing HTML can be slow, especially if there are images to download. stick up a "formatting message..." message before letting Swing loose. or work out why we're blocking.
+ + copy & paste from HTML should include line breaks! at the moment, it's all just one long line. probably Swing's fault, but we'll need to fix/work around it.
+ + running HTML through tidy(1) seems to improve Swing's chances of rendering it correctly. worth automating?
+ + when Outlook sends an HTML message with an embedded image (i.e. one that's available as another MIME part rather than linked to on the web) we show the image as an attachment (which is probably fine until you get a mail with hundreds of images) and a broken image icon in the HTML (which isn't good). we need to work out how to get the Swing HTML renderer to let us provide the right images.
+
+* alternatives to "Outlook 3-pane" style.
+ + widescreen: compress the table into a list that goes in a column between the folder tree and the preview pane. the advantage is that it's better suited to modern widescreen displays, and is especially useful if you crank the font size down.
+ + gmail style: the trick of putting all the thread into one stream & eliding the repetitious bits is pretty cool in those cases where you want to review a whole thread. this might be most useful as an alternative window, popped up to display a thread, rather than an alternative interface.
+ + blackberry style: if space were really tight, we might look very different. what about if we just wanted to make the best use of the (relatively) large amount of space we do have? why isn't the folder tree short, for example, like the mailbox table? the preview area could stretch the whole width of the window, and probably make better use of the lhs than the empty space beneath the tree. how often do you change folder anyway? why do you manually change folder? can that be avoided entirely?
+
+* appearance.
+ + remember window sizes and positions.
+ + remember split pane positions.
+ + remember table column widths. (or just do a good enough job of automatically setting them sensibly? i haven't manually adjusted once them since writing the auto-sizing code.)
+
+* signatures.
+ + maybe no UI? people l33t enough to have "~/.signature" get one, others don't. a "~/.signature"-editing UI can always be added later, given enough demand.
+ + at least the basic "one global signature, plain text".
+ + maybe "face" support? do enough other mailers use it? (no. Mac OS pulls images out of your address book. which is a pretty cool feature on platforms with such an address book.)
+
+* printing.
+
+* address book.
+ + ideally, integrate with the native system.
+ + if we use the native address book, how/where do we store things like "always show HTML from amazon and netflix" (assuming that we'll default to not showing HTML).
+ + (option to) automatically add anyone you send/reply to.
+
+* privacy/security.
+ + use clamscan(1) to check attachments?
+ + use clamscan(1) to check incoming mail from unrecognized senders for phishing? (i think it offers this functionality.)
+ + signing.
+ + encryption.
+
+* disconnected operation.
+ + no need to manually toggle.
+ + "best effort" based on what we have cached in RAM/on disk.
+ + if we can't send, just pop it in the Outbox and retry when we're reconnected. (obviously need to distinguish actual errors.)
+ + the read-ahead idea in "local caching" would be useful here. you'd probably already have the bodies of your unread mails available.

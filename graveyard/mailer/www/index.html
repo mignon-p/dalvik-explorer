@@ -1,0 +1,39 @@
+<!--#set var="PAGE_TITLE" value="Mailer" -->
+<!--#set var="HUMAN_NAME" value="Mailer" -->
+<!--#set var="SHORT_DIST_NAME" value="mailer" -->
+<!--#set var="LONG_DIST_NAME" value="org.jessies.mailer" -->
+
+<!--#include virtual="/salma-hayek/header.html" -->
+
+<h1>Mailer</h1>
+
+<p><strong>Mailer is a cross-platform GPL desktop mail client designed to be fast and simple.</strong>
+
+<p>Mailer is compatible with IMAP incoming mail servers and SMTP outgoing mail servers.
+It replaces Outlook, Evolution, and Apple's Mail.app.
+
+<!--#include virtual="/salma-hayek/navigation.html" -->
+
+<h2><a name="features">Features</a></h2>
+
+<p>Mailer was designed as a no-nonsense mail client after too many years fighting over-clever, over-configurable mailers on various platforms. Almost every mailer has something it does really well, but every mailer has some fundamental problem (even if it's only the lack of spelling checking as you type, or being tied to one particular platform):
+
+<ul>
+<li><p><strong>Available Everywhere</strong> - Mailer runs on Linux, Mac OS, Solaris, and Windows. No more using a different mailer on every platform.
+
+<li><p><strong>Strong Plain-Text Editing</strong> - Mailer uses an industrial-strength custom text component for displaying/editing plain text. (The same component is used in the full-blown editor for programmers, <a href="/evergreen/">Evergreen</a>.)
+
+<li><p><strong>Designed For Keyboard Navigation</strong> - Sometimes you're using the mouse, and sometimes you're using the keyboard. Apple's Mail.app showed how the flow in a GUI mailer could be improved by strong keyboard support, and Mailer is designed to be at least as good. In particular, when the mailbox table has the focus, the up and down arrow keys change the selected message, but the page up/page down and home/end keys scroll through the body of the currently selected message rather than much less usefully scrolling the table itself. The delete key moves selected messages to your trash folder, and shift-delete permanently deletes selected messages, bypassing the trash folder as in Outlook.
+
+<li><p><strong>Designed For High-Latency Links/Slow Servers</strong> - Not everyone is on the same LAN as their IMAP server, but many mailers behave as if they were. Mailer tries not to waste your time with unnecessary network ping-pong matches.
+
+<li><p><strong>Secure</strong> - Use SSL to connect to your IMAP and SMTP servers, and use SMTP authentication to identify yourself to your outgoing mail server. Your IMAP and SMTP passwords are not stored on disk.
+
+<li><p><strong>Simple Delete Behavior</strong> - Deleting a mail moves it to the trash folder; permanent deletion marks the message as deleted. Both expunge immediately. This is much less confusing if you point multiple mailers (or multiple instances of the same mailer) at the same mail store, because you don't log out at work when you go home, say, or because you have multiple computers around the house. Some argue that IMAP's existing distinction between marking as deleted and expunging is the appropriate implementation of two-stage deletion, but unless all clients agree on it, it causes trouble. It also means that your most frequently-accessed folder, your inbox, is larger than under the "move to trash" scheme.
+
+<li><p><strong>No POP</strong> - IMAP offers the potential for better performance, better functionality, and better concurrent behavior than POP did. Only supporting IMAP also simplifies configuration.
+</ul>
+
+<!--#include virtual="/salma-hayek/downloads.html" -->
+
+<!--#include virtual="/salma-hayek/footer.html" -->

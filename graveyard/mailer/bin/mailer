@@ -1,0 +1,10 @@
+#!/usr/bin/ruby -w
+
+# Cope with symbolic links to this script.
+require "pathname.rb"
+app_home = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
+require "#{app_home}/salma-hayek/bin/invoke-java.rb"
+
+invoker = Java.new("Mailer", "org/jessies/mailer/Mailer")
+invoker.add_property("org.jessies.frameIcon", "/usr/share/icons/Tango/22x22/apps/email.png")
+invoker.invoke()
