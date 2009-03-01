@@ -205,18 +205,6 @@ public class P9Term {
      */
     private void optionsDidChange() {
         updateBoldForegroundColor();
-        
-        // On the Mac, the Command key (called 'meta' by Java) is always used for keyboard equivalents.
-        // On other systems, Control tends to be used, but in the special case of terminal emulators this conflicts with the ability to type control characters.
-        // The traditional work-around has always been to use Alt, which -- conveniently for Mac users -- is in the same place on a PC keyboard as Command on a Mac keyboard.
-        // Things are complicated if we want to support emacs(1), which uses the alt key as meta.
-        // Things are complicated in a different direction if we want to support input methods that use alt.
-        // At the moment, we assume that Linux users who want characters not on their keyboard will switch keyboard mapping dynamically (which works fine).
-        // We can avoid the question on Mac OS for now because disabling input methods doesn't currently work properly, and we don't get the key events anyway.
-        if (GuiUtilities.isMacOs() == false) {
-            GuiUtilities.setDefaultKeyStrokeModifier(preferences.getBoolean(P9TermPreferences.USE_ALT_AS_META) ? java.awt.event.KeyEvent.SHIFT_MASK | java.awt.event.KeyEvent.CTRL_MASK : java.awt.event.KeyEvent.ALT_MASK);
-        }
-        
         for (int i = 0; i < frames.size(); ++i) {
             frames.get(i).optionsDidChange();
         }
