@@ -144,16 +144,8 @@ public class ComposeWindow extends JFrame {
     
     private void initSubjectListener() {
         // Keep the title bar up-to-date with respect to the subject field.
-        subjectField.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                updateTitleBar();
-            }
-            
-            public void insertUpdate(DocumentEvent e) {
-                updateTitleBar();
-            }
-            
-            public void removeUpdate(DocumentEvent e) {
+        subjectField.getDocument().addDocumentListener(new DocumentAdapter() {
+            public void documentChanged() {
                 updateTitleBar();
             }
         });
