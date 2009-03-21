@@ -18,6 +18,9 @@ static uint32_t r[16]; // 16 registers.
 
 static unsigned char memory[32*1024]; // 32KiB of RAM.
 
+static uint32_t fetchAddress;
+static uint32_t instruction;
+
 enum {
     lr = 14, // r14 is the "link register", lr.
     pc = 15, // r15 is the "program counter", pc.
@@ -37,6 +40,10 @@ static void dumpRegisters() {
             printf("\n");
         }
     }
+    printf("Executing:\n ");
+    ArmDisassembler disassembler(std::cout);
+    disassembler.disassembleInstruction(fetchAddress, instruction);
+    std::cout << "\n";
 }
 
 static void panic(const std::string&, bool) __attribute__((noreturn));
@@ -160,8 +167,8 @@ int main(int argc, char* argv[]) {
         //dumpRegisters();
         
         // Fetch.
-        const uint32_t fetchAddress = r[pc] & 0x03ffffff;
-        const uint32_t instruction = fetch(fetchAddress);
+        fetchAddress = r[pc] & 0x03ffffff;
+        instruction = fetch(fetchAddress);
         r[pc] += 4;
         
         if (disassemble) {
