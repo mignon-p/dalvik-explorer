@@ -1,0 +1,10 @@
+html, body { color: black; background: Window; font-family: sans-serif; }
+a img { border: 0px; vertical-align: middle; }
+#footer { margin-top: 24px; }
+#footer p { margin: 0px; text-align: center; font-size: 75%; }
+table { table-layout: fixed; margin-top: 8px; border-collapse: separate; border-spacing: 0px; padding: 1px; background: #3e83c9; }
+table thead th { padding: 4px; text-align: left; color: white; background: #3e83c9; }
+table thead th:first-child { border-left: 0px; }
+table tbody td { white-space: nowrap; overflow: hidden; text-overflow-mode: ellipsis; padding: 4px; color: black; }
+tr { background: white; }
+tr.alt { background: #ecf6fc; }

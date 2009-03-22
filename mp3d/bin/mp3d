@@ -1,0 +1,10 @@
+#!/usr/bin/ruby -w
+
+# Find out where we are, and where our support library is.
+require "pathname.rb"
+app_root = Pathname.new(__FILE__).realpath().dirname().dirname()
+salma_hayek = "#{app_root}/../salma-hayek"
+
+require "#{salma_hayek}/bin/invoke-java.rb"
+
+Java.runCommandLineTool("org/jessies/mp3d/Mp3d")
