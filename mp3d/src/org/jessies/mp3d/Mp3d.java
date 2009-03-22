@@ -60,6 +60,7 @@ public class Mp3d {
                 page.append("<head>\n");
                 page.append(" <title>mp3d</title>\n");
                 page.append(" <link rel='stylesheet' href='/static/mp3d.css' type='text/css'>\n");
+                page.append(" <script type='text/javascript' src='/static/mp3d.js'></script>\n");
                 page.append("</head>\n");
                 page.append("<body onload='document." + formName + "." + inputName + ".focus()'>\n");
                 
@@ -206,6 +207,7 @@ public class Mp3d {
         final StaticHandler staticHandler = new StaticHandler();
         
         staticHandler.put("/static/mp3d.css", new File(getResourceFilename("mp3d.css")));
+        staticHandler.put("/static/mp3d.js", new File(getResourceFilename("mp3d.js")));
         staticHandler.put("/static/add.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-add.png"));
         staticHandler.put("/static/play.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-media-play-ltr.png"));
         staticHandler.put("/static/remove.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-remove.png"));
@@ -289,7 +291,8 @@ public class Mp3d {
     private void appendMp3Table(StringBuilder out, Iterable<Mp3Info> mp3s, boolean isQueue) {
         out.append("<table width='100%'>\n");
         out.append("<thead>\n");
-        out.append(" <tr> <th width='24px'>&nbsp;</th> <th>Title</th> <th width='20%'>Artist</th> <th width='20%'>Album</th> </tr>\n");
+        String col1 = isQueue ? "&nbsp;" : "<input type='checkbox' onclick='checkAll(this);'>";
+        out.append(" <tr> <th width='24px'>" + col1 + "</th> <th>Title</th> <th width='20%'>Artist</th> <th width='20%'>Album</th> </tr>\n");
         out.append("</thead>\n");
         out.append("<tbody>\n");
         int rowCount = 0;
