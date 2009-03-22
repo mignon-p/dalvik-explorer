@@ -22,6 +22,7 @@ import com.sun.net.httpserver.*;
 import e.util.*;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -75,7 +76,7 @@ public class Mp3d {
                 page.append("<input name='" + inputName + "' type='text' value='" + (q != null ? q : "") + "'>");
                 page.append("</form>\n");
                 
-                if (terms.size() != 0) {
+                if (!terms.isEmpty()) {
                     // Collect the matching mp3s.
                     final ArrayList<Mp3Info> matchingMp3s = new ArrayList<Mp3Info>();
                     for (Mp3Info mp3 : allMp3s) {
@@ -97,7 +98,12 @@ public class Mp3d {
                         }
                     });
                     
+                    page.append("<form name='add_form' action='/add' method='post'>");
                     appendMp3Table(page, matchingMp3s, false);
+                    if (!matchingMp3s.isEmpty()) {
+                        page.append("<p><input type='submit' value='Add to Queue'>");
+                    }
+                    page.append("</form>\n");
                 }
                 
                 page.append("<div id='footer'>");
@@ -149,25 +155,18 @@ public class Mp3d {
     
     private class AddHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            final Mp3Info mp3 = requestedMp3(t);
-            
             try {
-                playQueue.put(mp3);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            
-            HttpUtilities.sendSeeOther(t, "/");
-        }
-    }
-    
-    private class PlayHandler implements HttpHandler {
-        public void handle(HttpExchange t) throws IOException {
-            final Mp3Info mp3 = requestedMp3(t);
-            
-            playQueue.clear();
-            try {
-                playQueue.put(mp3);
+                // Read the form input.
+                BufferedReader in = new BufferedReader(new InputStreamReader(t.getRequestBody(), Charset.forName("UTF-8")));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    for (String nameAndValue : line.split("&")) {
+                        final int id = Integer.parseInt(nameAndValue.substring(nameAndValue.indexOf('=') + 1));
+                        System.err.println(id);
+                        playQueue.put(findMp3(id));
+                        
+                    }
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -215,8 +214,7 @@ public class Mp3d {
         System.err.println("Starting HTTP server on port " + MP3D_PORT + "...");
         final HttpServer server = HttpServer.create(new InetSocketAddress(MP3D_PORT), 0);
         server.createContext("/", new MainHandler());
-        server.createContext("/add/", new AddHandler());
-        server.createContext("/play/", new PlayHandler());
+        server.createContext("/add", new AddHandler());
         server.createContext("/remove/", new RemoveHandler());
         server.createContext("/static/", staticHandler);
         server.setExecutor(null);
@@ -301,8 +299,7 @@ public class Mp3d {
             if (isQueue) {
                 out.append("<a href='/remove/" + mp3.id + "'><img src='/static/remove.png'></a>");
             } else {
-                out.append("<a href='/add/" + mp3.id + "'><img src='/static/add.png'></a>");
-                //out.append("<a href='/play/" + mp3.id + "'><img src='/static/play.png'></a>");
+                out.append("<input type='checkbox' name='id' value='" + mp3.id + "'>");
             }
             out.append("</td>");
             // FIXME: html escape these strings!
