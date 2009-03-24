@@ -287,10 +287,13 @@ public class Mp3d {
         }
     }
     
-    private void appendMp3Table(StringBuilder out, Iterable<Mp3Info> mp3s, boolean isQueue) {
+    private void appendMp3Table(StringBuilder out, Collection<Mp3Info> mp3s, boolean isQueue) {
+        // If there's only one choice, select it automatically to save the user a click.
+        final String checked = (mp3s.size() == 1) ? " checked" : "";
+        
         out.append("<table width='100%'>\n");
         out.append("<thead>\n");
-        String col1 = isQueue ? "&nbsp;" : "<input type='checkbox' onclick='checkAll(this);'>";
+        final String col1 = isQueue ? "&nbsp;" : "<input type='checkbox' onclick='checkAll(this);'" + checked + ">";
         out.append(" <tr> <th width='24px'>" + col1 + "</th> <th>Title</th> <th width='20%'>Artist</th> <th width='20%'>Album</th> </tr>\n");
         out.append("</thead>\n");
         out.append("<tbody>\n");
@@ -301,7 +304,7 @@ public class Mp3d {
             if (isQueue) {
                 out.append("<a href='/remove/" + mp3.id + "'><img src='/static/remove.png'></a>");
             } else {
-                out.append("<input type='checkbox' name='id' value='" + mp3.id + "'>");
+                out.append("<input type='checkbox' name='id' value='" + mp3.id + "'" + checked + ">");
             }
             out.append("</td>");
             // FIXME: html escape these strings!
