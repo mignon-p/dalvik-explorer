@@ -163,7 +163,6 @@ public class Mp3d {
                 while ((line = in.readLine()) != null) {
                     for (String nameAndValue : line.split("&")) {
                         final int id = Integer.parseInt(nameAndValue.substring(nameAndValue.indexOf('=') + 1));
-                        System.err.println(id);
                         playQueue.put(findMp3(id));
                         
                     }
