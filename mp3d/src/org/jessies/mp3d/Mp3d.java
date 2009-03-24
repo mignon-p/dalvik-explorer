@@ -212,7 +212,6 @@ public class Mp3d {
         staticHandler.put("/static/remove.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-remove.png"));
         
         // Start the HTTP server.
-        System.err.println("Starting HTTP server on port " + MP3D_PORT + "...");
         final HttpServer server = HttpServer.create(new InetSocketAddress(MP3D_PORT), 0);
         server.createContext("/", new MainHandler());
         server.createContext("/add", new AddHandler());
@@ -223,6 +222,10 @@ public class Mp3d {
         
         // Start the mp3 player thread.
         new Thread(new PlayQueueRunnable()).start();
+        
+        // Announce the HTTP server via DNS-SD.
+        final int portNumber = server.getAddress().getPort();
+        ProcessUtilities.spawn(null, "/usr/bin/avahi-publish", "-f", "-s", "mp3d", "_http._tcp", Integer.toString(portNumber));
     }
     
     private class PlayQueueRunnable implements Runnable {
