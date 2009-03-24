@@ -100,6 +100,6 @@ public final class Mp3Info {
     }
     
     @Override public String toString() {
-        return "Mp3Info[title='" + title + "',artist='" + artist + "'album='" + album + "',disc=" + disc + ",track=" + track + ",order=" + order + ",id=" + id + " (" + filename + ")]";
+        return "Mp3Info[title='" + title + "',artist='" + artist + "',album='" + album + "',disc=" + disc + ",track=" + track + ",order=" + order + ",id=" + id + " (" + filename + ")]";
     }
 }
