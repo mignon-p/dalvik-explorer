@@ -330,14 +330,15 @@ public class Mp3d {
     }
     
     public static void main(String[] args) throws Exception {
+        // It's traditional on Mac OS and Linux to keep mp3s in ~/Music.
         if (args.length == 0) {
-            usage();
+            args = new String[] { "~/Music" };
         }
         
         // Check the arguments are all directories.
         final ArrayList<File> musicDirectories = new ArrayList<File>();
         for (String arg : args) {
-            File dir = new File(arg);
+            File dir = FileUtilities.fileFromString(arg);
             if (!dir.exists() || !dir.isDirectory()) {
                 usage();
             }
