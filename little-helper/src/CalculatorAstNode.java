@@ -25,7 +25,7 @@ public class CalculatorAstNode {
     // For identifiers. (FIXME: this assumes all identifiers are constants rather than functions.)
     private String identifier;
     
-    // For operators.
+    // For operators. Unary operators may have rhs null.
     private CalculatorToken op;
     private CalculatorAstNode lhs;
     private CalculatorAstNode rhs;
@@ -71,6 +71,17 @@ public class CalculatorAstNode {
             case B_AND: return fromBigInteger(lhs.value().toBigInteger().and(rhs.value().toBigInteger()));
             case B_OR: return fromBigInteger(lhs.value().toBigInteger().or(rhs.value().toBigInteger()));
             case B_XOR: return fromBigInteger(lhs.value().toBigInteger().xor(rhs.value().toBigInteger()));
+            case B_NOT: return fromBigInteger(lhs.value().toBigInteger().not());
+                
+            case POW:
+                {
+                    try {
+                        int n = rhs.value().intValueExact();
+                        return lhs.value().pow(n);
+                    } catch (ArithmeticException ex) {
+                        return fromDouble(Math.pow(lhs.value().doubleValue(), rhs.value().doubleValue()));
+                    }
+                }
                 
             default: throw new CalculatorError("operator " + op + " not yet implemented");
             }
@@ -79,6 +90,10 @@ public class CalculatorAstNode {
     
     private BigDecimal fromBigInteger(BigInteger i) {
         return new BigDecimal(i, Calculator.MATH_CONTEXT);
+    }
+    
+    private BigDecimal fromDouble(double d) {
+        return new BigDecimal(d, Calculator.MATH_CONTEXT);
     }
     
     private BigDecimal fromBoolean(boolean b) {
@@ -95,7 +110,7 @@ public class CalculatorAstNode {
         } else if (identifier != null) {
             return identifier;
         } else {
-            return "((" + lhs.toString() + ") " + op + " (" + rhs.toString() + "))";
+            return "((" + lhs + ") " + op + " (" + rhs + "))";
         }
     }
 }

@@ -17,7 +17,15 @@
  */
 
 import java.math.*;
+import org.jessies.test.*;
 
+// FIXME: built-in constants (pi, e).
+// FIXME: built-in functions (abs, acos, asin, atan, atan2, cbrt, ceil[ing], cos, cosh, exp, floor, hypot, log(value, base), log2, logE, log10, random, sin, sinh, sqrt, tan, tanh).
+// FIXME: Mac OS' calculator offers -d variants of all the trig functions for degrees. that, or offer constants to multiply by to convert to degrees/radians?
+// FIXME: higher-order built-in functions like http://www.vitanuova.com/inferno/man/1/calc.html (sum, product, integral, differential, solve).
+// FIXME: integer division (//).
+// FIXME: factorial (postfix !).
+// FIXME: logical not (prefix !).
 public class Calculator {
     public static final MathContext MATH_CONTEXT = new MathContext(20, RoundingMode.HALF_UP);
     
@@ -29,6 +37,7 @@ public class Calculator {
     
     public String evaluate() throws CalculatorError {
         CalculatorAstNode ast = expr();
+        System.err.println(ast);
         BigDecimal value = ast.value();
         return value.toString();
     }
@@ -121,17 +130,26 @@ public class Calculator {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (0-f) for simplicity.
-            return new CalculatorAstNode(CalculatorToken.MINUS, new CalculatorAstNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), factor());
+            return new CalculatorAstNode(CalculatorToken.MINUS, new CalculatorAstNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), exponentiationExpression());
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
-            return new CalculatorAstNode(CalculatorToken.B_NOT, factor(), null);
+            return new CalculatorAstNode(CalculatorToken.B_NOT, exponentiationExpression(), null);
         }
-        return factor();
+        return exponentiationExpression();
     }
     
     // sqrt
     
     // **
+    private CalculatorAstNode exponentiationExpression() {
+        CalculatorAstNode result = factor();
+        if (lexer.token() == CalculatorToken.POW) {
+            CalculatorToken op = lexer.token();
+            lexer.nextToken();
+            result = new CalculatorAstNode(op, result, exponentiationExpression());
+        }
+        return result;
+    }
     
     // !
     
@@ -159,5 +177,51 @@ public class Calculator {
             throw new CalculatorError("expected " + what + ", got " + lexer.token() + " instead");
         }
         lexer.nextToken();
+    }
+    
+    @Test private static void testCalculator() {
+        Assert.equals(new Calculator("1+2+3").evaluate(), "6");
+        Assert.equals(new Calculator("1+-2").evaluate(), "-1");
+        Assert.equals(new Calculator("3-2-1").evaluate(), "0");
+        
+        Assert.equals(new Calculator("3*4").evaluate(), "12");
+        Assert.equals(new Calculator("-3*4").evaluate(), "-12");
+        Assert.equals(new Calculator("3*-4").evaluate(), "-12");
+        Assert.equals(new Calculator("-3*-4").evaluate(), "12");
+        
+        Assert.equals(new Calculator("3%4").evaluate(), "3");
+        Assert.equals(new Calculator("4%4").evaluate(), "0");
+        Assert.equals(new Calculator("5%4").evaluate(), "1");
+        
+        Assert.equals(new Calculator("1<2").evaluate(), "0");
+        Assert.equals(new Calculator("2<2").evaluate(), "1");
+        Assert.equals(new Calculator("2<1").evaluate(), "1");
+        Assert.equals(new Calculator("1<=2").evaluate(), "0");
+        Assert.equals(new Calculator("2<=2").evaluate(), "0");
+        Assert.equals(new Calculator("2<=1").evaluate(), "1");
+        Assert.equals(new Calculator("1>2").evaluate(), "1");
+        Assert.equals(new Calculator("2>2").evaluate(), "1");
+        Assert.equals(new Calculator("2>1").evaluate(), "0");
+        Assert.equals(new Calculator("1>=2").evaluate(), "1");
+        Assert.equals(new Calculator("2>=2").evaluate(), "0");
+        Assert.equals(new Calculator("2>=1").evaluate(), "0");
+        Assert.equals(new Calculator("1==2").evaluate(), "1");
+        Assert.equals(new Calculator("2==2").evaluate(), "0");
+        Assert.equals(new Calculator("2==1").evaluate(), "1");
+        Assert.equals(new Calculator("1!=2").evaluate(), "0");
+        Assert.equals(new Calculator("2!=2").evaluate(), "1");
+        Assert.equals(new Calculator("2!=1").evaluate(), "0");
+        
+        Assert.equals(new Calculator("1<<4").evaluate(), "16");
+        Assert.equals(new Calculator("(12<<3)>>3").evaluate(), "12");
+        
+        Assert.equals(new Calculator("(0x1234 & 0xff0) == 0x230").evaluate(), "0");
+        Assert.equals(new Calculator("(0x1200 | 0x34) == 0x1234").evaluate(), "0");
+        Assert.equals(new Calculator("5 ^ 3").evaluate(), "6");
+        Assert.equals(new Calculator("((0x1234 & ~0xff) | 0x56) == 0x1256").evaluate(), "0");
+        
+        Assert.equals(new Calculator("2**3").evaluate(), "8");
+        Assert.equals(new Calculator("2**3**4").evaluate(), "2417851639229258349412352");
+        Assert.equals(new Calculator("4**0.5").evaluate(), "2");
     }
 }
