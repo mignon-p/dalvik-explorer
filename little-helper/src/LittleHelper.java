@@ -1,3 +1,21 @@
+/*
+ * This file is part of LittleHelper.
+ * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
+ * 
+ * LittleHelper is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Talc is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
@@ -129,7 +147,11 @@ public class LittleHelper extends JFrame {
             model.addElement(unitConversion);
         }
         
-        // FIXME: Calculator.
+        // Evaluate mathematical expressions.
+        final String calculatorResult = calculate(query);
+        if (calculatorResult != null) {
+            model.addElement(calculatorResult);
+        }
         
         resultList.setModel(model);
     }
@@ -144,6 +166,15 @@ public class LittleHelper extends JFrame {
         } catch (java.io.IOException ex) {
             ex.printStackTrace();
             // bark
+        }
+    }
+    
+    private static String calculate(String s) {
+        try {
+            return new Calculator(s).evaluate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
     
