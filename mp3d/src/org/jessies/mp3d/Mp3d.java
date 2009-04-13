@@ -25,30 +25,31 @@ import java.net.*;
 import java.nio.charset.*;
 import java.util.*;
 import java.util.concurrent.*;
+import javazoom.jl.player.*;
 
 public class Mp3d {
     private static final int MP3D_PORT = 8888;
+    
+    private static final String FORM_NAME = "search_form";
+    private static final String INPUT_NAME = "mp3d_q";
     
     private List<File> musicDirectories;
     
     private LinkedBlockingQueue<Mp3Info> playQueue = new LinkedBlockingQueue<Mp3Info>();
     private List<Mp3Info> allMp3s = Collections.emptyList();
     private volatile Mp3Info nowPlaying = null;
-    private volatile Process player = null;
+    private volatile Player player = null;
     
     private class MainHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            final String formName = "search_form";
-            final String inputName = "mp3d_q";
-            
             try {
                 ArrayList<String> terms = new ArrayList<String>();
                 final String rawQuery = t.getRequestURI().getRawQuery();
                 String q = null;
                 if (rawQuery != null) {
                     q = StringUtilities.urlDecode(rawQuery);
-                    if (q.startsWith(inputName + "=")) {
-                        q = q.substring(inputName.length() + 1);
+                    if (q.startsWith(INPUT_NAME + "=")) {
+                        q = q.substring(INPUT_NAME.length() + 1);
                     }
                     for (String term : q.split(" ")) {
                         terms.add(term.toLowerCase());
@@ -63,7 +64,7 @@ public class Mp3d {
                 page.append(" <link rel='stylesheet' href='/static/mp3d.css' type='text/css'>\n");
                 page.append(" <script type='text/javascript' src='/static/mp3d.js'></script>\n");
                 page.append("</head>\n");
-                page.append("<body onload='document." + formName + "." + inputName + ".focus()'>\n");
+                page.append("<body onload='document." + FORM_NAME + "." + INPUT_NAME + ".focus()'>\n");
                 
                 page.append("<h1>Queued Music</h1>\n");
                 if (nowPlaying != null) {
@@ -76,8 +77,8 @@ public class Mp3d {
                 }
                 
                 page.append("<h1>Search Library</h1>\n");
-                page.append("<form name='" + formName + "'>");
-                page.append("<input name='" + inputName + "' type='text' value='" + (q != null ? q : "") + "'>");
+                page.append("<form name='" + FORM_NAME + "'>");
+                page.append("<input name='" + INPUT_NAME + "' type='text' value='" + (q != null ? q : "") + "'>");
                 page.append("</form>\n");
                 
                 if (!terms.isEmpty()) {
@@ -179,18 +180,18 @@ public class Mp3d {
     
     private class RemoveHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
-            final Mp3Info mp3 = requestedMp3(t);
-            
-            if (mp3.equals(nowPlaying)) {
-                // Stop the player...
-                player.destroy();
-                try {
-                    // ...and wait for it to stop before redirecting the user's browser, so they get to see the new state of the play queue.
-                    player.waitFor();
-                } catch (InterruptedException ex) {
+            try {
+                final Mp3Info mp3 = requestedMp3(t);
+                
+                if (mp3.equals(nowPlaying)) {
+                    player.close();
+                    nowPlaying = null;
+                    player = null;
+                } else {
+                    playQueue.remove(mp3);
                 }
-            } else {
-                playQueue.remove(mp3);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
             
             HttpUtilities.sendSeeOther(t, "/");
@@ -247,19 +248,13 @@ public class Mp3d {
                     System.err.println("Waiting for something to play...");
                     nowPlaying = playQueue.take();
                     
-                    // For greater control over playback, we might want to use Java mp3 playing code:
-                    // http://www.javazoom.net/javalayer/docs/docs1.0/index.html
-                    
                     System.err.println("Playing " + nowPlaying + "...");
                     try {
-                        // FIXME: if we're interrupted, we start another mplayer off which doesn't die when we do.
-                        player = new ProcessBuilder().command("/usr/bin/mplayer", "-quiet", "-msglevel", "all=1", nowPlaying.filename).start();
-                        player.waitFor();
+                        AudioDevice audioDevice = FactoryRegistry.systemRegistry().createAudioDevice();
+                        player = new Player(new FileInputStream(nowPlaying.filename), audioDevice);
+                        player.play();
                     } catch (Exception ex) {
-                        Log.warn("Failed to spawn mplayer", ex);
-                    } finally {
-                        nowPlaying = null;
-                        player = null;
+                        Log.warn("Failed to play \"" + nowPlaying.filename + "\"", ex);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
