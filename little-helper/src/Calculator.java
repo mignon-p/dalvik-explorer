@@ -130,10 +130,10 @@ public class Calculator {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (0-f) for simplicity.
-            return new CalculatorAstNode(CalculatorToken.MINUS, new CalculatorAstNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), exponentiationExpression());
+            return new CalculatorAstNode(CalculatorToken.MINUS, new CalculatorAstNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), unaryExpression());
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
-            return new CalculatorAstNode(CalculatorToken.B_NOT, exponentiationExpression(), null);
+            return new CalculatorAstNode(CalculatorToken.B_NOT, unaryExpression(), null);
         }
         return exponentiationExpression();
     }
@@ -180,14 +180,29 @@ public class Calculator {
     }
     
     @Test private static void testCalculator() {
+        Assert.equals(new Calculator("0").evaluate(), "0");
+        Assert.equals(new Calculator("1").evaluate(), "1");
+        Assert.equals(new Calculator("-1").evaluate(), "-1");
+        Assert.equals(new Calculator("--1").evaluate(), "1");
+        Assert.equals(new Calculator("1.00").evaluate(), "1.00");
+        
         Assert.equals(new Calculator("1+2+3").evaluate(), "6");
         Assert.equals(new Calculator("1+-2").evaluate(), "-1");
         Assert.equals(new Calculator("3-2-1").evaluate(), "0");
+        Assert.equals(new Calculator("10000+0.001").evaluate(), "10000.001");
+        Assert.equals(new Calculator("0.001+10000").evaluate(), "10000.001");
+        Assert.equals(new Calculator("10000-0.001").evaluate(), "9999.999");
+        Assert.equals(new Calculator("0.001-10000").evaluate(), "-9999.999");
         
         Assert.equals(new Calculator("3*4").evaluate(), "12");
         Assert.equals(new Calculator("-3*4").evaluate(), "-12");
         Assert.equals(new Calculator("3*-4").evaluate(), "-12");
         Assert.equals(new Calculator("-3*-4").evaluate(), "12");
+        
+        Assert.equals(new Calculator("1+2*3").evaluate(), "7");
+        Assert.equals(new Calculator("(1+2)*3").evaluate(), "9");
+        
+        Assert.equals(new Calculator("1/2").evaluate(), "0.5");
         
         Assert.equals(new Calculator("3%4").evaluate(), "3");
         Assert.equals(new Calculator("4%4").evaluate(), "0");
@@ -219,9 +234,13 @@ public class Calculator {
         Assert.equals(new Calculator("(0x1200 | 0x34) == 0x1234").evaluate(), "0");
         Assert.equals(new Calculator("5 ^ 3").evaluate(), "6");
         Assert.equals(new Calculator("((0x1234 & ~0xff) | 0x56) == 0x1256").evaluate(), "0");
+        Assert.equals(new Calculator("~3").evaluate(), "-4");
+        Assert.equals(new Calculator("~~3").evaluate(), "3");
         
         Assert.equals(new Calculator("2**3").evaluate(), "8");
         Assert.equals(new Calculator("2**3**4").evaluate(), "2417851639229258349412352");
         Assert.equals(new Calculator("4**0.5").evaluate(), "2");
+        Assert.equals(new Calculator("-10**2").evaluate(), "-100");
+        Assert.equals(new Calculator("(-10)**2").evaluate(), "100");
     }
 }
