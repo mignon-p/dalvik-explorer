@@ -235,6 +235,9 @@ public class Mp3d {
                     System.err.println("Waiting for something to play...");
                     Mp3Info mp3 = playQueue.take();
                     
+                    // For greater control over playback, we might want to use Java mp3 playing code:
+                    // http://www.javazoom.net/javalayer/docs/docs1.0/index.html
+                    
                     System.err.println("Playing " + mp3 + "...");
                     nowPlaying = mp3;
                     int status = ProcessUtilities.backQuote(null, new String[] { "mplayer", mp3.filename }, new ArrayList<String>(), new ArrayList<String>());
