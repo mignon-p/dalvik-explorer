@@ -33,7 +33,8 @@ public class Mp3d {
     
     private LinkedBlockingQueue<Mp3Info> playQueue = new LinkedBlockingQueue<Mp3Info>();
     private List<Mp3Info> allMp3s = Collections.emptyList();
-    private Mp3Info nowPlaying = null;
+    private volatile Mp3Info nowPlaying = null;
+    private volatile Process player = null;
     
     private class MainHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
@@ -64,13 +65,15 @@ public class Mp3d {
                 page.append("</head>\n");
                 page.append("<body onload='document." + formName + "." + inputName + ".focus()'>\n");
                 
-                if (nowPlaying != null) {
-                    page.append("<h1>Now Playing</h1>\n");
-                    page.append("<p>\"" + nowPlaying.title + "\" by " + nowPlaying.artist + " from " + nowPlaying.album + ".\n");
-                }
-                
                 page.append("<h1>Queued Music</h1>\n");
-                appendMp3Table(page, playQueue, true);
+                if (nowPlaying != null) {
+                    ArrayList<Mp3Info> shownQueue = new ArrayList<Mp3Info>();
+                    shownQueue.add(nowPlaying);
+                    shownQueue.addAll(playQueue);
+                    appendMp3Table(page, shownQueue, true);
+                } else {
+                    appendMp3Table(page, playQueue, true);
+                }
                 
                 page.append("<h1>Search Library</h1>\n");
                 page.append("<form name='" + formName + "'>");
@@ -164,7 +167,6 @@ public class Mp3d {
                     for (String nameAndValue : line.split("&")) {
                         final int id = Integer.parseInt(nameAndValue.substring(nameAndValue.indexOf('=') + 1));
                         playQueue.put(findMp3(id));
-                        
                     }
                 }
             } catch (Exception ex) {
@@ -179,7 +181,17 @@ public class Mp3d {
         public void handle(HttpExchange t) throws IOException {
             final Mp3Info mp3 = requestedMp3(t);
             
-            playQueue.remove(mp3);
+            if (mp3.equals(nowPlaying)) {
+                // Stop the player...
+                player.destroy();
+                try {
+                    // ...and wait for it to stop before redirecting the user's browser, so they get to see the new state of the play queue.
+                    player.waitFor();
+                } catch (InterruptedException ex) {
+                }
+            } else {
+                playQueue.remove(mp3);
+            }
             
             HttpUtilities.sendSeeOther(t, "/");
         }
@@ -233,15 +245,22 @@ public class Mp3d {
             while (true) {
                 try {
                     System.err.println("Waiting for something to play...");
-                    Mp3Info mp3 = playQueue.take();
+                    nowPlaying = playQueue.take();
                     
                     // For greater control over playback, we might want to use Java mp3 playing code:
                     // http://www.javazoom.net/javalayer/docs/docs1.0/index.html
                     
-                    System.err.println("Playing " + mp3 + "...");
-                    nowPlaying = mp3;
-                    int status = ProcessUtilities.backQuote(null, new String[] { "mplayer", mp3.filename }, new ArrayList<String>(), new ArrayList<String>());
-                    nowPlaying = null;
+                    System.err.println("Playing " + nowPlaying + "...");
+                    try {
+                        // FIXME: if we're interrupted, we start another mplayer off which doesn't die when we do.
+                        player = new ProcessBuilder().command("/usr/bin/mplayer", "-quiet", "-msglevel", "all=1", nowPlaying.filename).start();
+                        player.waitFor();
+                    } catch (Exception ex) {
+                        Log.warn("Failed to spawn mplayer", ex);
+                    } finally {
+                        nowPlaying = null;
+                        player = null;
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
