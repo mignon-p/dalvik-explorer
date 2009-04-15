@@ -285,26 +285,27 @@ public class Mp3d {
     
     private List<File> findMp3Files(List<File> musicDirectories) {
         final long t0 = System.nanoTime();
+        
+        final FileFinder.Filter mp3Filter = new FileFinder.Filter() {
+            public boolean acceptFile(File file) {
+                return file.toString().endsWith(".mp3");
+            }
+            
+            public boolean enterDirectory(File directory) {
+                return true;
+            }
+        };
+        
         final List<File> mp3files = new ArrayList<File>();
-        for (File directory : musicDirectories) {
-            findMp3Files(directory, mp3files);
+        for (File musicDirectory : musicDirectories) {
+            for (File file : new FileFinder().filesUnder(musicDirectory, mp3Filter)) {
+                mp3files.add(file);
+            }
         }
+        
         final long t1 = System.nanoTime();
         System.err.println("Found " + mp3files.size() + " .mp3 files in " + TimeUtilities.nsToString(t1 - t0));
         return mp3files;
-    }
-    
-    private void findMp3Files(File directory, List<File> result) {
-        // FIXME: parallelize?
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
-                findMp3Files(file, result);
-            } else if (file.toString().endsWith(".mp3")) {
-                result.add(file);
-            } else {
-                //System.err.println("warning: '" + file + "' is neither a directory nor a .mp3 file");
-            }
-        }
     }
     
     private void appendMp3Table(StringBuilder out, Collection<Mp3Info> mp3s, boolean isQueue) {
