@@ -253,6 +253,7 @@ public class Mp3d {
                         AudioDevice audioDevice = FactoryRegistry.systemRegistry().createAudioDevice();
                         player = new Player(new FileInputStream(nowPlaying.filename), audioDevice);
                         player.play();
+                        nowPlaying = null;
                     } catch (Exception ex) {
                         Log.warn("Failed to play \"" + nowPlaying.filename + "\"", ex);
                     }
