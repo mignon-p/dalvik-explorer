@@ -26,6 +26,7 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javazoom.jl.player.*;
+import org.jessies.os.*;
 
 public class Mp3d {
     private static final int MP3D_PORT = 8888;
@@ -288,11 +289,11 @@ public class Mp3d {
         final long t0 = System.nanoTime();
         
         final FileFinder.Filter mp3Filter = new FileFinder.Filter() {
-            public boolean acceptFile(File file) {
+            public boolean acceptFile(File file, Stat stat) {
                 return file.toString().endsWith(".mp3");
             }
             
-            public boolean enterDirectory(File directory) {
+            public boolean enterDirectory(File directory, Stat stat) {
                 return true;
             }
         };
