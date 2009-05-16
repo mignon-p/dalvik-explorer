@@ -26,13 +26,15 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javazoom.jl.player.*;
+import org.jessies.cli.*;
 import org.jessies.os.*;
 
 public class Mp3d {
-    private static final int MP3D_PORT = 8888;
-    
     private static final String FORM_NAME = "search_form";
     private static final String INPUT_NAME = "mp3d_q";
+    
+    @Option(names = { "--port" })
+    private int portNumber = 8888;
     
     private List<File> musicDirectories;
     
@@ -209,28 +211,34 @@ public class Mp3d {
         return System.getProperty("org.jessies.projectRoot") + File.separator + "lib" + File.separator + "data" + File.separator + leafName;
     }
     
-    private Mp3d(List<File> musicDirectories) throws Exception {
-        this.musicDirectories = musicDirectories;
+    private Mp3d(String[] args) throws Exception {
+        List<String> directoryNames = new OptionParser(this).parse(args);
+        
+        // It's traditional on Mac OS and Linux to keep mp3s in ~/Music.
+        if (directoryNames.isEmpty()) {
+            directoryNames.add("~/Music");
+        }
+        
+        // Check the arguments are all directories.
+        this.musicDirectories = new ArrayList<File>();
+        for (String directoryName : directoryNames) {
+            File dir = FileUtilities.fileFromString(directoryName);
+            if (!dir.exists() || !dir.isDirectory()) {
+                usage();
+            }
+            musicDirectories.add(dir);
+        }
         
         // Index all the mp3s.
         final List<File> mp3files = findMp3Files(musicDirectories);
         this.allMp3s = scanId3v2Tags(mp3files);
         
-        // Set up the static files we need to serve.
-        final StaticHandler staticHandler = new StaticHandler();
-        
-        staticHandler.put("/static/mp3d.css", new File(getResourceFilename("mp3d.css")));
-        staticHandler.put("/static/mp3d.js", new File(getResourceFilename("mp3d.js")));
-        staticHandler.put("/static/add.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-add.png"));
-        staticHandler.put("/static/play.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-media-play-ltr.png"));
-        staticHandler.put("/static/remove.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-remove.png"));
-        
         // Start the HTTP server.
-        final HttpServer server = HttpServer.create(new InetSocketAddress(MP3D_PORT), 0);
+        final HttpServer server = HttpServer.create(new InetSocketAddress(portNumber), 0);
         server.createContext("/", new MainHandler());
         server.createContext("/add", new AddHandler());
         server.createContext("/remove/", new RemoveHandler());
-        server.createContext("/static/", staticHandler);
+        server.createContext("/static/", makeStaticHandler());
         server.setExecutor(null);
         server.start();
         
@@ -238,8 +246,18 @@ public class Mp3d {
         new Thread(new PlayQueueRunnable()).start();
         
         // Announce the HTTP server via DNS-SD.
-        final int portNumber = server.getAddress().getPort();
         ProcessUtilities.spawn(null, "/usr/bin/avahi-publish", "-f", "-s", "mp3d", "_http._tcp", Integer.toString(portNumber));
+    }
+    
+    // Sets up the static files we need to serve.
+    private HttpHandler makeStaticHandler() throws IOException {
+        final StaticHandler staticHandler = new StaticHandler();
+        staticHandler.put("/static/mp3d.css", new File(getResourceFilename("mp3d.css")));
+        staticHandler.put("/static/mp3d.js", new File(getResourceFilename("mp3d.js")));
+        staticHandler.put("/static/add.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-add.png"));
+        staticHandler.put("/static/play.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-media-play-ltr.png"));
+        staticHandler.put("/static/remove.png", new File("/usr/share/icons/gnome/16x16/actions/gtk-remove.png"));
+        return staticHandler;
     }
     
     private class PlayQueueRunnable implements Runnable {
@@ -350,22 +368,6 @@ public class Mp3d {
     }
     
     public static void main(String[] args) throws Exception {
-        // It's traditional on Mac OS and Linux to keep mp3s in ~/Music.
-        if (args.length == 0) {
-            args = new String[] { "~/Music" };
-        }
-        
-        // Check the arguments are all directories.
-        final ArrayList<File> musicDirectories = new ArrayList<File>();
-        for (String arg : args) {
-            File dir = FileUtilities.fileFromString(arg);
-            if (!dir.exists() || !dir.isDirectory()) {
-                usage();
-            }
-            musicDirectories.add(dir);
-        }
-        
-        // Start the server.
-        new Mp3d(musicDirectories);
+        new Mp3d(args);
     }
 }
