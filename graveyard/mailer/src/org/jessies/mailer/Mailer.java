@@ -90,7 +90,7 @@ public class Mailer extends MainFrame {
             
             statusBar.setText("Looking for trash folder...");
             initSentAndTrash(mailStore);
-            statusBar.clearStatusBar();
+            statusBar.setText("");
             
             initCurrentFolderMonitor();
             
@@ -496,7 +496,7 @@ public class Mailer extends MainFrame {
                     if (currentFolder != null) {
                         currentFolder.getNewMessageCount();
                     }
-                    statusBar.clearStatusBar();
+                    statusBar.setText("");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -528,7 +528,7 @@ public class Mailer extends MainFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            statusBar.clearStatusBar();
+            statusBar.setText("");
         }
     }
     
@@ -563,7 +563,7 @@ public class Mailer extends MainFrame {
         } catch (MessagingException ex) {
             ex.printStackTrace();
         } finally {
-            statusBar.clearStatusBar();
+            statusBar.setText("");
         }
     }
     
