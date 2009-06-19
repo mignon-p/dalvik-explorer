@@ -230,8 +230,7 @@ public class Mp3d {
         }
         
         // Index all the mp3s.
-        final List<File> mp3files = findMp3Files(musicDirectories);
-        this.allMp3s = scanId3v2Tags(mp3files);
+        this.allMp3s = scanId3v2Tags(findMp3Files(musicDirectories));
         
         // Start the HTTP server.
         final HttpServer server = HttpServer.create(new InetSocketAddress(portNumber), 0);
@@ -283,26 +282,42 @@ public class Mp3d {
         }
     }
     
-    private List<Mp3Info> scanId3v2Tags(List<File> mp3files) {
+    private List<Mp3Info> scanId3v2Tags(Iterable<File> mp3files) {
+        final int threadCount = Runtime.getRuntime().availableProcessors();
+        
         final long t0 = System.nanoTime();
         final ArrayList<Mp3Info> mp3s = new ArrayList<Mp3Info>();
-        for (File mp3file : mp3files) {
-            try {
-                Mp3Info mp3 = new Id3v2Scanner(mp3file).scanId3v2Tags();
-                if (mp3 != null) {
-                    //System.err.println(mp3);
-                    mp3s.add(mp3);
+        final ExecutorService executor = ThreadUtilities.newFixedThreadPool(threadCount, "id3 scanner");
+        for (final File mp3file : mp3files) {
+            executor.execute(new Runnable() {
+                public void run() {
+                    try {
+                        final Mp3Info mp3 = new Id3v2Scanner(mp3file).scanId3v2Tags();
+                        if (mp3 != null) {
+                            synchronized (mp3s) {
+                                mp3s.add(mp3);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("Problem with " + mp3file);
+                        ex.printStackTrace();
+                    }
                 }
-            } catch (Exception ex) {
-                System.err.println("Problem with " + mp3file);
-                ex.printStackTrace();
-            }
+            });
         }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+        
         final long t1 = System.nanoTime();
-        System.err.println("Scanned " + mp3s.size() + " .mp3 files' ID3v2 tags in " + TimeUtilities.nsToString(t1 - t0));
+        System.err.println("Scanned " + mp3s.size() + " .mp3 files' ID3v2 tags in " + TimeUtilities.nsToString(t1 - t0) + " (" + threadCount + " threads)");
         return mp3s;
     }
     
+    // FIXME: return an Iterable so we can start scanning for idv3 tags before we've finished finding all the files.
     private List<File> findMp3Files(List<File> musicDirectories) {
         final long t0 = System.nanoTime();
         
