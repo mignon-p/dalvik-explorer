@@ -20,7 +20,6 @@ import java.math.*;
 import java.util.*;
 import org.jessies.test.*;
 
-// FIXME: built-in functions (abs, acos, asin, atan, atan2, cbrt, ceil[ing], cos, cosh, exp, floor, hypot, log(value, base), log2, logE, log10, random, sin, sinh, sqrt, tan, tanh).
 // FIXME: Mac OS' calculator offers -d variants of all the trig functions for degrees. that, or offer constants to multiply by to convert to degrees/radians?
 // FIXME: higher-order built-in functions like http://www.vitanuova.com/inferno/man/1/calc.html (sum, product, integral, differential, solve).
 // FIXME: integer division (//).
@@ -30,22 +29,56 @@ public class Calculator {
     public static final MathContext MATH_CONTEXT = new MathContext(20, RoundingMode.HALF_UP);
     
     private final CalculatorLexer lexer;
-    private final Map<String, CalculatorAstNode> namespace;
+    private final Map<String, CalculatorAstNode> constants;
+    private final Map<String, CalculatorFunction> functions;
     
     public Calculator(String expression) {
         this.lexer = new CalculatorLexer(expression);
-        this.namespace = new HashMap<String, CalculatorAstNode>();
+        this.constants = new HashMap<String, CalculatorAstNode>();
+        this.functions = new HashMap<String, CalculatorFunction>();
         
         initBuiltInConstants();
+        initBuiltInFunctions();
     }
     
     private void initBuiltInConstants() {
         // FIXME: use higher-precision string forms?
-        namespace.put("e", new CalculatorNumberNode(new BigDecimal(Math.E)));
+        constants.put("e", new CalculatorNumberNode(new BigDecimal(Math.E)));
         
         final CalculatorAstNode pi = new CalculatorNumberNode(new BigDecimal(Math.PI));
-        namespace.put("pi", pi);
-        namespace.put("π", pi);
+        constants.put("pi", pi);
+        constants.put("π", pi);
+    }
+    
+    private void initBuiltInFunctions() {
+        // FIXME: acosh, asinh, atanh, chop, clip, sign(um), int(eger_part), frac(tional_part)
+        functions.put("abs",     new CalculatorFunctions.Abs());
+        functions.put("acos",    new CalculatorFunctions.Acos());
+        functions.put("asin",    new CalculatorFunctions.Asin());
+        functions.put("atan",    new CalculatorFunctions.Atan());
+        functions.put("atan2",   new CalculatorFunctions.Atan2());
+        functions.put("cbrt",    new CalculatorFunctions.Cbrt());
+        final CalculatorFunction ceiling = new CalculatorFunctions.Ceiling();
+        functions.put("ceil",    ceiling);
+        functions.put("ceiling", ceiling);
+        functions.put("cos",     new CalculatorFunctions.Cos());
+        functions.put("cosh",    new CalculatorFunctions.Cosh());
+        functions.put("exp",     new CalculatorFunctions.Exp());
+        functions.put("floor",   new CalculatorFunctions.Floor());
+        functions.put("hypot",   new CalculatorFunctions.Hypot());
+        functions.put("log",     new CalculatorFunctions.Log());
+        functions.put("log10",   new CalculatorFunctions.Log10());
+        functions.put("log2",    new CalculatorFunctions.Log2());
+        functions.put("logE",    new CalculatorFunctions.LogE());
+        final CalculatorFunction random = new CalculatorFunctions.Random();
+        functions.put("rand",    random);
+        functions.put("random",  random);
+        functions.put("round",   new CalculatorFunctions.Round());
+        functions.put("sin",     new CalculatorFunctions.Sin());
+        functions.put("sinh",    new CalculatorFunctions.Sinh());
+        functions.put("sqrt",    new CalculatorFunctions.Sqrt());
+        functions.put("tan",     new CalculatorFunctions.Tan());
+        functions.put("tanh",    new CalculatorFunctions.Tanh());
     }
     
     public String evaluate() throws CalculatorError {
@@ -177,16 +210,37 @@ public class Calculator {
             expect(CalculatorToken.NUMBER);
             return result;
         } else if (lexer.token() == CalculatorToken.IDENTIFIER) {
-            CalculatorAstNode result = namespace.get(lexer.identifier());
-            if (result == null) {
-                // FIXME: support free variables for symbolic computation.
-                throw new CalculatorError("undefined function or variable '" + lexer.identifier() + "'");
-            }
+            final String identifier = lexer.identifier();
             expect(CalculatorToken.IDENTIFIER);
+            CalculatorAstNode result = constants.get(identifier);
+            if (result == null) {
+                final CalculatorFunction fn = functions.get(identifier);
+                if (fn != null) {
+                    result = new CalculatorFunctionApplicationNode(fn, parseArgs());
+                } else {
+                    // FIXME: support free variables for symbolic computation.
+                    throw new CalculatorError("undefined function or variable '" + identifier + "'");
+                }
+            }
             return result;
         } else {
             throw new CalculatorError("unexpected '" + lexer.token() + "'");
         }
+    }
+    
+    // '(' expr [ ',' expr ] ')'
+    private List<CalculatorAstNode> parseArgs() {
+        final List<CalculatorAstNode> result = new LinkedList<CalculatorAstNode>();
+        expect(CalculatorToken.OPEN_PARENTHESIS);
+        while (lexer.token() != CalculatorToken.CLOSE_PARENTHESIS) {
+            result.add(parseExpr());
+            if (lexer.token() == CalculatorToken.COMMA) {
+                expect(CalculatorToken.COMMA);
+                continue;
+            }
+        }
+        expect(CalculatorToken.CLOSE_PARENTHESIS);
+        return result;
     }
     
     private void expect(CalculatorToken what) {
@@ -227,24 +281,24 @@ public class Calculator {
     }
     
     @Test private static void testRelationalOperations() {
-        Assert.equals(new Calculator("1<2").evaluate(), "0");
-        Assert.equals(new Calculator("2<2").evaluate(), "1");
-        Assert.equals(new Calculator("2<1").evaluate(), "1");
-        Assert.equals(new Calculator("1<=2").evaluate(), "0");
-        Assert.equals(new Calculator("2<=2").evaluate(), "0");
-        Assert.equals(new Calculator("2<=1").evaluate(), "1");
-        Assert.equals(new Calculator("1>2").evaluate(), "1");
-        Assert.equals(new Calculator("2>2").evaluate(), "1");
-        Assert.equals(new Calculator("2>1").evaluate(), "0");
-        Assert.equals(new Calculator("1>=2").evaluate(), "1");
-        Assert.equals(new Calculator("2>=2").evaluate(), "0");
-        Assert.equals(new Calculator("2>=1").evaluate(), "0");
-        Assert.equals(new Calculator("1==2").evaluate(), "1");
-        Assert.equals(new Calculator("2==2").evaluate(), "0");
-        Assert.equals(new Calculator("2==1").evaluate(), "1");
-        Assert.equals(new Calculator("1!=2").evaluate(), "0");
-        Assert.equals(new Calculator("2!=2").evaluate(), "1");
-        Assert.equals(new Calculator("2!=1").evaluate(), "0");
+        Assert.equals(new Calculator("1<2").evaluate(), "1");
+        Assert.equals(new Calculator("2<2").evaluate(), "0");
+        Assert.equals(new Calculator("2<1").evaluate(), "0");
+        Assert.equals(new Calculator("1<=2").evaluate(), "1");
+        Assert.equals(new Calculator("2<=2").evaluate(), "1");
+        Assert.equals(new Calculator("2<=1").evaluate(), "0");
+        Assert.equals(new Calculator("1>2").evaluate(), "0");
+        Assert.equals(new Calculator("2>2").evaluate(), "0");
+        Assert.equals(new Calculator("2>1").evaluate(), "1");
+        Assert.equals(new Calculator("1>=2").evaluate(), "0");
+        Assert.equals(new Calculator("2>=2").evaluate(), "1");
+        Assert.equals(new Calculator("2>=1").evaluate(), "1");
+        Assert.equals(new Calculator("1==2").evaluate(), "0");
+        Assert.equals(new Calculator("2==2").evaluate(), "1");
+        Assert.equals(new Calculator("2==1").evaluate(), "0");
+        Assert.equals(new Calculator("1!=2").evaluate(), "1");
+        Assert.equals(new Calculator("2!=2").evaluate(), "0");
+        Assert.equals(new Calculator("2!=1").evaluate(), "1");
     }
     
     @Test private static void testShifts() {
@@ -253,10 +307,10 @@ public class Calculator {
     }
     
     @Test private static void testBitOperations() {
-        Assert.equals(new Calculator("(0x1234 & 0xff0) == 0x230").evaluate(), "0");
-        Assert.equals(new Calculator("(0x1200 | 0x34) == 0x1234").evaluate(), "0");
+        Assert.equals(new Calculator("(0x1234 & 0xff0) == 0x230").evaluate(), "1");
+        Assert.equals(new Calculator("(0x1200 | 0x34) == 0x1234").evaluate(), "1");
         Assert.equals(new Calculator("5 ^ 3").evaluate(), "6");
-        Assert.equals(new Calculator("((0x1234 & ~0xff) | 0x56) == 0x1256").evaluate(), "0");
+        Assert.equals(new Calculator("((0x1234 & ~0xff) | 0x56) == 0x1256").evaluate(), "1");
         Assert.equals(new Calculator("~3").evaluate(), "-4");
         Assert.equals(new Calculator("~~3").evaluate(), "3");
     }
@@ -272,6 +326,36 @@ public class Calculator {
     @Test private static void testConstants() {
         Assert.equals(Double.valueOf(new Calculator("e").evaluate()), Math.E, 0.000001);
         Assert.equals(Double.valueOf(new Calculator("pi").evaluate()), Math.PI, 0.000001);
-        Assert.equals(new Calculator("pi == π").evaluate(), "0");
+        Assert.equals(new Calculator("pi == π").evaluate(), "1");
+    }
+    
+    @Test private static void testFunctions() {
+        // FIXME: better tests?
+        Assert.equals(new Calculator("abs(2)").evaluate(), "2");
+        Assert.equals(new Calculator("abs(-2)").evaluate(), "2");
+        Assert.equals(new Calculator("acos(1)").evaluate(), "0");
+        Assert.equals(new Calculator("asin(0)").evaluate(), "0");
+        Assert.equals(new Calculator("acos(0) == asin(1)").evaluate(), "1");
+        Assert.equals(new Calculator("atan(0)").evaluate(), "0");
+        Assert.equals(new Calculator("cbrt(27)").evaluate(), "3");
+        Assert.equals(new Calculator("ceil(1.2)").evaluate(), "2");
+        Assert.equals(new Calculator("cos(0)").evaluate(), "1");
+        Assert.equals(new Calculator("cos(pi)").evaluate(), "-1");
+        Assert.equals(new Calculator("cosh(0)").evaluate(), "1");
+        Assert.equals(Double.valueOf(new Calculator("exp(1)/e").evaluate()), 1.0, 0.000001);
+        Assert.equals(new Calculator("floor(1.2)").evaluate(), "1");
+        Assert.equals(new Calculator("hypot(3, 4)").evaluate(), "5");
+        Assert.equals(new Calculator("log(2, 1024)").evaluate(), "10");
+        Assert.equals(new Calculator("log2(1024)").evaluate(), "10");
+        Assert.equals(new Calculator("logE(exp(4))").evaluate(), "4");
+        Assert.equals(new Calculator("log10(1000)").evaluate(), "3");
+        Assert.equals(new Calculator("round(1.2)").evaluate(), "1");
+        Assert.equals(new Calculator("round(1.8)").evaluate(), "2");
+        Assert.equals(new Calculator("sin(0)").evaluate(), "0");
+        Assert.equals(new Calculator("sin(pi/2)").evaluate(), "1");
+        Assert.equals(new Calculator("sinh(0)").evaluate(), "0");
+        Assert.equals(new Calculator("sqrt(81)").evaluate(), "9");
+        Assert.equals(new Calculator("tan(0)").evaluate(), "0");
+        Assert.equals(new Calculator("tanh(0)").evaluate(), "0");
     }
 }

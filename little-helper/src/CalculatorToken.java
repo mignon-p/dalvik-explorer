@@ -63,7 +63,9 @@ public enum CalculatorToken {
     // Brackets.
     
     OPEN_PARENTHESIS("("),
-    CLOSE_PARENTHESIS(")")
+    CLOSE_PARENTHESIS(")"),
+    
+    COMMA(",")
     
     ;
     

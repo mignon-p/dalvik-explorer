@@ -87,7 +87,7 @@ public class CalculatorOpNode implements CalculatorAstNode {
     }
     
     private BigDecimal fromBoolean(boolean b) {
-        return b ? new BigDecimal("0", Calculator.MATH_CONTEXT) : new BigDecimal("1", Calculator.MATH_CONTEXT);
+        return b ? new BigDecimal("1", Calculator.MATH_CONTEXT) : new BigDecimal("0", Calculator.MATH_CONTEXT);
     }
     
     private int cmp() {
