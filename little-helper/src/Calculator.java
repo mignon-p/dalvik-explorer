@@ -17,9 +17,9 @@
  */
 
 import java.math.*;
+import java.util.*;
 import org.jessies.test.*;
 
-// FIXME: built-in constants (pi, e).
 // FIXME: built-in functions (abs, acos, asin, atan, atan2, cbrt, ceil[ing], cos, cosh, exp, floor, hypot, log(value, base), log2, logE, log10, random, sin, sinh, sqrt, tan, tanh).
 // FIXME: Mac OS' calculator offers -d variants of all the trig functions for degrees. that, or offer constants to multiply by to convert to degrees/radians?
 // FIXME: higher-order built-in functions like http://www.vitanuova.com/inferno/man/1/calc.html (sum, product, integral, differential, solve).
@@ -30,14 +30,24 @@ public class Calculator {
     public static final MathContext MATH_CONTEXT = new MathContext(20, RoundingMode.HALF_UP);
     
     private final CalculatorLexer lexer;
+    private final Map<String, CalculatorAstNode> namespace;
     
     public Calculator(String expression) {
         this.lexer = new CalculatorLexer(expression);
+        this.namespace = new HashMap<String, CalculatorAstNode>();
+        
+        initBuiltInConstants();
+    }
+    
+    private void initBuiltInConstants() {
+        // FIXME: use higher-precision string forms?
+        namespace.put("e", new CalculatorAstNode(new BigDecimal(Math.E)));
+        namespace.put("pi", new CalculatorAstNode(new BigDecimal(Math.PI)));
     }
     
     public String evaluate() throws CalculatorError {
         CalculatorAstNode ast = expr();
-        System.err.println(ast);
+        //System.err.println(ast);
         BigDecimal value = ast.value();
         return value.toString();
     }
@@ -164,7 +174,10 @@ public class Calculator {
             expect(CalculatorToken.NUMBER);
             return result;
         } else if (lexer.token() == CalculatorToken.IDENTIFIER) {
-            CalculatorAstNode result = new CalculatorAstNode(lexer.identifier());
+            CalculatorAstNode result = namespace.get(lexer.identifier());
+            if (result == null) {
+                result = new CalculatorAstNode(lexer.identifier());
+            }
             expect(CalculatorToken.IDENTIFIER);
             return result;
         } else {
@@ -179,7 +192,7 @@ public class Calculator {
         lexer.nextToken();
     }
     
-    @Test private static void testCalculator() {
+    @Test private static void testArithmetic() {
         Assert.equals(new Calculator("0").evaluate(), "0");
         Assert.equals(new Calculator("1").evaluate(), "1");
         Assert.equals(new Calculator("-1").evaluate(), "-1");
@@ -207,7 +220,9 @@ public class Calculator {
         Assert.equals(new Calculator("3%4").evaluate(), "3");
         Assert.equals(new Calculator("4%4").evaluate(), "0");
         Assert.equals(new Calculator("5%4").evaluate(), "1");
-        
+    }
+    
+    @Test private static void testRelationalOperations() {
         Assert.equals(new Calculator("1<2").evaluate(), "0");
         Assert.equals(new Calculator("2<2").evaluate(), "1");
         Assert.equals(new Calculator("2<1").evaluate(), "1");
@@ -226,21 +241,32 @@ public class Calculator {
         Assert.equals(new Calculator("1!=2").evaluate(), "0");
         Assert.equals(new Calculator("2!=2").evaluate(), "1");
         Assert.equals(new Calculator("2!=1").evaluate(), "0");
-        
+    }
+    
+    @Test private static void testShifts() {
         Assert.equals(new Calculator("1<<4").evaluate(), "16");
         Assert.equals(new Calculator("(12<<3)>>3").evaluate(), "12");
-        
+    }
+    
+    @Test private static void testBitOperations() {
         Assert.equals(new Calculator("(0x1234 & 0xff0) == 0x230").evaluate(), "0");
         Assert.equals(new Calculator("(0x1200 | 0x34) == 0x1234").evaluate(), "0");
         Assert.equals(new Calculator("5 ^ 3").evaluate(), "6");
         Assert.equals(new Calculator("((0x1234 & ~0xff) | 0x56) == 0x1256").evaluate(), "0");
         Assert.equals(new Calculator("~3").evaluate(), "-4");
         Assert.equals(new Calculator("~~3").evaluate(), "3");
-        
+    }
+    
+    @Test private static void testExponentiation() {
         Assert.equals(new Calculator("2**3").evaluate(), "8");
         Assert.equals(new Calculator("2**3**4").evaluate(), "2417851639229258349412352");
         Assert.equals(new Calculator("4**0.5").evaluate(), "2");
         Assert.equals(new Calculator("-10**2").evaluate(), "-100");
         Assert.equals(new Calculator("(-10)**2").evaluate(), "100");
+    }
+    
+    @Test private static void testConstants() {
+        Assert.equals(Double.valueOf(new Calculator("e").evaluate()), Math.E, 0.000001);
+        Assert.equals(Double.valueOf(new Calculator("pi").evaluate()), Math.PI, 0.000001);
     }
 }
