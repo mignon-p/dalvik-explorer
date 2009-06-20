@@ -18,6 +18,18 @@
 
 import java.math.*;
 
-public interface CalculatorAstNode {
-    public BigDecimal value(Calculator environment);
+public class CalculatorVariableNode implements CalculatorAstNode {
+    private final String name;
+    
+    public CalculatorVariableNode(String name) {
+        this.name = name;
+    }
+    
+    public BigDecimal value(Calculator environment) {
+        final BigDecimal result = environment.getVariable(name);
+        if (result == null) {
+            throw new CalculatorError("use of undefined variable '" + name + "'");
+        }
+        return result;
+    }
 }

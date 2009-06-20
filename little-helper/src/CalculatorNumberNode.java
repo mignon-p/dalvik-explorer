@@ -25,7 +25,7 @@ public class CalculatorNumberNode implements CalculatorAstNode {
         this.number = number;
     }
     
-    public BigDecimal value() {
+    public BigDecimal value(Calculator environment) {
         return number;
     }
     

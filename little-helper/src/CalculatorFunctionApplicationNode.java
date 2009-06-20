@@ -35,7 +35,7 @@ public class CalculatorFunctionApplicationNode implements CalculatorAstNode {
         }
     }
     
-    public BigDecimal value() {
-        return function.apply(args);
+    public BigDecimal value(Calculator environment) {
+        return function.apply(environment, args);
     }
 }

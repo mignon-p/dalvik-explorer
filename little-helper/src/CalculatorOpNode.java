@@ -30,46 +30,46 @@ public class CalculatorOpNode implements CalculatorAstNode {
         this.rhs = rhs;
     }
     
-    public BigDecimal value() {
+    public BigDecimal value(Calculator environment) {
         switch (op) {
         case PLUS:
-            return lhs.value().add(rhs.value());
+            return lhs.value(environment).add(rhs.value(environment));
         case MINUS:
-            return lhs.value().subtract(rhs.value());
+            return lhs.value(environment).subtract(rhs.value(environment));
             
         case DIV:
-            return lhs.value().divide(rhs.value(), Calculator.MATH_CONTEXT);
+            return lhs.value(environment).divide(rhs.value(environment), Calculator.MATH_CONTEXT);
         case MUL:
-            return lhs.value().multiply(rhs.value());
+            return lhs.value(environment).multiply(rhs.value(environment));
         case MOD:
-            return lhs.value().remainder(rhs.value());
+            return lhs.value(environment).remainder(rhs.value(environment));
             
-        case LT: return fromBoolean(cmp() < 0);
-        case LE: return fromBoolean(cmp() <= 0);
-        case GT: return fromBoolean(cmp() > 0);
-        case GE: return fromBoolean(cmp() >= 0);
-        case EQ: return fromBoolean(cmp() == 0);
-        case NE: return fromBoolean(cmp() != 0);
+        case LT: return fromBoolean(cmp(environment) < 0);
+        case LE: return fromBoolean(cmp(environment) <= 0);
+        case GT: return fromBoolean(cmp(environment) > 0);
+        case GE: return fromBoolean(cmp(environment) >= 0);
+        case EQ: return fromBoolean(cmp(environment) == 0);
+        case NE: return fromBoolean(cmp(environment) != 0);
             
-        case SHL: return fromBigInteger(lhs.value().toBigInteger().shiftLeft(rhs.value().intValue()));
-        case SHR: return fromBigInteger(lhs.value().toBigInteger().shiftRight(rhs.value().intValue()));
+        case SHL: return fromBigInteger(lhs.value(environment).toBigInteger().shiftLeft(rhs.value(environment).intValue()));
+        case SHR: return fromBigInteger(lhs.value(environment).toBigInteger().shiftRight(rhs.value(environment).intValue()));
             
         case B_AND:
-            return fromBigInteger(lhs.value().toBigInteger().and(rhs.value().toBigInteger()));
+            return fromBigInteger(lhs.value(environment).toBigInteger().and(rhs.value(environment).toBigInteger()));
         case B_OR:
-            return fromBigInteger(lhs.value().toBigInteger().or(rhs.value().toBigInteger()));
+            return fromBigInteger(lhs.value(environment).toBigInteger().or(rhs.value(environment).toBigInteger()));
         case B_XOR:
-            return fromBigInteger(lhs.value().toBigInteger().xor(rhs.value().toBigInteger()));
+            return fromBigInteger(lhs.value(environment).toBigInteger().xor(rhs.value(environment).toBigInteger()));
         case B_NOT:
-            return fromBigInteger(lhs.value().toBigInteger().not());
+            return fromBigInteger(lhs.value(environment).toBigInteger().not());
             
         case POW:
             {
                 try {
-                    int n = rhs.value().intValueExact();
-                    return lhs.value().pow(n);
+                    int n = rhs.value(environment).intValueExact();
+                    return lhs.value(environment).pow(n);
                 } catch (ArithmeticException ex) {
-                    return fromDouble(Math.pow(lhs.value().doubleValue(), rhs.value().doubleValue()));
+                    return fromDouble(Math.pow(lhs.value(environment).doubleValue(), rhs.value(environment).doubleValue()));
                 }
             }
             
@@ -90,8 +90,8 @@ public class CalculatorOpNode implements CalculatorAstNode {
         return b ? new BigDecimal("1", Calculator.MATH_CONTEXT) : new BigDecimal("0", Calculator.MATH_CONTEXT);
     }
     
-    private int cmp() {
-        return lhs.value().compareTo(rhs.value());
+    private int cmp(Calculator environment) {
+        return lhs.value(environment).compareTo(rhs.value(environment));
     }
     
     @Override public String toString() {

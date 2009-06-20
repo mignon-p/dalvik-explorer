@@ -35,7 +35,7 @@ public abstract class CalculatorFunction {
         return arity;
     }
     
-    public abstract BigDecimal apply(List<CalculatorAstNode> args);
+    public abstract BigDecimal apply(Calculator environment, List<CalculatorAstNode> args);
     
     @Override public String toString() {
         return name;

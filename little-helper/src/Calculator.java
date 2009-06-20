@@ -31,11 +31,13 @@ public class Calculator {
     private final CalculatorLexer lexer;
     private final Map<String, CalculatorAstNode> constants;
     private final Map<String, CalculatorFunction> functions;
+    private final Map<String, BigDecimal> variables;
     
     public Calculator(String expression) {
         this.lexer = new CalculatorLexer(expression);
         this.constants = new HashMap<String, CalculatorAstNode>();
         this.functions = new HashMap<String, CalculatorFunction>();
+        this.variables = new HashMap<String, BigDecimal>();
         
         initBuiltInConstants();
         initBuiltInFunctions();
@@ -79,13 +81,25 @@ public class Calculator {
         functions.put("sqrt",    new CalculatorFunctions.Sqrt());
         functions.put("tan",     new CalculatorFunctions.Tan());
         functions.put("tanh",    new CalculatorFunctions.Tanh());
+        
+        final CalculatorFunction sum = new CalculatorFunctions.Sum();
+        functions.put("sum",     sum);
+        functions.put("∑",       sum);
     }
     
     public String evaluate() throws CalculatorError {
         CalculatorAstNode ast = parseExpr();
         //System.err.println(ast);
-        BigDecimal value = ast.value();
+        BigDecimal value = ast.value(this);
         return value.toString();
+    }
+    
+    public BigDecimal getVariable(String name) {
+        return variables.get(name);
+    }
+    
+    public void setVariable(String name, BigDecimal newValue) {
+        variables.put(name, newValue);
     }
     
     private CalculatorAstNode parseExpr() {
@@ -218,8 +232,7 @@ public class Calculator {
                 if (fn != null) {
                     result = new CalculatorFunctionApplicationNode(fn, parseArgs());
                 } else {
-                    // FIXME: support free variables for symbolic computation.
-                    throw new CalculatorError("undefined function or variable '" + identifier + "'");
+                    result = new CalculatorVariableNode(identifier);
                 }
             }
             return result;
@@ -357,5 +370,12 @@ public class Calculator {
         Assert.equals(new Calculator("sqrt(81)").evaluate(), "9");
         Assert.equals(new Calculator("tan(0)").evaluate(), "0");
         Assert.equals(new Calculator("tanh(0)").evaluate(), "0");
+    }
+    
+    @Test private static void testSum() {
+        Assert.equals(new Calculator("sum(0, 10, i)").evaluate(), "55");
+        Assert.equals(new Calculator("sum(0, 10.2, i)").evaluate(), "55");
+        Assert.equals(new Calculator("sum(0, 10, i**2)").evaluate(), "385");
+        // FIXME: failure test for min > max.
     }
 }
