@@ -18,6 +18,18 @@
 
 import java.math.*;
 
-public interface CalculatorAstNode {
-    public BigDecimal value();
+public class CalculatorNumberNode implements CalculatorAstNode {
+    private final BigDecimal number;
+    
+    public CalculatorNumberNode(BigDecimal number) {
+        this.number = number;
+    }
+    
+    public BigDecimal value() {
+        return number;
+    }
+    
+    @Override public String toString() {
+        return number.toString();
+    }
 }

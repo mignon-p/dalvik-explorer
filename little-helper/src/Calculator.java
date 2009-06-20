@@ -41,8 +41,8 @@ public class Calculator {
     
     private void initBuiltInConstants() {
         // FIXME: use higher-precision string forms?
-        namespace.put("e", new CalculatorAstNode(new BigDecimal(Math.E)));
-        namespace.put("pi", new CalculatorAstNode(new BigDecimal(Math.PI)));
+        namespace.put("e", new CalculatorNumberNode(new BigDecimal(Math.E)));
+        namespace.put("pi", new CalculatorNumberNode(new BigDecimal(Math.PI)));
     }
     
     public String evaluate() throws CalculatorError {
@@ -64,7 +64,7 @@ public class Calculator {
         while (lexer.token() == CalculatorToken.B_OR) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseXorExpression());
+            result = new CalculatorOpNode(op, result, parseXorExpression());
         }
         return result;
     }
@@ -75,7 +75,7 @@ public class Calculator {
         while (lexer.token() == CalculatorToken.B_XOR) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseAndExpression());
+            result = new CalculatorOpNode(op, result, parseAndExpression());
         }
         return result;
     }
@@ -86,7 +86,7 @@ public class Calculator {
         while (lexer.token() == CalculatorToken.B_AND) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseRelationalExpression());
+            result = new CalculatorOpNode(op, result, parseRelationalExpression());
         }
         return result;
     }
@@ -97,7 +97,7 @@ public class Calculator {
         while (lexer.token() == CalculatorToken.EQ || lexer.token() == CalculatorToken.GE || lexer.token() == CalculatorToken.GT || lexer.token() == CalculatorToken.LE || lexer.token() == CalculatorToken.LT || lexer.token() == CalculatorToken.NE) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseShiftExpression());
+            result = new CalculatorOpNode(op, result, parseShiftExpression());
         }
         return result;
     }
@@ -108,7 +108,7 @@ public class Calculator {
         while (lexer.token() == CalculatorToken.SHL || lexer.token() == CalculatorToken.SHR) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseAdditiveExpression());
+            result = new CalculatorOpNode(op, result, parseAdditiveExpression());
         }
         return result;
     }
@@ -119,7 +119,7 @@ public class Calculator {
         while (lexer.token() == CalculatorToken.PLUS || lexer.token() == CalculatorToken.MINUS) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseMultiplicativeExpression());
+            result = new CalculatorOpNode(op, result, parseMultiplicativeExpression());
         }
         return result;
     }
@@ -130,7 +130,7 @@ public class Calculator {
         while (lexer.token() == CalculatorToken.MUL || lexer.token() == CalculatorToken.DIV || lexer.token() == CalculatorToken.MOD) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseUnaryExpression());
+            result = new CalculatorOpNode(op, result, parseUnaryExpression());
         }
         return result;
     }
@@ -140,10 +140,10 @@ public class Calculator {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (0-f) for simplicity.
-            return new CalculatorAstNode(CalculatorToken.MINUS, new CalculatorAstNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), parseUnaryExpression());
+            return new CalculatorOpNode(CalculatorToken.MINUS, new CalculatorNumberNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), parseUnaryExpression());
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
-            return new CalculatorAstNode(CalculatorToken.B_NOT, parseUnaryExpression(), null);
+            return new CalculatorOpNode(CalculatorToken.B_NOT, parseUnaryExpression(), null);
         }
         return parseExponentiationExpression();
     }
@@ -156,7 +156,7 @@ public class Calculator {
         if (lexer.token() == CalculatorToken.POW) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, parseExponentiationExpression());
+            result = new CalculatorOpNode(op, result, parseExponentiationExpression());
         }
         return result;
     }
@@ -170,13 +170,14 @@ public class Calculator {
             expect(CalculatorToken.CLOSE_PARENTHESIS);
             return result;
         } else if (lexer.token() == CalculatorToken.NUMBER) {
-            CalculatorAstNode result = new CalculatorAstNode(lexer.number());
+            CalculatorAstNode result = new CalculatorNumberNode(lexer.number());
             expect(CalculatorToken.NUMBER);
             return result;
         } else if (lexer.token() == CalculatorToken.IDENTIFIER) {
             CalculatorAstNode result = namespace.get(lexer.identifier());
             if (result == null) {
-                result = new CalculatorAstNode(lexer.identifier());
+                // FIXME: support free variables for symbolic computation.
+                throw new CalculatorError("undefined function or variable '" + lexer.identifier() + "'");
             }
             expect(CalculatorToken.IDENTIFIER);
             return result;
