@@ -84,7 +84,13 @@ public class Calculator {
         
         final CalculatorFunction sum = new CalculatorFunctions.Sum();
         functions.put("sum",     sum);
-        functions.put("∑",       sum);
+        functions.put("\u03a3",  sum); // Unicode Greek capital letter sigma.
+        functions.put("\u2211",  sum); // Unicode summation sign.
+        
+        final CalculatorFunction product = new CalculatorFunctions.Product();
+        functions.put("product", product);
+        functions.put("\u03a0",  product); // Unicode Greek capital letter pi.
+        functions.put("\u220f",  product); // Unicode product sign.
     }
     
     public String evaluate() throws CalculatorError {
@@ -378,4 +384,12 @@ public class Calculator {
         Assert.equals(new Calculator("sum(0, 10, i**2)").evaluate(), "385");
         // FIXME: failure test for min > max.
     }
+    
+    @Test private static void testProduct() {
+        Assert.equals(new Calculator("product(1, 10, i)").evaluate(), "3628800");
+        Assert.equals(new Calculator("product(1, 10.2, i)").evaluate(), "3628800");
+        Assert.equals(new Calculator("product(1, 6, i**2)").evaluate(), "518400");
+        // FIXME: failure test for min > max.
+    }
+    
 }

@@ -187,6 +187,16 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Product extends CalculatorFunction {
+        public Product() {
+            super("product", 3);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+            return series(environment, args, BigDecimal.ONE, false);
+        }
+    }
+    
     public static class Random extends CalculatorFunction {
         public Random() {
             super("random", 0);
@@ -207,31 +217,42 @@ public class CalculatorFunctions {
         }
     }
     
+    private static BigDecimal series(Calculator environment, List<CalculatorAstNode> args, BigDecimal initial, boolean isSum) {
+        final BigDecimal iMin = args.get(0).value(environment);
+        final BigDecimal iMax = args.get(1).value(environment);
+        final CalculatorAstNode expr = args.get(2);
+        
+        if (iMin.compareTo(iMax) > 0) {
+            throw new CalculatorError("minimum (" + iMin + ") greater than maximum (" + iMax + ")");
+        }
+        
+        // FIXME: support infinite sums/products, adding convergence testing.
+        
+        final BigDecimal originalI = environment.getVariable("i");
+        try {
+            BigDecimal result = initial;
+            for (BigDecimal i = iMin; i.compareTo(iMax) <= 0; i = i.add(BigDecimal.ONE)) {
+                environment.setVariable("i", i);
+                final BigDecimal term = expr.value(environment);
+                if (isSum) {
+                    result = result.add(term);
+                } else {
+                    result = result.multiply(term);
+                }
+            }
+            return result;
+        } finally {
+            environment.setVariable("i", originalI);
+        }
+    }
+    
     public static class Sum extends CalculatorFunction {
         public Sum() {
             super("sum", 3);
         }
         
         public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
-            final BigDecimal iMin = args.get(0).value(environment);
-            final BigDecimal iMax = args.get(1).value(environment);
-            final CalculatorAstNode expr = args.get(2);
-            
-            if (iMin.compareTo(iMax) > 0) {
-                throw new CalculatorError("minimum (" + iMin + ") greater than maximum (" + iMax + ")");
-            }
-            
-            final BigDecimal originalI = environment.getVariable("i");
-            try {
-                BigDecimal result = BigDecimal.ZERO;
-                for (BigDecimal i = iMin; i.compareTo(iMax) <= 0; i = i.add(BigDecimal.ONE)) {
-                    environment.setVariable("i", i);
-                    result = result.add(expr.value(environment));
-                }
-                return result;
-            } finally {
-                environment.setVariable("i", originalI);
-            }
+            return series(environment, args, BigDecimal.ZERO, true);
         }
     }
     
