@@ -46,127 +46,127 @@ public class Calculator {
     }
     
     public String evaluate() throws CalculatorError {
-        CalculatorAstNode ast = expr();
+        CalculatorAstNode ast = parseExpr();
         //System.err.println(ast);
         BigDecimal value = ast.value();
         return value.toString();
     }
     
-    private CalculatorAstNode expr() {
-        return orExpression();
+    private CalculatorAstNode parseExpr() {
+        return parseOrExpression();
     }
     
     // Mathematica operator precedence: http://reference.wolfram.com/mathematica/tutorial/OperatorInputForms.html
     
     // |
-    private CalculatorAstNode orExpression() {
-        CalculatorAstNode result = xorExpression();
+    private CalculatorAstNode parseOrExpression() {
+        CalculatorAstNode result = parseXorExpression();
         while (lexer.token() == CalculatorToken.B_OR) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, xorExpression());
+            result = new CalculatorAstNode(op, result, parseXorExpression());
         }
         return result;
     }
     
     // ^
-    private CalculatorAstNode xorExpression() {
-        CalculatorAstNode result = andExpression();
+    private CalculatorAstNode parseXorExpression() {
+        CalculatorAstNode result = parseAndExpression();
         while (lexer.token() == CalculatorToken.B_XOR) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, andExpression());
+            result = new CalculatorAstNode(op, result, parseAndExpression());
         }
         return result;
     }
     
     // &
-    private CalculatorAstNode andExpression() {
-        CalculatorAstNode result = relationalExpression();
+    private CalculatorAstNode parseAndExpression() {
+        CalculatorAstNode result = parseRelationalExpression();
         while (lexer.token() == CalculatorToken.B_AND) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, relationalExpression());
+            result = new CalculatorAstNode(op, result, parseRelationalExpression());
         }
         return result;
     }
     
     // == >= > <= < !=
-    private CalculatorAstNode relationalExpression() {
-        CalculatorAstNode result = shiftExpression();
+    private CalculatorAstNode parseRelationalExpression() {
+        CalculatorAstNode result = parseShiftExpression();
         while (lexer.token() == CalculatorToken.EQ || lexer.token() == CalculatorToken.GE || lexer.token() == CalculatorToken.GT || lexer.token() == CalculatorToken.LE || lexer.token() == CalculatorToken.LT || lexer.token() == CalculatorToken.NE) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, shiftExpression());
+            result = new CalculatorAstNode(op, result, parseShiftExpression());
         }
         return result;
     }
     
     // << >>
-    private CalculatorAstNode shiftExpression() {
-        CalculatorAstNode result = additiveExpression();
+    private CalculatorAstNode parseShiftExpression() {
+        CalculatorAstNode result = parseAdditiveExpression();
         while (lexer.token() == CalculatorToken.SHL || lexer.token() == CalculatorToken.SHR) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, additiveExpression());
+            result = new CalculatorAstNode(op, result, parseAdditiveExpression());
         }
         return result;
     }
     
     // + -
-    private CalculatorAstNode additiveExpression() {
-        CalculatorAstNode result = multiplicativeExpression();
+    private CalculatorAstNode parseAdditiveExpression() {
+        CalculatorAstNode result = parseMultiplicativeExpression();
         while (lexer.token() == CalculatorToken.PLUS || lexer.token() == CalculatorToken.MINUS) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, multiplicativeExpression());
+            result = new CalculatorAstNode(op, result, parseMultiplicativeExpression());
         }
         return result;
     }
     
     // * / %
-    private CalculatorAstNode multiplicativeExpression() {
-        CalculatorAstNode result = unaryExpression();
+    private CalculatorAstNode parseMultiplicativeExpression() {
+        CalculatorAstNode result = parseUnaryExpression();
         while (lexer.token() == CalculatorToken.MUL || lexer.token() == CalculatorToken.DIV || lexer.token() == CalculatorToken.MOD) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, unaryExpression());
+            result = new CalculatorAstNode(op, result, parseUnaryExpression());
         }
         return result;
     }
     
     // ~ -
-    private CalculatorAstNode unaryExpression() {
+    private CalculatorAstNode parseUnaryExpression() {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (0-f) for simplicity.
-            return new CalculatorAstNode(CalculatorToken.MINUS, new CalculatorAstNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), unaryExpression());
+            return new CalculatorAstNode(CalculatorToken.MINUS, new CalculatorAstNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), parseUnaryExpression());
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
-            return new CalculatorAstNode(CalculatorToken.B_NOT, unaryExpression(), null);
+            return new CalculatorAstNode(CalculatorToken.B_NOT, parseUnaryExpression(), null);
         }
-        return exponentiationExpression();
+        return parseExponentiationExpression();
     }
     
     // sqrt
     
     // **
-    private CalculatorAstNode exponentiationExpression() {
-        CalculatorAstNode result = factor();
+    private CalculatorAstNode parseExponentiationExpression() {
+        CalculatorAstNode result = parseFactor();
         if (lexer.token() == CalculatorToken.POW) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorAstNode(op, result, exponentiationExpression());
+            result = new CalculatorAstNode(op, result, parseExponentiationExpression());
         }
         return result;
     }
     
     // !
     
-    private CalculatorAstNode factor() {
+    private CalculatorAstNode parseFactor() {
         if (lexer.token() == CalculatorToken.OPEN_PARENTHESIS) {
             expect(CalculatorToken.OPEN_PARENTHESIS);
-            CalculatorAstNode result = expr();
+            CalculatorAstNode result = parseExpr();
             expect(CalculatorToken.CLOSE_PARENTHESIS);
             return result;
         } else if (lexer.token() == CalculatorToken.NUMBER) {
