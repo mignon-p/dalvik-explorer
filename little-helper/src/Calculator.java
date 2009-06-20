@@ -42,7 +42,10 @@ public class Calculator {
     private void initBuiltInConstants() {
         // FIXME: use higher-precision string forms?
         namespace.put("e", new CalculatorNumberNode(new BigDecimal(Math.E)));
-        namespace.put("pi", new CalculatorNumberNode(new BigDecimal(Math.PI)));
+        
+        final CalculatorAstNode pi = new CalculatorNumberNode(new BigDecimal(Math.PI));
+        namespace.put("pi", pi);
+        namespace.put("π", pi);
     }
     
     public String evaluate() throws CalculatorError {
@@ -269,5 +272,6 @@ public class Calculator {
     @Test private static void testConstants() {
         Assert.equals(Double.valueOf(new Calculator("e").evaluate()), Math.E, 0.000001);
         Assert.equals(Double.valueOf(new Calculator("pi").evaluate()), Math.PI, 0.000001);
+        Assert.equals(new Calculator("pi == π").evaluate(), "0");
     }
 }
