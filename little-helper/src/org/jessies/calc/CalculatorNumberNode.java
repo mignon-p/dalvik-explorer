@@ -1,3 +1,5 @@
+package org.jessies.calc;
+
 /*
  * This file is part of LittleHelper.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
@@ -18,6 +20,18 @@
 
 import java.math.*;
 
-public interface CalculatorAstNode {
-    public BigDecimal value(Calculator environment);
+public class CalculatorNumberNode implements CalculatorAstNode {
+    private final BigDecimal number;
+    
+    public CalculatorNumberNode(BigDecimal number) {
+        this.number = number;
+    }
+    
+    public BigDecimal value(Calculator environment) {
+        return number;
+    }
+    
+    @Override public String toString() {
+        return number.toString();
+    }
 }

@@ -1,3 +1,5 @@
+package org.jessies.calc;
+
 /*
  * This file is part of LittleHelper.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
@@ -18,18 +20,18 @@
 
 import java.math.*;
 
-public class CalculatorNumberNode implements CalculatorAstNode {
-    private final BigDecimal number;
+public class CalculatorVariableNode implements CalculatorAstNode {
+    private final String name;
     
-    public CalculatorNumberNode(BigDecimal number) {
-        this.number = number;
+    public CalculatorVariableNode(String name) {
+        this.name = name;
     }
     
     public BigDecimal value(Calculator environment) {
-        return number;
-    }
-    
-    @Override public String toString() {
-        return number.toString();
+        final BigDecimal result = environment.getVariable(name);
+        if (result == null) {
+            throw new CalculatorError("use of undefined variable '" + name + "'");
+        }
+        return result;
     }
 }

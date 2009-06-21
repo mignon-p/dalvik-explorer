@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.imageio.*;
 import javax.swing.*;
+import org.jessies.calc.*;
 import org.jessies.test.*;
 
 /**

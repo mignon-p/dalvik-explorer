@@ -1,3 +1,5 @@
+package org.jessies.calc;
+
 /*
  * This file is part of LittleHelper.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
@@ -17,27 +19,7 @@
  */
 
 import java.math.*;
-import java.util.*;
 
-/**
- * Represents a built-in function.
- */
-public abstract class CalculatorFunction {
-    private final String name;
-    private final int arity;
-    
-    public CalculatorFunction(String name, int arity) {
-        this.name = name;
-        this.arity = arity;
-    }
-    
-    public int arity() {
-        return arity;
-    }
-    
-    public abstract BigDecimal apply(Calculator environment, List<CalculatorAstNode> args);
-    
-    @Override public String toString() {
-        return name;
-    }
+public interface CalculatorAstNode {
+    public BigDecimal value(Calculator environment);
 }

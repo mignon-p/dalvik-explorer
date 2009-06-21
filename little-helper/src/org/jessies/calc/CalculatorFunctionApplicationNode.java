@@ -1,3 +1,5 @@
+package org.jessies.calc;
+
 /*
  * This file is part of LittleHelper.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
@@ -16,20 +18,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import e.util.*;
 import java.math.*;
+import java.util.*;
 
-public class CalculatorVariableNode implements CalculatorAstNode {
-    private final String name;
+/**
+ * Represents a function application.
+ */
+public class CalculatorFunctionApplicationNode implements CalculatorAstNode {
+    private final CalculatorFunction function;
+    private final List<CalculatorAstNode> args;
     
-    public CalculatorVariableNode(String name) {
-        this.name = name;
+    public CalculatorFunctionApplicationNode(CalculatorFunction function, List<CalculatorAstNode> args) {
+        this.function = function;
+        this.args = args;
+        if (function.arity() != args.size()) {
+            throw new CalculatorError("function \"" + function + "\" requires " + StringUtilities.pluralize(function.arity(), "argument", "arguments") + "; got " + args.size());
+        }
     }
     
     public BigDecimal value(Calculator environment) {
-        final BigDecimal result = environment.getVariable(name);
-        if (result == null) {
-            throw new CalculatorError("use of undefined variable '" + name + "'");
-        }
-        return result;
+        return function.apply(environment, args);
     }
 }

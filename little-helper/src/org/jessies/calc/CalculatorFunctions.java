@@ -1,3 +1,5 @@
+package org.jessies.calc;
+
 /*
  * This file is part of LittleHelper.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
