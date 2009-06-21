@@ -26,8 +26,6 @@ import org.jessies.test.*;
 // FIXME: factorial (postfix !).
 // FIXME: logical not (prefix !).
 public class Calculator {
-    public static final MathContext MATH_CONTEXT = new MathContext(20, RoundingMode.HALF_UP);
-    
     private final CalculatorLexer lexer;
     private final Map<String, CalculatorAstNode> constants;
     private final Map<String, CalculatorFunction> functions;
@@ -54,45 +52,46 @@ public class Calculator {
     
     private void initBuiltInFunctions() {
         // FIXME: acosh, asinh, atanh, chop, clip, sign(um), int(eger_part), frac(tional_part)
-        functions.put("abs",     new CalculatorFunctions.Abs());
-        functions.put("acos",    new CalculatorFunctions.Acos());
-        functions.put("asin",    new CalculatorFunctions.Asin());
-        functions.put("atan",    new CalculatorFunctions.Atan());
-        functions.put("atan2",   new CalculatorFunctions.Atan2());
-        functions.put("cbrt",    new CalculatorFunctions.Cbrt());
+        functions.put("abs",       new CalculatorFunctions.Abs());
+        functions.put("acos",      new CalculatorFunctions.Acos());
+        functions.put("asin",      new CalculatorFunctions.Asin());
+        functions.put("atan",      new CalculatorFunctions.Atan());
+        functions.put("atan2",     new CalculatorFunctions.Atan2());
+        functions.put("cbrt",      new CalculatorFunctions.Cbrt());
         final CalculatorFunction ceiling = new CalculatorFunctions.Ceiling();
-        functions.put("ceil",    ceiling);
-        functions.put("ceiling", ceiling);
-        functions.put("cos",     new CalculatorFunctions.Cos());
-        functions.put("cosh",    new CalculatorFunctions.Cosh());
-        functions.put("exp",     new CalculatorFunctions.Exp());
-        functions.put("floor",   new CalculatorFunctions.Floor());
-        functions.put("hypot",   new CalculatorFunctions.Hypot());
-        functions.put("log",     new CalculatorFunctions.Log());
-        functions.put("log10",   new CalculatorFunctions.Log10());
-        functions.put("log2",    new CalculatorFunctions.Log2());
-        functions.put("logE",    new CalculatorFunctions.LogE());
+        functions.put("ceil",      ceiling);
+        functions.put("ceiling",   ceiling);
+        functions.put("cos",       new CalculatorFunctions.Cos());
+        functions.put("cosh",      new CalculatorFunctions.Cosh());
+        functions.put("exp",       new CalculatorFunctions.Exp());
+        functions.put("factorial", new CalculatorFunctions.Factorial());
+        functions.put("floor",     new CalculatorFunctions.Floor());
+        functions.put("hypot",     new CalculatorFunctions.Hypot());
+        functions.put("log",       new CalculatorFunctions.Log());
+        functions.put("log10",     new CalculatorFunctions.Log10());
+        functions.put("log2",      new CalculatorFunctions.Log2());
+        functions.put("logE",      new CalculatorFunctions.LogE());
         final CalculatorFunction random = new CalculatorFunctions.Random();
-        functions.put("rand",    random);
-        functions.put("random",  random);
-        functions.put("round",   new CalculatorFunctions.Round());
-        functions.put("sin",     new CalculatorFunctions.Sin());
-        functions.put("sinh",    new CalculatorFunctions.Sinh());
-        functions.put("sqrt",    new CalculatorFunctions.Sqrt());
-        functions.put("tan",     new CalculatorFunctions.Tan());
-        functions.put("tanh",    new CalculatorFunctions.Tanh());
+        functions.put("rand",      random);
+        functions.put("random",    random);
+        functions.put("round",     new CalculatorFunctions.Round());
+        functions.put("sin",       new CalculatorFunctions.Sin());
+        functions.put("sinh",      new CalculatorFunctions.Sinh());
+        functions.put("sqrt",      new CalculatorFunctions.Sqrt());
+        functions.put("tan",       new CalculatorFunctions.Tan());
+        functions.put("tanh",      new CalculatorFunctions.Tanh());
         
         final CalculatorFunction sum = new CalculatorFunctions.Sum();
-        functions.put("sum",     sum);
-        functions.put("\u03a3",  sum); // Unicode Greek capital letter sigma.
-        functions.put("\u2211",  sum); // Unicode summation sign.
+        functions.put("sum",       sum);
+        functions.put("\u03a3",    sum); // Unicode Greek capital letter sigma.
+        functions.put("\u2211",    sum); // Unicode summation sign.
         
         final CalculatorFunction product = new CalculatorFunctions.Product();
-        functions.put("product", product);
-        functions.put("\u03a0",  product); // Unicode Greek capital letter pi.
-        functions.put("\u220f",  product); // Unicode product sign.
+        functions.put("product",   product);
+        functions.put("\u03a0",    product); // Unicode Greek capital letter pi.
+        functions.put("\u220f",    product); // Unicode product sign.
     }
-    
+    // sum(0,30,1/factorial(i))-e
     public String evaluate() throws CalculatorError {
         CalculatorAstNode ast = parseExpr();
         //System.err.println(ast);
@@ -196,7 +195,7 @@ public class Calculator {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (0-f) for simplicity.
-            return new CalculatorOpNode(CalculatorToken.MINUS, new CalculatorNumberNode(new BigDecimal("0", Calculator.MATH_CONTEXT)), parseUnaryExpression());
+            return new CalculatorOpNode(CalculatorToken.MINUS, new CalculatorNumberNode(BigDecimal.ZERO), parseUnaryExpression());
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
             return new CalculatorOpNode(CalculatorToken.B_NOT, parseUnaryExpression(), null);

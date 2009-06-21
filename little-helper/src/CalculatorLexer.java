@@ -19,6 +19,7 @@
 import java.io.*;
 import java.math.*;
 import java.util.*;
+import static org.jessies.calc.BigDecimals.*;
 
 public class CalculatorLexer {
     private static final int EOF = -1;
@@ -154,9 +155,9 @@ public class CalculatorLexer {
                 reader.unread(ch);
                 
                 if (isReal) {
-                    number = new BigDecimal(text.toString(), Calculator.MATH_CONTEXT);
+                    number = /*BigDecimals.*/fromString(text.toString());
                 } else {
-                    number = new BigDecimal(new BigInteger(text.toString(), base), Calculator.MATH_CONTEXT);
+                    number = new BigDecimal(new BigInteger(text.toString(), base), /*BigDecimals.*/MATH_CONTEXT);
                 }
                 
                 return CalculatorToken.NUMBER;

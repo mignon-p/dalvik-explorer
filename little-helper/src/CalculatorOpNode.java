@@ -17,6 +17,7 @@
  */
 
 import java.math.*;
+import static org.jessies.calc.BigDecimals.*;
 
 public class CalculatorOpNode implements CalculatorAstNode {
     // Unary operators may have rhs null.
@@ -38,7 +39,7 @@ public class CalculatorOpNode implements CalculatorAstNode {
             return lhs.value(environment).subtract(rhs.value(environment));
             
         case DIV:
-            return lhs.value(environment).divide(rhs.value(environment), Calculator.MATH_CONTEXT);
+            return lhs.value(environment).divide(rhs.value(environment), MATH_CONTEXT);
         case MUL:
             return lhs.value(environment).multiply(rhs.value(environment));
         case MOD:
@@ -76,18 +77,6 @@ public class CalculatorOpNode implements CalculatorAstNode {
         default:
             throw new CalculatorError("operator " + op + " not yet implemented");
         }
-    }
-    
-    private BigDecimal fromBigInteger(BigInteger i) {
-        return new BigDecimal(i, Calculator.MATH_CONTEXT);
-    }
-    
-    private BigDecimal fromDouble(double d) {
-        return new BigDecimal(d, Calculator.MATH_CONTEXT);
-    }
-    
-    private BigDecimal fromBoolean(boolean b) {
-        return b ? new BigDecimal("1", Calculator.MATH_CONTEXT) : new BigDecimal("0", Calculator.MATH_CONTEXT);
     }
     
     private int cmp(Calculator environment) {
