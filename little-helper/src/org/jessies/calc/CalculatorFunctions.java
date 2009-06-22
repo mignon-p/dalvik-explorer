@@ -131,32 +131,34 @@ public class CalculatorFunctions {
         }
         
         public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
-            final BigDecimal arg0 = args.get(0).value(environment);
-            BigInteger n;
-            try {
-                n = arg0.toBigIntegerExact();
-            } catch (ArithmeticException ex) {
-                throw new CalculatorError("factorial requires an integer argument; got " + arg0 + " instead");
-            }
-            
-            final int signum = n.signum();
-            if (signum < 0) {
-                throw new IllegalArgumentException("factorial requires a non-negative integer argument; got " + this + " instead");
-            } else if (signum == 0) {
-                return BigDecimal.ONE;
-            }
-            // Based on fact6 from Richard J Fateman's "Comments on Factorial Programs".
-            return fromBigInteger(factorialHelper(n, BigInteger.ONE));
+            return factorial(args.get(0).value(environment));
+        }
+    }
+    
+    public static BigDecimal factorial(BigDecimal arg) {
+        BigInteger n;
+        try {
+            n = arg.toBigIntegerExact();
+        } catch (ArithmeticException ex) {
+            throw new CalculatorError("factorial requires an integer argument; got " + arg + " instead");
         }
         
-        private BigInteger factorialHelper(BigInteger n, BigInteger m) {
-            if (n.compareTo(m) <= 0) {
-                return n;
-            }
-            final BigInteger twoM = BigInteger.valueOf(2).multiply(m); // This seems consistently faster than m.shiftLeft(1)!
-            return factorialHelper(n, twoM).multiply(factorialHelper(n.subtract(m), twoM));
+        final int signum = n.signum();
+        if (signum < 0) {
+            throw new IllegalArgumentException("factorial requires a non-negative integer argument; got " + arg + " instead");
+        } else if (signum == 0) {
+            return BigDecimal.ONE;
         }
-        
+        // Based on fact6 from Richard J Fateman's "Comments on Factorial Programs".
+        return fromBigInteger(factorialHelper(n, BigInteger.ONE));
+    }
+    
+    private static BigInteger factorialHelper(BigInteger n, BigInteger m) {
+        if (n.compareTo(m) <= 0) {
+            return n;
+        }
+        final BigInteger twoM = BigInteger.valueOf(2).multiply(m); // This seems consistently faster than m.shiftLeft(1)!
+        return factorialHelper(n, twoM).multiply(factorialHelper(n.subtract(m), twoM));
     }
     
     public static class Floor extends CalculatorFunction {

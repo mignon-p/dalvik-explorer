@@ -66,6 +66,9 @@ public class CalculatorOpNode implements CalculatorAstNode {
         case B_NOT:
             return fromBigInteger(lhs.value(environment).toBigInteger().not());
             
+        case FACTORIAL:
+            return CalculatorFunctions.factorial(lhs.value(environment));
+            
         case POW:
             {
                 try {

@@ -93,9 +93,11 @@ public class Calculator {
         functions.put("\u03a0",    product); // Unicode Greek capital letter pi.
         functions.put("\u220f",    product); // Unicode product sign.
     }
-    // sum(0,30,1/factorial(i))-e
+    
     public String evaluate() throws CalculatorError {
         CalculatorAstNode ast = parseExpr();
+        expect(CalculatorToken.END_OF_INPUT);
+        
         //System.err.println(ast);
         BigDecimal value = ast.value(this);
         return value.toString();
@@ -209,7 +211,7 @@ public class Calculator {
     
     // **
     private CalculatorAstNode parseExponentiationExpression() {
-        CalculatorAstNode result = parseFactor();
+        CalculatorAstNode result = parseFactorialExpression();
         if (lexer.token() == CalculatorToken.POW) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
@@ -218,7 +220,15 @@ public class Calculator {
         return result;
     }
     
-    // !
+    // postfix-!
+    private CalculatorAstNode parseFactorialExpression() {
+        CalculatorAstNode result = parseFactor();
+        if (lexer.token() == CalculatorToken.PLING) {
+            expect(CalculatorToken.PLING);
+            result = new CalculatorOpNode(CalculatorToken.FACTORIAL, result, null);
+        }
+        return result;
+    }
     
     private CalculatorAstNode parseFactor() {
         if (lexer.token() == CalculatorToken.OPEN_PARENTHESIS) {
@@ -363,6 +373,8 @@ public class Calculator {
         Assert.equals(new Calculator("cos(pi)").evaluate(), "-1");
         Assert.equals(new Calculator("cosh(0)").evaluate(), "1");
         Assert.equals(Double.valueOf(new Calculator("exp(1)/e").evaluate()), 1.0, 0.000001);
+        Assert.equals(new Calculator("factorial(5)").evaluate(), "120");
+        Assert.equals(new Calculator("factorial(5) == 5!").evaluate(), "1");
         Assert.equals(new Calculator("floor(1.2)").evaluate(), "1");
         Assert.equals(new Calculator("hypot(3, 4)").evaluate(), "5");
         Assert.equals(new Calculator("log(2, 1024)").evaluate(), "10");
@@ -383,6 +395,7 @@ public class Calculator {
         Assert.equals(new Calculator("sum(0, 10, i)").evaluate(), "55");
         Assert.equals(new Calculator("sum(0, 10.2, i)").evaluate(), "55");
         Assert.equals(new Calculator("sum(0, 10, i**2)").evaluate(), "385");
+        Assert.equals(Double.valueOf(new Calculator("sum(0,30,1/i!)-e").evaluate()), 0.0, 0.000001);
         // FIXME: failure test for min > max.
     }
     
