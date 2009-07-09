@@ -18,7 +18,6 @@ package org.jessies.calc;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import e.util.*;
 import java.math.*;
 import java.util.*;
 
@@ -33,7 +32,7 @@ public class CalculatorFunctionApplicationNode implements CalculatorAstNode {
         this.function = function;
         this.args = args;
         if (function.arity() != args.size()) {
-            throw new CalculatorError("function \"" + function + "\" requires " + StringUtilities.pluralize(function.arity(), "argument", "arguments") + "; got " + args.size());
+            throw new CalculatorError("wrong number of arguments to function \"" + function + "\"; need " + function.arity() + " but got " + args.size());
         }
     }
     
