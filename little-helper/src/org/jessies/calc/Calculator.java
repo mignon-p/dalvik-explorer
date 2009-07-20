@@ -49,7 +49,7 @@ public class Calculator {
         
         final CalculatorAstNode pi = new CalculatorNumberNode(new BigDecimal(Math.PI));
         constants.put("pi", pi);
-        constants.put("π", pi);
+        constants.put("\u03c0", pi);
     }
     
     private void initBuiltInFunctions() {
@@ -356,7 +356,7 @@ public class Calculator {
     @Test private static void testConstants() {
         Assert.equals(Double.valueOf(new Calculator("e").evaluate()), Math.E, 0.000001);
         Assert.equals(Double.valueOf(new Calculator("pi").evaluate()), Math.PI, 0.000001);
-        Assert.equals(new Calculator("pi == π").evaluate(), "1");
+        Assert.equals(new Calculator("pi == \u03c0").evaluate(), "1");
     }
     
     @Test private static void testFunctions() {
@@ -405,5 +405,4 @@ public class Calculator {
         Assert.equals(new Calculator("product(1, 6, i**2)").evaluate(), "518400");
         // FIXME: failure test for min > max.
     }
-    
 }
