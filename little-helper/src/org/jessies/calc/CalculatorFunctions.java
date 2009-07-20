@@ -181,6 +181,49 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class IsPrime extends CalculatorFunction {
+        public IsPrime() {
+            super("is_prime", 1);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+            return fromBoolean(isPrime(args.get(0).value(environment)));
+        }
+    }
+    
+    public static boolean isPrime(BigDecimal arg) {
+        int n;
+        try {
+            n = arg.intValueExact();
+        } catch (ArithmeticException ex) {
+            try {
+                final BigInteger bn = arg.toBigIntegerExact();
+            } catch (ArithmeticException ex2) {
+                throw new IllegalArgumentException("is_prime uses a naive algorithm unsuitable for huge numbers");
+            }
+            return false;
+        }
+        
+        // FIXME: replace the naive algorithm with something better.
+        n = Math.abs(n);
+        if (n == 1) {
+            return false;
+        }
+        if (n == 2) {
+            return true;
+        }
+        if ((n % 2) == 0) {
+            return false;
+        }
+        final int max = (int) Math.sqrt(n);
+        for (int i = 3; i <= max; ++i) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     // log(base, n).
     public static class Log extends CalculatorFunction {
         public Log() {

@@ -69,6 +69,7 @@ public class Calculator {
         functions.put("factorial", new CalculatorFunctions.Factorial());
         functions.put("floor",     new CalculatorFunctions.Floor());
         functions.put("hypot",     new CalculatorFunctions.Hypot());
+        functions.put("is_prime",  new CalculatorFunctions.IsPrime());
         functions.put("log",       new CalculatorFunctions.Log());
         functions.put("log10",     new CalculatorFunctions.Log10());
         functions.put("log2",      new CalculatorFunctions.Log2());
@@ -380,6 +381,16 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("factorial(5) == 5!"), "1");
         Assert.equals(new Calculator().evaluate("floor(1.2)"), "1");
         Assert.equals(new Calculator().evaluate("hypot(3, 4)"), "5");
+        
+        Assert.equals(new Calculator().evaluate("is_prime(0)"), "0");
+        Assert.equals(new Calculator().evaluate("is_prime(1)"), "0");
+        Assert.equals(new Calculator().evaluate("is_prime(2)"), "1");
+        Assert.equals(new Calculator().evaluate("is_prime(3)"), "1");
+        Assert.equals(new Calculator().evaluate("is_prime(4)"), "0");
+        Assert.equals(new Calculator().evaluate("is_prime(5)"), "1");
+        Assert.equals(new Calculator().evaluate("is_prime(-4)"), "0");
+        Assert.equals(new Calculator().evaluate("is_prime(-5)"), "1");
+        
         Assert.equals(new Calculator().evaluate("log(2, 1024)"), "10");
         Assert.equals(new Calculator().evaluate("log2(1024)"), "10");
         Assert.equals(new Calculator().evaluate("logE(exp(4))"), "4");
