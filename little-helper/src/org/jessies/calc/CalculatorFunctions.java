@@ -216,7 +216,7 @@ public class CalculatorFunctions {
             return false;
         }
         final int max = (int) Math.sqrt(n);
-        for (int i = 3; i <= max; ++i) {
+        for (int i = 3; i <= max; i += 2) {
             if (n % i == 0) {
                 return false;
             }
