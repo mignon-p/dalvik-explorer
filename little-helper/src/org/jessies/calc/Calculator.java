@@ -25,7 +25,6 @@ import org.jessies.test.*;
 // FIXME: Mac OS' calculator offers -d variants of all the trig functions for degrees. that, or offer constants to multiply by to convert to degrees/radians?
 // FIXME: higher-order built-in functions like http://www.vitanuova.com/inferno/man/1/calc.html (sum, product, integral, differential, solve).
 // FIXME: integer division (//).
-// FIXME: factorial (postfix !).
 // FIXME: logical not (prefix !).
 public class Calculator {
     private final Map<String, CalculatorAstNode> constants;
@@ -258,7 +257,7 @@ public class Calculator {
             }
             return result;
         } else {
-            throw new CalculatorError("unexpected '" + lexer.token() + "'");
+            throw new CalculatorError("unexpected " + quoteTokenForErrorMessage(lexer.token()));
         }
     }
     
@@ -279,9 +278,19 @@ public class Calculator {
     
     private void expect(CalculatorToken what) {
         if (lexer.token() != what) {
-            throw new CalculatorError("expected " + what + ", got " + lexer.token() + " instead");
+            throw new CalculatorError("expected " + quoteTokenForErrorMessage(what) + ", got " + quoteTokenForErrorMessage(lexer.token()) + " instead");
         }
         lexer.nextToken();
+    }
+    
+    private static String quoteTokenForErrorMessage(CalculatorToken token) {
+        String result = token.toString();
+        if (result.length() > 2) {
+            // We probably already have something usable like "end of input".
+            return result;
+        }
+        // Quote operators.
+        return "'" + result + "'";
     }
     
     @Test private static void testArithmetic() {
