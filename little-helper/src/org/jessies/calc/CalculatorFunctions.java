@@ -145,7 +145,7 @@ public class CalculatorFunctions {
         
         final int signum = n.signum();
         if (signum < 0) {
-            throw new IllegalArgumentException("factorial requires a non-negative integer argument; got " + arg + " instead");
+            throw new CalculatorError("factorial requires a non-negative integer argument; got " + arg + " instead");
         } else if (signum == 0) {
             return BigDecimal.ONE;
         }
@@ -199,9 +199,11 @@ public class CalculatorFunctions {
             try {
                 final BigInteger bn = arg.toBigIntegerExact();
             } catch (ArithmeticException ex2) {
-                throw new IllegalArgumentException("is_prime uses a naive algorithm unsuitable for huge numbers");
+                // It's a real.
+                return false;
             }
-            return false;
+            // It's just too big for us.
+            throw new CalculatorError("is_prime uses a naive algorithm unsuitable for huge numbers");
         }
         
         // FIXME: replace the naive algorithm with something better.
