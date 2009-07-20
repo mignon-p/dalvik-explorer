@@ -67,6 +67,8 @@ public class LittleHelper extends JFrame {
     private JTextField textField;
     private JList resultList;
     
+    private Calculator calculator = new Calculator();
+    
     public LittleHelper() {
         super("Little Helper");
         
@@ -170,9 +172,9 @@ public class LittleHelper extends JFrame {
         }
     }
     
-    private static String calculate(String s) {
+    private String calculate(String s) {
         try {
-            return new Calculator(s).evaluate();
+            return calculator.evaluate(s);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
