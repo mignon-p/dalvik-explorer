@@ -408,4 +408,12 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("product(1, 6, i**2)"), "518400");
         // FIXME: failure test for min > max.
     }
+    
+    @Test private static void testAns() {
+        final Calculator calculator = new Calculator();
+        Assert.equals(calculator.evaluate("0"), "0");
+        Assert.equals(calculator.evaluate("1+Ans"), "1");
+        Assert.equals(calculator.evaluate("1+Ans"), "2");
+        Assert.equals(calculator.evaluate("Ans*2"), "4");
+    }
 }
