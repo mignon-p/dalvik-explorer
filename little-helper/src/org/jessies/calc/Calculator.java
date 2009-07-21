@@ -156,16 +156,24 @@ public class Calculator {
     
     // &
     private CalculatorAstNode parseAndExpression() {
-        CalculatorAstNode result = parseRelationalExpression();
+        CalculatorAstNode result = parseNotExpression();
         while (lexer.token() == CalculatorToken.B_AND) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseRelationalExpression());
+            result = new CalculatorOpNode(op, result, parseNotExpression());
         }
         return result;
     }
     
     // !
+    private CalculatorAstNode parseNotExpression() {
+        if (lexer.token() == CalculatorToken.PLING) {
+            lexer.nextToken();
+            return new CalculatorOpNode(CalculatorToken.L_NOT, parseNotExpression(), null);
+        } else {
+            return parseRelationalExpression();
+        }
+    }
     
     // == >= > <= < !=
     private CalculatorAstNode parseRelationalExpression() {
@@ -356,6 +364,12 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("1!=2"), "1");
         Assert.equals(new Calculator().evaluate("2!=2"), "0");
         Assert.equals(new Calculator().evaluate("2!=1"), "1");
+    }
+    
+    @Test private static void testNot() {
+        Assert.equals(new Calculator().evaluate("!(1==2)"), "1");
+        Assert.equals(new Calculator().evaluate("!(2==2)"), "0");
+        Assert.equals(new Calculator().evaluate("!!(2==2)"), "1");
     }
     
     @Test private static void testShifts() {

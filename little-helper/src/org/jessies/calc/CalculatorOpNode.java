@@ -54,6 +54,8 @@ public class CalculatorOpNode implements CalculatorAstNode {
         case EQ: return fromBoolean(cmp(environment) == 0);
         case NE: return fromBoolean(cmp(environment) != 0);
             
+        case L_NOT: return fromBoolean(lhs.value(environment).toBigInteger().equals(BigInteger.ZERO));
+            
         case SHL: return fromBigInteger(lhs.value(environment).toBigInteger().shiftLeft(rhs.value(environment).intValue()));
         case SHR: return fromBigInteger(lhs.value(environment).toBigInteger().shiftRight(rhs.value(environment).intValue()));
             
