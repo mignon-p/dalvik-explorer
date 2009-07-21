@@ -308,11 +308,11 @@ public class CalculatorFunctions {
         
         // FIXME: support infinite sums/products, adding convergence testing.
         
-        final BigDecimal originalI = environment.getVariable("i");
+        final CalculatorAstNode originalI = environment.getVariable("i");
         try {
             BigDecimal result = initial;
             for (BigDecimal i = iMin; i.compareTo(iMax) <= 0; i = i.add(BigDecimal.ONE)) {
-                environment.setVariable("i", i);
+                environment.setVariable("i", new CalculatorNumberNode(i));
                 final BigDecimal term = expr.value(environment);
                 if (isSum) {
                     result = result.add(term);

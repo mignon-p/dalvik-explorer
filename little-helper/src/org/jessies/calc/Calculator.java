@@ -29,14 +29,14 @@ import org.jessies.test.*;
 public class Calculator {
     private final Map<String, CalculatorAstNode> constants;
     private final Map<String, CalculatorFunction> functions;
-    private final Map<String, BigDecimal> variables;
+    private final Map<String, CalculatorAstNode> variables;
     
     private CalculatorLexer lexer;
     
     public Calculator() {
         this.constants = new HashMap<String, CalculatorAstNode>();
         this.functions = new HashMap<String, CalculatorFunction>();
-        this.variables = new HashMap<String, BigDecimal>();
+        this.variables = new HashMap<String, CalculatorAstNode>();
         
         initBuiltInConstants();
         initBuiltInFunctions();
@@ -102,15 +102,15 @@ public class Calculator {
         
         //System.err.println(ast);
         BigDecimal value = ast.value(this);
-        setVariable("Ans", value);
+        setVariable("Ans", new CalculatorNumberNode(value));
         return value.toString();
     }
     
-    public BigDecimal getVariable(String name) {
+    public CalculatorAstNode getVariable(String name) {
         return variables.get(name);
     }
     
-    public void setVariable(String name, BigDecimal newValue) {
+    public void setVariable(String name, CalculatorAstNode newValue) {
         variables.put(name, newValue);
     }
     
