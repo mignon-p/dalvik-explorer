@@ -115,10 +115,22 @@ public class Calculator {
     }
     
     private CalculatorAstNode parseExpr() {
-        return parseOrExpression();
+        return parseAssignmentExpression();
     }
     
     // Mathematica operator precedence: http://reference.wolfram.com/mathematica/tutorial/OperatorInputForms.html
+    
+    // = (assignment)
+    private CalculatorAstNode parseAssignmentExpression() {
+        CalculatorAstNode result = parseOrExpression();
+        if (lexer.token() == CalculatorToken.ASSIGN) {
+            CalculatorToken op = lexer.token();
+            lexer.nextToken();
+            result = new CalculatorOpNode(op, result, parseOrExpression());
+        }
+        return result;
+        
+    }
     
     // |
     private CalculatorAstNode parseOrExpression() {
@@ -152,6 +164,8 @@ public class Calculator {
         }
         return result;
     }
+    
+    // !
     
     // == >= > <= < !=
     private CalculatorAstNode parseRelationalExpression() {
@@ -435,5 +449,12 @@ public class Calculator {
         Assert.equals(calculator.evaluate("1+Ans"), "1");
         Assert.equals(calculator.evaluate("1+Ans"), "2");
         Assert.equals(calculator.evaluate("Ans*2"), "4");
+    }
+    
+    @Test private static void testVariables() {
+        final Calculator calculator = new Calculator();
+        Assert.equals(calculator.evaluate("a = 2"), "2");
+        Assert.equals(calculator.evaluate("a"), "2");
+        Assert.equals(calculator.evaluate("2*a"), "4");
     }
 }

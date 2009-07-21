@@ -81,14 +81,7 @@ public class CalculatorLexer {
         case ',': return CalculatorToken.COMMA;
         case ')': return CalculatorToken.CLOSE_PARENTHESIS;
             
-        case '=':
-            {
-                int ch2 = reader.read();
-                if (ch2 == '=') {
-                    return CalculatorToken.EQ;
-                }
-                throw new CalculatorError("unrecognized '='; did you mean '=='?");
-            }
+        case '=': return maybe('=', CalculatorToken.EQ, CalculatorToken.ASSIGN);
         case '+': return CalculatorToken.PLUS;
         case '-': return CalculatorToken.MINUS;
         case '/': return CalculatorToken.DIV;

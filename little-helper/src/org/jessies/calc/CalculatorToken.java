@@ -32,6 +32,8 @@ public enum CalculatorToken {
     
     // Binary.
     
+    ASSIGN("="),
+    
     PLUS("+"),
     MUL("*"),
     POW("**"),

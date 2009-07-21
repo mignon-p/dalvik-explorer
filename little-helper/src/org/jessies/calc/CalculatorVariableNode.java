@@ -27,6 +27,10 @@ public class CalculatorVariableNode implements CalculatorAstNode {
         this.name = name;
     }
     
+    public String name() {
+        return name;
+    }
+    
     public BigDecimal value(Calculator environment) {
         final BigDecimal result = environment.getVariable(name).value(environment);
         if (result == null) {
