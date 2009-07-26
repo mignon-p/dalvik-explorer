@@ -149,6 +149,20 @@ public class CalculatorLexer {
                     }
                     ch = reader.read();
                 }
+                
+                if (ch == 'E') {
+                    isReal = true; // FIXME: this is a hack so we go via the BigDecimal constructor which supports this notation.
+                    text.append('E');
+                    ch = reader.read();
+                    if (ch == '-' || ch == '+') {
+                        text.append((char) ch);
+                        ch = reader.read();
+                    }
+                    while (ch != EOF && (isValidDigit((char) ch, 10))) {
+                        text.append((char) ch);
+                        ch = reader.read();
+                    }
+                }
                 reader.unread(ch);
                 
                 if (isReal) {

@@ -332,6 +332,11 @@ public class Calculator {
         
         Assert.equals(new Calculator().evaluate(".2"), "0.2");
         
+        Assert.equals(new Calculator().evaluate("1.2E3"), "1.2E+3");
+        Assert.equals(new Calculator().evaluate("1E3"), "1E+3");
+        Assert.equals(new Calculator().evaluate("1.E3"), "1E+3");
+        Assert.equals(new Calculator().evaluate(".1E3"), "1E+2");
+        
         Assert.equals(new Calculator().evaluate("1+2+3"), "6");
         Assert.equals(new Calculator().evaluate("1+-2"), "-1");
         Assert.equals(new Calculator().evaluate("3-2-1"), "0");
