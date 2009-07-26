@@ -120,7 +120,7 @@ public class CalculatorLexer {
             }
         
         default:
-            if (ch >= '0' && ch <= '9') {
+            if ((ch >= '0' && ch <= '9') || ch == '.') {
                 // Number.
                 StringBuilder text = new StringBuilder();
                 
@@ -139,7 +139,7 @@ public class CalculatorLexer {
                     }
                 }
                 
-                boolean isReal = false;
+                boolean isReal = (ch == '.');
                 while (ch != EOF && (isValidDigit((char) ch, base) || (base == 10 && ch == '.'))) {
                     text.append((char) ch);
                     if (ch == '.') {
