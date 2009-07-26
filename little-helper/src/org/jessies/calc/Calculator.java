@@ -229,10 +229,18 @@ public class Calculator {
             lexer.nextToken();
             return new CalculatorOpNode(CalculatorToken.B_NOT, parseUnaryExpression(), null);
         }
-        return parseExponentiationExpression();
+        return parseSqrtExpression();
     }
     
     // sqrt
+    private CalculatorAstNode parseSqrtExpression() {
+        if (lexer.token() == CalculatorToken.SQRT) {
+            lexer.nextToken();
+            return new CalculatorFunctionApplicationNode(functions.get("sqrt"), Collections.singletonList(parseSqrtExpression()));
+        } else {
+            return parseExponentiationExpression();
+        }
+    }
     
     // **
     private CalculatorAstNode parseExponentiationExpression() {
@@ -442,6 +450,12 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("sqrt(81)"), "9");
         Assert.equals(new Calculator().evaluate("tan(0)"), "0");
         Assert.equals(new Calculator().evaluate("tanh(0)"), "0");
+    }
+    
+    @Test private static void testSqrt() {
+        Assert.equals(new Calculator().evaluate("\u221a4"), "2");
+        // Check /3*2 == 2*/3 (where / is ASCII-safe \u221a).
+        Assert.startsWith(new Calculator().evaluate("\u221a3*2"), "3.464");
     }
     
     @Test private static void testSum() {

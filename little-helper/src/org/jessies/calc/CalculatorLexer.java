@@ -94,6 +94,8 @@ public class CalculatorLexer {
         case '|': return CalculatorToken.B_OR;
         case '*': return maybe('*', CalculatorToken.POW, CalculatorToken.MUL);
             
+        case '\u221a': return CalculatorToken.SQRT;
+            
         case '<':
             {
                 int ch2 = reader.read();

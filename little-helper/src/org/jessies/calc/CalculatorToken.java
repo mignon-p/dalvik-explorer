@@ -59,6 +59,7 @@ public enum CalculatorToken {
     // Prefix unary.
     
     B_NOT("unary ~"),
+    SQRT("\u221a"),
     
     // Postifx unary.
     
