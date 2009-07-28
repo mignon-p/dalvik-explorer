@@ -88,11 +88,11 @@ public class CalculatorLexer {
         case '%': return CalculatorToken.MOD;
         case '!': return maybe('=', CalculatorToken.NE, CalculatorToken.PLING);
         case '~': return CalculatorToken.B_NOT;
-        case '^': return CalculatorToken.B_XOR;
+        case '^': return CalculatorToken.POW;
             
         case '&': return CalculatorToken.B_AND;
         case '|': return CalculatorToken.B_OR;
-        case '*': return maybe('*', CalculatorToken.POW, CalculatorToken.MUL);
+        case '*': return CalculatorToken.MUL;
             
         case '\u221a': return CalculatorToken.SQRT;
             

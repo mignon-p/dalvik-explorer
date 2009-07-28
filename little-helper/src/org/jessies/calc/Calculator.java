@@ -58,6 +58,10 @@ public class Calculator {
         functions.put("asin",      new CalculatorFunctions.Asin());
         functions.put("atan",      new CalculatorFunctions.Atan());
         functions.put("atan2",     new CalculatorFunctions.Atan2());
+        functions.put("BitAnd",    new CalculatorFunctions.BitAnd());
+        functions.put("BitNot",    new CalculatorFunctions.BitNot());
+        functions.put("BitOr",     new CalculatorFunctions.BitOr());
+        functions.put("BitXor",    new CalculatorFunctions.BitXor());
         functions.put("cbrt",      new CalculatorFunctions.Cbrt());
         final CalculatorFunction ceiling = new CalculatorFunctions.Ceiling();
         functions.put("ceil",      ceiling);
@@ -134,22 +138,11 @@ public class Calculator {
     
     // |
     private CalculatorAstNode parseOrExpression() {
-        CalculatorAstNode result = parseXorExpression();
-        while (lexer.token() == CalculatorToken.B_OR) {
-            CalculatorToken op = lexer.token();
-            lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseXorExpression());
-        }
-        return result;
-    }
-    
-    // ^
-    private CalculatorAstNode parseXorExpression() {
         CalculatorAstNode result = parseAndExpression();
-        while (lexer.token() == CalculatorToken.B_XOR) {
-            CalculatorToken op = lexer.token();
+        while (lexer.token() == CalculatorToken.B_OR) {
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseAndExpression());
+            // FIXME: make BitOr varargs.
+            result = new CalculatorFunctionApplicationNode(functions.get("BitOr"), Arrays.asList(result, parseAndExpression()));
         }
         return result;
     }
@@ -158,9 +151,9 @@ public class Calculator {
     private CalculatorAstNode parseAndExpression() {
         CalculatorAstNode result = parseNotExpression();
         while (lexer.token() == CalculatorToken.B_AND) {
-            CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseNotExpression());
+            // FIXME: make BitAnd varargs.
+            result = new CalculatorFunctionApplicationNode(functions.get("BitAnd"), Arrays.asList(result, parseNotExpression()));
         }
         return result;
     }
@@ -227,7 +220,7 @@ public class Calculator {
             return new CalculatorOpNode(CalculatorToken.MINUS, new CalculatorNumberNode(BigDecimal.ZERO), parseUnaryExpression());
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
-            return new CalculatorOpNode(CalculatorToken.B_NOT, parseUnaryExpression(), null);
+            return new CalculatorFunctionApplicationNode(functions.get("BitNot"), Collections.singletonList(parseUnaryExpression()));
         }
         return parseSqrtExpression();
     }
@@ -242,7 +235,7 @@ public class Calculator {
         }
     }
     
-    // **
+    // ^
     private CalculatorAstNode parseExponentiationExpression() {
         CalculatorAstNode result = parseFactorialExpression();
         if (lexer.token() == CalculatorToken.POW) {
@@ -395,18 +388,18 @@ public class Calculator {
     @Test private static void testBitOperations() {
         Assert.equals(new Calculator().evaluate("(0x1234 & 0xff0) == 0x230"), "1");
         Assert.equals(new Calculator().evaluate("(0x1200 | 0x34) == 0x1234"), "1");
-        Assert.equals(new Calculator().evaluate("5 ^ 3"), "6");
+        Assert.equals(new Calculator().evaluate("BitXor(5, 3)"), "6");
         Assert.equals(new Calculator().evaluate("((0x1234 & ~0xff) | 0x56) == 0x1256"), "1");
         Assert.equals(new Calculator().evaluate("~3"), "-4");
         Assert.equals(new Calculator().evaluate("~~3"), "3");
     }
     
     @Test private static void testExponentiation() {
-        Assert.equals(new Calculator().evaluate("2**3"), "8");
-        Assert.equals(new Calculator().evaluate("2**3**4"), "2417851639229258349412352");
-        Assert.equals(new Calculator().evaluate("4**0.5"), "2");
-        Assert.equals(new Calculator().evaluate("-10**2"), "-100");
-        Assert.equals(new Calculator().evaluate("(-10)**2"), "100");
+        Assert.equals(new Calculator().evaluate("2^3"), "8");
+        Assert.equals(new Calculator().evaluate("2^3^4"), "2417851639229258349412352");
+        Assert.equals(new Calculator().evaluate("4^0.5"), "2");
+        Assert.equals(new Calculator().evaluate("-10^2"), "-100");
+        Assert.equals(new Calculator().evaluate("(-10)^2"), "100");
     }
     
     @Test private static void testConstants() {
@@ -466,7 +459,7 @@ public class Calculator {
     @Test private static void testSum() {
         Assert.equals(new Calculator().evaluate("sum(0, 10, i)"), "55");
         Assert.equals(new Calculator().evaluate("sum(0, 10.2, i)"), "55");
-        Assert.equals(new Calculator().evaluate("sum(0, 10, i**2)"), "385");
+        Assert.equals(new Calculator().evaluate("sum(0, 10, i^2)"), "385");
         Assert.equals(Double.valueOf(new Calculator().evaluate("sum(0,30,1/i!)-e")), 0.0, 0.000001);
         // FIXME: failure test for min > max.
     }
@@ -474,7 +467,7 @@ public class Calculator {
     @Test private static void testProduct() {
         Assert.equals(new Calculator().evaluate("product(1, 10, i)"), "3628800");
         Assert.equals(new Calculator().evaluate("product(1, 10.2, i)"), "3628800");
-        Assert.equals(new Calculator().evaluate("product(1, 6, i**2)"), "518400");
+        Assert.equals(new Calculator().evaluate("product(1, 6, i^2)"), "518400");
         // FIXME: failure test for min > max.
     }
     

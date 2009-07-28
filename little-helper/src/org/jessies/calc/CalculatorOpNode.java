@@ -59,15 +59,6 @@ public class CalculatorOpNode implements CalculatorAstNode {
         case SHL: return fromBigInteger(lhs.value(environment).toBigInteger().shiftLeft(rhs.value(environment).intValue()));
         case SHR: return fromBigInteger(lhs.value(environment).toBigInteger().shiftRight(rhs.value(environment).intValue()));
             
-        case B_AND:
-            return fromBigInteger(lhs.value(environment).toBigInteger().and(rhs.value(environment).toBigInteger()));
-        case B_OR:
-            return fromBigInteger(lhs.value(environment).toBigInteger().or(rhs.value(environment).toBigInteger()));
-        case B_XOR:
-            return fromBigInteger(lhs.value(environment).toBigInteger().xor(rhs.value(environment).toBigInteger()));
-        case B_NOT:
-            return fromBigInteger(lhs.value(environment).toBigInteger().not());
-            
         case FACTORIAL:
             return CalculatorFunctions.factorial(lhs.value(environment));
             

@@ -75,6 +75,53 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class BitAnd extends CalculatorFunction {
+        public BitAnd() {
+            super("BitAnd", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
+            final BigInteger rhs = args.get(1).value(environment).toBigInteger();
+            return fromBigInteger(lhs.and(rhs));
+        }
+    }
+    
+    public static class BitNot extends CalculatorFunction {
+        public BitNot() {
+            super("BitNot", 1);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
+            return fromBigInteger(lhs.not());
+        }
+    }
+    
+    public static class BitOr extends CalculatorFunction {
+        public BitOr() {
+            super("BitOr", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
+            final BigInteger rhs = args.get(1).value(environment).toBigInteger();
+            return fromBigInteger(lhs.or(rhs));
+        }
+    }
+    
+    public static class BitXor extends CalculatorFunction {
+        public BitXor() {
+            super("BitXor", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
+            final BigInteger rhs = args.get(1).value(environment).toBigInteger();
+            return fromBigInteger(lhs.xor(rhs));
+        }
+    }
+    
     public static class Cbrt extends CalculatorFunction {
         public Cbrt() {
             super("cbrt", 1);

@@ -36,7 +36,7 @@ public enum CalculatorToken {
     
     PLUS("+"),
     MUL("*"),
-    POW("**"),
+    POW("^"),
     DIV("/"),
     MOD("%"),
     
@@ -54,7 +54,6 @@ public enum CalculatorToken {
     
     B_AND("&"),
     B_OR("|"),
-    B_XOR("^"),
     
     // Prefix unary.
     
