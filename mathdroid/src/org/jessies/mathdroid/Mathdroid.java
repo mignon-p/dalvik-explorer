@@ -63,8 +63,8 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         buttonMap.put(R.id.ans,    "Ans");
         buttonMap.put(R.id.plus,   "+");
         buttonMap.put(R.id.minus,  "-");
-        buttonMap.put(R.id.times,  "*");
-        buttonMap.put(R.id.divide, "/");
+        buttonMap.put(R.id.times,  "\u00d7");
+        buttonMap.put(R.id.divide, "\u00f7");
         buttonMap.put(R.id.pi,     "\u03c0");
         buttonMap.put(R.id.sqrt,   "\u221a");
         buttonMap.put(R.id.open,   "(");

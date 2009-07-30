@@ -72,11 +72,11 @@
         </LinearLayout>
 
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
-            <Button android:id="@+id/digit4"   android:text="4" style="@style/number_button_style" />
-            <Button android:id="@+id/digit5"   android:text="5" style="@style/number_button_style" />
-            <Button android:id="@+id/digit6"   android:text="6" style="@style/number_button_style" />
-            <Button android:id="@+id/times"    android:text="*" style="@style/text_button_style" />
-            <Button android:id="@+id/divide"   android:text="/" style="@style/text_button_style" />
+            <Button android:id="@+id/digit4"   android:text="4"      style="@style/number_button_style" />
+            <Button android:id="@+id/digit5"   android:text="5"      style="@style/number_button_style" />
+            <Button android:id="@+id/digit6"   android:text="6"      style="@style/number_button_style" />
+            <Button android:id="@+id/times"    android:text="\u00d7" style="@style/text_button_style" />
+            <Button android:id="@+id/divide"   android:text="\u00f7" style="@style/text_button_style" />
         </LinearLayout>
 
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">

@@ -84,7 +84,9 @@ public class CalculatorLexer {
         case '=': return maybe('=', CalculatorToken.EQ, CalculatorToken.ASSIGN);
         case '+': return CalculatorToken.PLUS;
         case '-': return CalculatorToken.MINUS;
-        case '/': return CalculatorToken.DIV;
+        case '/':
+        case '\u00f7': // Unicode division sign.
+            return CalculatorToken.DIV;
         case '%': return CalculatorToken.MOD;
         case '!': return maybe('=', CalculatorToken.NE, CalculatorToken.PLING);
         case '~': return CalculatorToken.B_NOT;
@@ -92,7 +94,10 @@ public class CalculatorLexer {
             
         case '&': return CalculatorToken.B_AND;
         case '|': return CalculatorToken.B_OR;
-        case '*': return CalculatorToken.MUL;
+            
+        case '*':
+        case '\u00d7': // Unicode multiplication sign.
+            return CalculatorToken.MUL;
             
         case '\u221a': return CalculatorToken.SQRT;
             
