@@ -39,11 +39,11 @@ public class CalculatorLexer {
     }
     
     public CalculatorLexer(File file) throws IOException {
-        this(new InputStreamReader(new FileInputStream(file)), file);
+        this(new BufferedReader(new InputStreamReader(new FileInputStream(file))), file);
     }
     
     private CalculatorLexer(Reader reader, File file) {
-        this.reader = new MyPushbackReader(new BufferedReader(reader), file);
+        this.reader = new MyPushbackReader(reader, file);
         nextToken();
     }
     
