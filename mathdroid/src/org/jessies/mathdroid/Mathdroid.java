@@ -262,7 +262,7 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         final TextView transcriptView = transcriptView();
         transcriptView.setText(state.getString("transcript", ""));
         
-        // We can't scroll to the bottom until the text has been laid out.
+        // We can't scroll to the bottom of the transcript until the text has been laid out.
         // This method runs *before* we're visible, so we need to wait.
         transcriptView.post(new Runnable() {
             public void run() {
