@@ -24,11 +24,11 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" >
 
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
-            <Button android:id="@+id/more"     android:text="2nd"    style="@style/more_button_style" />
             <Button android:id="@+id/sin"      android:text="sin"    style="@style/text_button_style" />
             <Button android:id="@+id/cos"      android:text="cos"    style="@style/text_button_style" />
             <Button android:id="@+id/tan"      android:text="tan"    style="@style/text_button_style" />
             <Button android:id="@+id/pi"       android:text="\u03c0" style="@style/text_button_style" />
+            <Button android:id="@+id/more"     android:text="2nd"    style="@style/more_button_style" />
         </LinearLayout>
 
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
@@ -44,11 +44,11 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" >
     
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
-            <Button android:id="@+id/less"     android:text="1st"    style="@style/more_button_style" />
             <Button android:id="@+id/asin"     android:text="asin"   style="@style/text_button_style" />
             <Button android:id="@+id/acos"     android:text="acos"   style="@style/text_button_style" />
             <Button android:id="@+id/atan"     android:text="atan"   style="@style/text_button_style" />
             <Button android:id="@+id/pling"    android:text="!"      style="@style/text_button_style" />
+            <Button android:id="@+id/less"     android:text="1st"    style="@style/more_button_style" />
         </LinearLayout>
 
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
