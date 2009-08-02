@@ -1,10 +1,13 @@
 package org.jessies.mathdroid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -19,6 +22,9 @@ import org.jessies.calc.UnitsConverter;
 
 public class Mathdroid extends Activity implements TextView.OnEditorActionListener, View.OnClickListener {
     private static final String TAG = "Mathdroid";
+    
+    // Constants for the options menu items.
+    private static final int OPTIONS_MENU_HELP = 0;
     
     private final Calculator calculator = new Calculator();
     
@@ -84,6 +90,22 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         buttonMap.put(R.id.x,      "x");
         buttonMap.put(R.id.ceil,   "ceil()");
         buttonMap.put(R.id.floor,  "floor()");
+    }
+    
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        Log.i(TAG, "onCreateOptionsMenu");
+        menu.add(0, OPTIONS_MENU_HELP, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case OPTIONS_MENU_HELP:
+            showHelp();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
     
     @Override public void onPause() {
@@ -229,5 +251,9 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         state.putString("query", queryView.getText().toString());
         state.putString("answer", answerView.getText().toString());
         state.commit();
+    }
+    
+    private void showHelp() {
+        startActivity(new Intent(this, MathdroidHelp.class));
     }
 }
