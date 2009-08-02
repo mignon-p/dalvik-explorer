@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 import java.util.HashMap;
@@ -30,7 +32,7 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     
     private final HashMap<Integer, String> buttonMap = new HashMap<Integer, String>();
     
-    /** Called when the activity is first created. */
+    // Called when the activity is first created.
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -187,12 +189,30 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
             // FIXME: report an error?
             return;
         }
+        queryView.selectAll();
         
         final String answerText = computeAnswer(queryText);
-        final TextView answerView = (TextView) findViewById(R.id.a);
-        answerView.setText(answerText);
-        ((EditText) queryView).selectAll();
-        return;
+        final Editable transcript = transcriptView().getEditableText();
+        if (transcript.length() > 0) {
+            // We add the newline between question/answer pairs when we add the next pair, so we don't waste space on a blank line.
+            transcript.append("\n");
+        }
+        transcript.append("?= ");
+        transcript.append(queryText);
+        transcript.append("\n");
+        transcript.append("%= ");
+        transcript.append(answerText);
+        
+        scrollToBottomOfTranscript();
+    }
+    
+    private void scrollToBottomOfTranscript() {
+        final TextView transcriptView = transcriptView();
+        final android.graphics.Rect bounds = new android.graphics.Rect();
+        final int y = transcriptView.getLineBounds(transcriptView.getLineCount() - 1, bounds);
+        
+        final ScrollView transcriptScrollView = (ScrollView) findViewById(R.id.transcript_scroll_view);
+        transcriptScrollView.smoothScrollTo(0, bounds.bottom);
     }
     
     private String computeAnswer(String query) {
@@ -230,27 +250,40 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     private void loadState() {
         Log.i(TAG, "Restoring state");
         final SharedPreferences state = getPreferences(MODE_PRIVATE);
-        if (state.getInt("version", 0) != 1) {
+        final int version = state.getInt("version", 0);
+        if (version != 2) {
             // We've never been run before, or the last run was an incompatible version.
             return;
         }
         
         final EditText queryView = (EditText) findViewById(R.id.q);
-        final TextView answerView = (TextView) findViewById(R.id.a);
         queryView.setText(state.getString("query", ""));
-        answerView.setText(state.getString("answer", ""));
+        
+        final TextView transcriptView = transcriptView();
+        transcriptView.setText(state.getString("transcript", ""));
+        
+        // We can't scroll to the bottom until the text has been laid out.
+        // This method runs *before* we're visible, so we need to wait.
+        transcriptView.post(new Runnable() {
+            public void run() {
+                scrollToBottomOfTranscript();
+            }
+        });
     }
     
     private void saveState() {
         Log.i(TAG, "Saving state");
         final EditText queryView = (EditText) findViewById(R.id.q);
-        final TextView answerView = (TextView) findViewById(R.id.a);
         
         final SharedPreferences.Editor state = getPreferences(MODE_PRIVATE).edit();
-        state.putInt("version", 1);
+        state.putInt("version", 2);
         state.putString("query", queryView.getText().toString());
-        state.putString("answer", answerView.getText().toString());
+        state.putString("transcript", transcriptView().getText().toString());
         state.commit();
+    }
+    
+    private TextView transcriptView() {
+        return (TextView) findViewById(R.id.transcript);
     }
     
     private void showHelp() {
