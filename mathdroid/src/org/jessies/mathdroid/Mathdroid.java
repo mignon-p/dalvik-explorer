@@ -42,20 +42,27 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         
         initButtonMap();
         
-        ((Button) findViewById(R.id.more)).setOnClickListener(this);
-        ((Button) findViewById(R.id.less)).setOnClickListener(this);
-        
-        ((ImageButton) findViewById(R.id.del)).setOnClickListener(this);
-        ((ImageButton) findViewById(R.id.exe)).setOnClickListener(this);
+        findViewById(R.id.clear).setOnClickListener(this);
+        findViewById(R.id.del).setOnClickListener(this);
+        findViewById(R.id.exe).setOnClickListener(this);
+        findViewById(R.id.less).setOnClickListener(this);
+        findViewById(R.id.more).setOnClickListener(this);
         
         for (int id : buttonMap.keySet()) {
-            ((Button) findViewById(id)).setOnClickListener(this);
+            findViewById(id).setOnClickListener(this);
         }
         
         loadState();
     }
     
     private void initButtonMap() {
+        buttonMap.put(R.id.acos,   "acos()");
+        buttonMap.put(R.id.ans,    "Ans");
+        buttonMap.put(R.id.asin,   "asin()");
+        buttonMap.put(R.id.atan,   "atan()");
+        buttonMap.put(R.id.close,  ")");
+        buttonMap.put(R.id.comma,  ",");
+        buttonMap.put(R.id.cos,    "cos()");
         buttonMap.put(R.id.digit0, "0");
         buttonMap.put(R.id.digit1, "1");
         buttonMap.put(R.id.digit2, "2");
@@ -66,32 +73,24 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         buttonMap.put(R.id.digit7, "7");
         buttonMap.put(R.id.digit8, "8");
         buttonMap.put(R.id.digit9, "9");
-        buttonMap.put(R.id.eng,    "E");
-        buttonMap.put(R.id.dot,    ".");
-        buttonMap.put(R.id.ans,    "Ans");
-        buttonMap.put(R.id.plus,   "+");
-        buttonMap.put(R.id.minus,  "-");
-        buttonMap.put(R.id.times,  "\u00d7");
         buttonMap.put(R.id.divide, "\u00f7");
-        buttonMap.put(R.id.pi,     "\u03c0");
-        buttonMap.put(R.id.sqrt,   "\u221a");
-        buttonMap.put(R.id.open,   "(");
-        buttonMap.put(R.id.close,  ")");
-        buttonMap.put(R.id.pow,    "^");
+        buttonMap.put(R.id.dot,    ".");
+        buttonMap.put(R.id.e,      "e");
+        buttonMap.put(R.id.eng,    "E");
         buttonMap.put(R.id.log10,  "log10()");
         buttonMap.put(R.id.logE,   "logE()");
-        buttonMap.put(R.id.sin,    "sin()");
-        buttonMap.put(R.id.cos,    "cos()");
-        buttonMap.put(R.id.tan,    "tan()");
-        buttonMap.put(R.id.asin,   "asin()");
-        buttonMap.put(R.id.acos,   "acos()");
-        buttonMap.put(R.id.atan,   "atan()");
-        buttonMap.put(R.id.e,      "e");
+        buttonMap.put(R.id.log,    "log()");
+        buttonMap.put(R.id.minus,  "-");
+        buttonMap.put(R.id.open,   "(");
+        buttonMap.put(R.id.pi,     "\u03c0");
         buttonMap.put(R.id.pling,  "!");
-        buttonMap.put(R.id.comma,  ",");
+        buttonMap.put(R.id.plus,   "+");
+        buttonMap.put(R.id.pow,    "^");
+        buttonMap.put(R.id.sin,    "sin()");
+        buttonMap.put(R.id.sqrt,   "\u221a");
+        buttonMap.put(R.id.tan,    "tan()");
+        buttonMap.put(R.id.times,  "\u00d7");
         buttonMap.put(R.id.x,      "x");
-        buttonMap.put(R.id.ceil,   "ceil()");
-        buttonMap.put(R.id.floor,  "floor()");
     }
     
     @Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,6 +118,9 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         final EditText queryView = (EditText) findViewById(R.id.q);
         final int id = view.getId();
         switch (id) {
+        case R.id.clear:
+            clear(queryView);
+            break;
         case R.id.del:
             del(queryView);
             break;
@@ -163,6 +165,11 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
             newCaretOffset = startOffset + newText.length();
         }
         queryView.setSelection(newCaretOffset, newCaretOffset);
+    }
+    
+    private void clear(EditText queryView) {
+        queryView.setText("");
+        transcriptView().setText("");
     }
     
     private void del(EditText queryView) {

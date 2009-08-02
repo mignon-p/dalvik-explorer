@@ -54,8 +54,8 @@
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
             <Button android:id="@+id/x"        android:text="x"      style="@style/text_button_style" />
             <Button android:id="@+id/comma"    android:text=","      style="@style/text_button_style" />
-            <Button android:id="@+id/ceil"     android:text="ceil"   style="@style/text_button_style" />
-            <Button android:id="@+id/floor"    android:text="floor"  style="@style/text_button_style" />
+            <Button android:id="@+id/sqrt"     android:text="\u221a" style="@style/text_button_style" />
+            <Button android:id="@+id/log"      android:text="log"    style="@style/text_button_style" />
             <Button android:id="@+id/e"        android:text="e"      style="@style/text_button_style" />
         </LinearLayout>
 
@@ -70,8 +70,8 @@
             <Button android:id="@+id/digit7"   android:text="7"      style="@style/number_button_style" />
             <Button android:id="@+id/digit8"   android:text="8"      style="@style/number_button_style" />
             <Button android:id="@+id/digit9"   android:text="9"      style="@style/number_button_style" />
-            <Button android:id="@+id/sqrt"     android:text="\u221a" style="@style/text_button_style" />
             <ImageButton android:id="@+id/del" android:src="@drawable/sym_keyboard_delete"    style="@style/del_button_style" />
+            <Button android:id="@+id/clear"    android:text="AC"     style="@style/del_button_style" />
         </LinearLayout>
 
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
