@@ -26,7 +26,8 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     private static final String TAG = "Mathdroid";
     
     // Constants for the options menu items.
-    private static final int OPTIONS_MENU_HELP = 0;
+    private static final int OPTIONS_MENU_CLEAR = 0;
+    private static final int OPTIONS_MENU_HELP  = 1;
     
     private final Calculator calculator = new Calculator();
     
@@ -103,12 +104,16 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         Log.i(TAG, "onCreateOptionsMenu");
-        menu.add(0, OPTIONS_MENU_HELP, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
+        menu.add(0, OPTIONS_MENU_CLEAR, 0, "Clear").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+        menu.add(0, OPTIONS_MENU_HELP,  0, "Help").setIcon(android.R.drawable.ic_menu_help);
         return super.onCreateOptionsMenu(menu);
     }
     
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+        case OPTIONS_MENU_CLEAR:
+            clear((EditText) findViewById(R.id.q));
+            return true;
         case OPTIONS_MENU_HELP:
             showHelp();
             return true;
