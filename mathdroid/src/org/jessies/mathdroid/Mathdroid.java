@@ -42,17 +42,25 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         
         initButtonMap();
         
-        findViewById(R.id.clear).setOnClickListener(this);
-        findViewById(R.id.del).setOnClickListener(this);
-        findViewById(R.id.exe).setOnClickListener(this);
-        findViewById(R.id.less).setOnClickListener(this);
-        findViewById(R.id.more).setOnClickListener(this);
+        initButtonClickListener(R.id.clear);
+        initButtonClickListener(R.id.del);
+        initButtonClickListener(R.id.exe);
+        initButtonClickListener(R.id.less);
+        initButtonClickListener(R.id.more);
         
         for (int id : buttonMap.keySet()) {
-            findViewById(id).setOnClickListener(this);
+            initButtonClickListener(id);
         }
         
         loadState();
+    }
+    
+    private void initButtonClickListener(int id) {
+        // Not all buttons will be present in all layouts.
+        final View button = findViewById(id);
+        if (button != null) {
+            button.setOnClickListener(this);
+        }
     }
     
     private void initButtonMap() {
@@ -132,9 +140,7 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
             ((ViewFlipper) findViewById(R.id.flipper)).showNext();
             break;
         default:
-            if (view instanceof Button) {
-                buttonPressed(queryView, id);
-            }
+            buttonPressed(queryView, id);
         }
     }
     
