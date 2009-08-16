@@ -103,7 +103,6 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     }
     
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        Log.i(TAG, "onCreateOptionsMenu");
         menu.add(0, OPTIONS_MENU_CLEAR, 0, "Clear").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
         menu.add(0, OPTIONS_MENU_HELP,  0, "Help").setIcon(android.R.drawable.ic_menu_help);
         return super.onCreateOptionsMenu(menu);
@@ -266,7 +265,6 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     }
     
     private void loadState() {
-        Log.i(TAG, "Restoring state");
         final SharedPreferences state = getPreferences(MODE_PRIVATE);
         final int version = state.getInt("version", 0);
         if (version != 2) {
@@ -290,7 +288,6 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     }
     
     private void saveState() {
-        Log.i(TAG, "Saving state");
         final EditText queryView = (EditText) findViewById(R.id.q);
         
         final SharedPreferences.Editor state = getPreferences(MODE_PRIVATE).edit();
