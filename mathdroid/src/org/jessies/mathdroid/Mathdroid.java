@@ -1,22 +1,12 @@
 package org.jessies.mathdroid;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.app.*;
+import android.content.*;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.ViewFlipper;
+import android.view.*;
+import android.widget.*;
 import java.util.HashMap;
 import org.jessies.calc.Calculator;
 import org.jessies.calc.CalculatorError;
