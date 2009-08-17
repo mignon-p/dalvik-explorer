@@ -26,7 +26,7 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     private final HashMap<Integer, String> buttonMap = new HashMap<Integer, String>();
     
     // Called when the activity is first created.
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
@@ -113,7 +113,7 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         }
     }
     
-    @Override public void onPause() {
+    @Override protected void onPause() {
         super.onPause();
         saveState();
     }
