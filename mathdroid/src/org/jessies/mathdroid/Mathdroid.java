@@ -2,8 +2,10 @@ package org.jessies.mathdroid;
 
 import android.app.*;
 import android.content.*;
+import android.graphics.*;
 import android.os.Bundle;
-import android.text.Editable;
+import android.text.*;
+import android.text.style.*;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -204,13 +206,20 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
             // We add the newline between question/answer pairs when we add the next pair, so we don't waste space on a blank line.
             transcript.append("\n");
         }
-        transcript.append("?= ");
+        final int inputStart = transcript.length();
         transcript.append(queryText);
+        final int inputEnd = transcript.length();
         transcript.append("\n");
-        transcript.append("%= ");
+        transcript.append(" = ");
         transcript.append(answerText);
+        highlightInput(transcript, inputStart, inputEnd);
         
         scrollToBottomOfTranscript();
+    }
+    
+    private void highlightInput(Spannable text, int start, int end) {
+        text.setSpan(new ForegroundColorSpan(0xffcdaa7d), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        text.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
     
     private void scrollToBottomOfTranscript() {
@@ -267,6 +276,15 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         
         final TextView transcriptView = transcriptView();
         transcriptView.setText(state.getString("transcript", ""));
+        
+        // We usually style the text as it's appended, but we don't store that information.
+        final Editable transcript = transcriptView().getEditableText();
+        int start = 0;
+        int end;
+        while (start != -1 && (end = TextUtils.indexOf(transcript, "\n =", start)) != -1) {
+            highlightInput(transcript, start, end);
+            start = TextUtils.indexOf(transcript, "\n", end + 1);
+        }
         
         // We can't scroll to the bottom of the transcript until the text has been laid out.
         // This method runs *before* we're visible, so we need to wait.
