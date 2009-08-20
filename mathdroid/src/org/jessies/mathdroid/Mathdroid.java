@@ -21,6 +21,10 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     private static final int OPTIONS_MENU_CLEAR = 0;
     private static final int OPTIONS_MENU_HELP  = 1;
     
+    // Constants for the transcript context menu items.
+    private static final int CONTEXT_MENU_COPY_LAST = 0;
+    private static final int CONTEXT_MENU_COPY_ALL  = 1;
+    
     private final Calculator calculator = new Calculator();
     
     private final HashMap<Integer, String> buttonMap = new HashMap<Integer, String>();
@@ -44,6 +48,8 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         for (int id : buttonMap.keySet()) {
             initButtonClickListener(id);
         }
+        
+        registerForContextMenu(transcriptView());
         
         loadState();
     }
@@ -111,6 +117,62 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         default:
             return super.onOptionsItemSelected(item);
         }
+    }
+    
+    @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        if (transcriptView().length() == 0) {
+            // If there's no transcript, there's nothing to copy, so no reason to show a menu.
+            return;
+        }
+        
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("History");
+        menu.add(0, CONTEXT_MENU_COPY_LAST, 0, "Copy last");
+        menu.add(0, CONTEXT_MENU_COPY_ALL,  0, "Copy all");
+    }
+    
+    public boolean onContextItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        switch (id) {
+        case CONTEXT_MENU_COPY_LAST:
+        case CONTEXT_MENU_COPY_ALL:
+            return copyHistoryToClipboard(id);
+        default:
+            return super.onContextItemSelected(item);
+        }
+    }
+    
+    private boolean copyHistoryToClipboard(int id) {
+        final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        // We work directly on the text history.
+        // This would all be simpler if we kept some kind of structured history.
+        final Editable transcript = transcriptView().getEditableText();
+        int start = 0;
+        int end = transcript.length();
+        
+        if (end == 0) {
+            
+        }
+        
+        if (id == CONTEXT_MENU_COPY_LAST) {
+            // Output is of the form:
+            // "sin(pi/2)\n"
+            // " = 1" // No trailing newline until the next history entry appears!
+            // So we need to go back two newlines...
+            start = TextUtils.lastIndexOf(transcript, '\n', end);
+            if (start == -1) {
+                return true;
+            }
+            start = TextUtils.lastIndexOf(transcript, '\n', start - 1);
+            if (start == -1) {
+                start = 0; // This is the first entry, so there's no newline before it.
+            } else {
+                // We don't actually want to copy the newline.
+                ++start;
+            }
+        }
+        clipboard.setText(transcript.subSequence(start, end));
+        return true;
     }
     
     @Override protected void onPause() {
