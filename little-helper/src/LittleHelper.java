@@ -35,10 +35,10 @@ import org.jessies.test.*;
 /**
  * Yet another attempt at the whole Google onebox/Mac OS Spotlight/GNOME Deskbar genre.
  * 
- * Under GNOME, to run little-helper when F4 (the Dashboard key on Apple keyboards) is pressed:
+ * Under GNOME, to run little-helper when F5 is pressed:
  * 
- * % gconftool-2 -t string -s /apps/metacity/global_keybindings/run_command_4 F4
- * % gconftool-2 -t string -s /apps/metacity/keybinding_commands/command_4 `which little-helper`
+ * % gconftool-2 -t string -s /apps/metacity/global_keybindings/run_command_5 F5
+ * % gconftool-2 -t string -s /apps/metacity/keybinding_commands/command_5 `which little-helper`
  * 
  * You can also use gconf-editor(1) to edit these from the GUI.
  */
