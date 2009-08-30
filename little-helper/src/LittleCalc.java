@@ -133,6 +133,7 @@ public class LittleCalc extends JFrame {
         } catch (CalculatorError ex) {
             return "Error: " + ex.getMessage();
         } catch (Exception ex) {
+            System.err.println("Exception thrown while evaluating '" + query + "':");
             ex.printStackTrace();
             return "What do you mean?";
         }

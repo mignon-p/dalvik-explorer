@@ -32,10 +32,10 @@ public class CalculatorVariableNode implements Node {
     }
     
     public BigDecimal value(Calculator environment) {
-        final BigDecimal result = environment.getVariable(name).value(environment);
-        if (result == null) {
+        final Node variable = environment.getVariable(name);
+        if (variable == null) {
             throw new CalculatorError("use of undefined variable '" + name + "'");
         }
-        return result;
+        return variable.value(environment);
     }
 }
