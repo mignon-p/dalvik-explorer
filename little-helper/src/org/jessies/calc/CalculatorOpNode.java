@@ -59,9 +59,6 @@ public class CalculatorOpNode implements Node {
         case SHL: return fromBigInteger(lhs.value(environment).toBigInteger().shiftLeft(rhs.value(environment).intValue()));
         case SHR: return fromBigInteger(lhs.value(environment).toBigInteger().shiftRight(rhs.value(environment).intValue()));
             
-        case FACTORIAL:
-            return CalculatorFunctions.factorial(lhs.value(environment));
-            
         case POW:
             {
                 try {

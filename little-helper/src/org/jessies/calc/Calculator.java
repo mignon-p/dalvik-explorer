@@ -251,7 +251,7 @@ public class Calculator {
         Node result = parseFactor();
         if (lexer.token() == CalculatorToken.PLING) {
             expect(CalculatorToken.PLING);
-            result = new CalculatorOpNode(CalculatorToken.FACTORIAL, result, null);
+            result = new CalculatorFunctionApplicationNode(functions.get("factorial"), Collections.singletonList(result));
         }
         return result;
     }
