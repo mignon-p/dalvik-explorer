@@ -73,6 +73,7 @@ public class Calculator {
         functions.put("cos",             new CalculatorFunctions.Cos());
         functions.put("cosh",            new CalculatorFunctions.Cosh());
         functions.put("define",          new CalculatorFunctions.Define());
+        functions.put("Divide",          new CalculatorFunctions.Divide());
         functions.put("Equal",           new CalculatorFunctions.Equal());
         functions.put("exp",             new CalculatorFunctions.Exp());
         functions.put("factorial",       new CalculatorFunctions.Factorial());
@@ -87,7 +88,9 @@ public class Calculator {
         functions.put("log10",           new CalculatorFunctions.Log10());
         functions.put("log2",            new CalculatorFunctions.Log2());
         functions.put("logE",            new CalculatorFunctions.LogE());
+        functions.put("Mod",             new CalculatorFunctions.Mod());
         functions.put("not",             new CalculatorFunctions.Not());
+        functions.put("Plus",            new CalculatorFunctions.Plus());
         functions.put("Power",           new CalculatorFunctions.Power());
         final CalculatorFunction random = new CalculatorFunctions.Random();
         functions.put("rand",            random);
@@ -96,8 +99,10 @@ public class Calculator {
         functions.put("sin",             new CalculatorFunctions.Sin());
         functions.put("sinh",            new CalculatorFunctions.Sinh());
         functions.put("sqrt",            new CalculatorFunctions.Sqrt());
+        functions.put("Subtract",        new CalculatorFunctions.Subtract());
         functions.put("tan",             new CalculatorFunctions.Tan());
         functions.put("tanh",            new CalculatorFunctions.Tanh());
+        functions.put("Times",           new CalculatorFunctions.Times());
         functions.put("Unequal",         new CalculatorFunctions.Unequal());
         
         final CalculatorFunction sum = new CalculatorFunctions.Sum();
@@ -110,16 +115,20 @@ public class Calculator {
         functions.put("\u03a0",          product); // Unicode Greek capital letter pi.
         functions.put("\u220f",          product); // Unicode product sign.
         
-        operators.put(CalculatorToken.EQ, functions.get("Equal"));
-        operators.put(CalculatorToken.GE, functions.get("GreaterEqual"));
-        operators.put(CalculatorToken.GT, functions.get("Greater"));
-        operators.put(CalculatorToken.LE, functions.get("LessEqual"));
-        operators.put(CalculatorToken.LT, functions.get("Less"));
-        operators.put(CalculatorToken.NE, functions.get("Unequal"));
-        
         operators.put(CalculatorToken.B_AND, functions.get("BitAnd"));
         operators.put(CalculatorToken.B_NOT, functions.get("BitNot"));
         operators.put(CalculatorToken.B_OR,  functions.get("BitOr"));
+        operators.put(CalculatorToken.DIV,   functions.get("Divide"));
+        operators.put(CalculatorToken.EQ,    functions.get("Equal"));
+        operators.put(CalculatorToken.GE,    functions.get("GreaterEqual"));
+        operators.put(CalculatorToken.GT,    functions.get("Greater"));
+        operators.put(CalculatorToken.LE,    functions.get("LessEqual"));
+        operators.put(CalculatorToken.LT,    functions.get("Less"));
+        operators.put(CalculatorToken.MINUS, functions.get("Subtract"));
+        operators.put(CalculatorToken.MOD,   functions.get("Mod"));
+        operators.put(CalculatorToken.MUL,   functions.get("Times"));
+        operators.put(CalculatorToken.NE,    functions.get("Unequal"));
+        operators.put(CalculatorToken.PLUS,  functions.get("Plus"));
         operators.put(CalculatorToken.POW,   functions.get("Power"));
         operators.put(CalculatorToken.SHL,   functions.get("BitShiftLeft"));
         operators.put(CalculatorToken.SHR,   functions.get("BitShiftRight"));
@@ -220,9 +229,9 @@ public class Calculator {
     private Node parseAdditiveExpression() {
         Node result = parseMultiplicativeExpression();
         while (lexer.token() == CalculatorToken.PLUS || lexer.token() == CalculatorToken.MINUS) {
-            CalculatorToken op = lexer.token();
+            final CalculatorFunction function = operators.get(lexer.token());
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseMultiplicativeExpression());
+            result = new CalculatorFunctionApplicationNode(function, Arrays.asList(result, parseMultiplicativeExpression()));
         }
         return result;
     }
@@ -231,9 +240,9 @@ public class Calculator {
     private Node parseMultiplicativeExpression() {
         Node result = parseUnaryExpression();
         while (lexer.token() == CalculatorToken.MUL || lexer.token() == CalculatorToken.DIV || lexer.token() == CalculatorToken.MOD) {
-            CalculatorToken op = lexer.token();
+            final CalculatorFunction function = operators.get(lexer.token());
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseUnaryExpression());
+            result = new CalculatorFunctionApplicationNode(function, Arrays.asList(result, parseUnaryExpression()));
         }
         return result;
     }
@@ -242,8 +251,8 @@ public class Calculator {
     private Node parseUnaryExpression() {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
-            // Convert (-f) to (0-f) for simplicity.
-            return new CalculatorOpNode(CalculatorToken.MINUS, new CalculatorNumberNode(BigDecimal.ZERO), parseUnaryExpression());
+            // Convert (-f) to (-1*f) for simplicity.
+            return new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.MUL), Arrays.asList(new CalculatorNumberNode(BigDecimal.ONE.negate()), parseUnaryExpression()));
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
             return new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.B_NOT), Collections.singletonList(parseUnaryExpression()));

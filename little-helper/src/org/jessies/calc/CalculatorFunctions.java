@@ -206,6 +206,18 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Divide extends CalculatorFunction {
+        public Divide() {
+            super("Divide", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            final Node lhs = args.get(0);
+            final Node rhs = args.get(1);
+            return lhs.value(environment).divide(rhs.value(environment), MATH_CONTEXT);
+        }
+    }
+    
     public static class Equal extends CalculatorFunction {
         public Equal() {
             super("Equal", 2);
@@ -408,6 +420,18 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Mod extends CalculatorFunction {
+        public Mod() {
+            super("Mod", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            final Node lhs = args.get(0);
+            final Node rhs = args.get(1);
+            return lhs.value(environment).remainder(rhs.value(environment));
+        }
+    }
+    
     public static class Not extends CalculatorFunction {
         public Not() {
             super("not", 1);
@@ -417,6 +441,19 @@ public class CalculatorFunctions {
             return fromBoolean(args.get(0).value(environment).toBigInteger().equals(BigInteger.ZERO));
         }
     }
+    
+    public static class Plus extends CalculatorFunction {
+        public Plus() {
+            super("Plus", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            final Node lhs = args.get(0);
+            final Node rhs = args.get(1);
+            return lhs.value(environment).add(rhs.value(environment));
+        }
+    }
+    
     
     public static class Power extends CalculatorFunction {
         public Power() {
@@ -534,6 +571,18 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Subtract extends CalculatorFunction {
+        public Subtract() {
+            super("Subtract", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            final Node lhs = args.get(0);
+            final Node rhs = args.get(1);
+            return lhs.value(environment).subtract(rhs.value(environment));
+        }
+    }
+    
     public static class Tan extends CalculatorFunction {
         public Tan() {
             super("tan", 1);
@@ -551,6 +600,18 @@ public class CalculatorFunctions {
         
         public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.tanh(args.get(0).value(environment).doubleValue()));
+        }
+    }
+    
+    public static class Times extends CalculatorFunction {
+        public Times() {
+            super("Times", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            final Node lhs = args.get(0);
+            final Node rhs = args.get(1);
+            return lhs.value(environment).multiply(rhs.value(environment));
         }
     }
     
