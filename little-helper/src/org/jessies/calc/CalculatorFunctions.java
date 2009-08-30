@@ -314,6 +314,33 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Not extends CalculatorFunction {
+        public Not() {
+            super("not", 1);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBoolean(args.get(0).value(environment).toBigInteger().equals(BigInteger.ZERO));
+        }
+    }
+    
+    public static class Power extends CalculatorFunction {
+        public Power() {
+            super("power", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            final Node lhs = args.get(0);
+            final Node rhs = args.get(1);
+            try {
+                int n = rhs.value(environment).intValueExact();
+                return lhs.value(environment).pow(n);
+            } catch (ArithmeticException ex) {
+                return fromDouble(Math.pow(lhs.value(environment).doubleValue(), rhs.value(environment).doubleValue()));
+            }
+        }
+    }
+    
     public static class Product extends CalculatorFunction {
         public Product() {
             super("product", 3);

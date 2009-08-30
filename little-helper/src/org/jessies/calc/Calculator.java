@@ -77,6 +77,8 @@ public class Calculator {
         functions.put("log10",     new CalculatorFunctions.Log10());
         functions.put("log2",      new CalculatorFunctions.Log2());
         functions.put("logE",      new CalculatorFunctions.LogE());
+        functions.put("not",       new CalculatorFunctions.Not());
+        functions.put("power",     new CalculatorFunctions.Power());
         final CalculatorFunction random = new CalculatorFunctions.Random();
         functions.put("rand",      random);
         functions.put("random",    random);
@@ -162,7 +164,7 @@ public class Calculator {
     private Node parseNotExpression() {
         if (lexer.token() == CalculatorToken.PLING) {
             lexer.nextToken();
-            return new CalculatorOpNode(CalculatorToken.L_NOT, parseNotExpression(), null);
+            return new CalculatorFunctionApplicationNode(functions.get("not"), Collections.singletonList(parseNotExpression()));
         } else {
             return parseRelationalExpression();
         }
@@ -241,7 +243,7 @@ public class Calculator {
         if (lexer.token() == CalculatorToken.POW) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseExponentiationExpression());
+            result = new CalculatorFunctionApplicationNode(functions.get("power"), Arrays.asList(result, parseExponentiationExpression()));
         }
         return result;
     }

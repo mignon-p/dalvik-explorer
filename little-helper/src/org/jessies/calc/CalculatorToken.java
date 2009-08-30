@@ -27,7 +27,7 @@ public enum CalculatorToken {
     
     // Ambiguous.
     
-    PLING("!"), // May be either L_NOT or FACTORIAL, depending on context.
+    PLING("!"), // May be either "not" or "factorial", depending on context.
     MINUS("-"), // May be either unary or binary, depending on context.
     
     // Binary.
@@ -50,8 +50,6 @@ public enum CalculatorToken {
     SHL("<<"),
     SHR(">>"),
     
-    L_NOT("prefix !"),
-    
     B_AND("&"),
     B_OR("|"),
     
@@ -59,10 +57,6 @@ public enum CalculatorToken {
     
     B_NOT("unary ~"),
     SQRT("\u221a"),
-    
-    // Postifx unary.
-    
-    FACTORIAL("postfix !"),
     
     // Brackets.
     
