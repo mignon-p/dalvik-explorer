@@ -162,6 +162,24 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Define extends CalculatorFunction {
+        public Define() {
+            super("define", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            final Node lhs = args.get(0);
+            final Node rhs = args.get(1);
+            if (!(lhs instanceof CalculatorVariableNode)) {
+                throw new CalculatorError("lhs of an assignment must be a variable name (user-defined functions not yet implemented)");
+            }
+            CalculatorVariableNode variable = (CalculatorVariableNode) lhs;
+            BigDecimal value = rhs.value(environment);
+            environment.setVariable(variable.name(), new CalculatorNumberNode(value));
+            return value;
+        }
+    }
+    
     public static class Exp extends CalculatorFunction {
         public Exp() {
             super("exp", 1);

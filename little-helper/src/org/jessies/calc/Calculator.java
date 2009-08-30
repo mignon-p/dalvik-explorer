@@ -68,6 +68,7 @@ public class Calculator {
         functions.put("ceiling",   ceiling);
         functions.put("cos",       new CalculatorFunctions.Cos());
         functions.put("cosh",      new CalculatorFunctions.Cosh());
+        functions.put("define",    new CalculatorFunctions.Define());
         functions.put("exp",       new CalculatorFunctions.Exp());
         functions.put("factorial", new CalculatorFunctions.Factorial());
         functions.put("floor",     new CalculatorFunctions.Floor());
@@ -130,9 +131,8 @@ public class Calculator {
     private Node parseAssignmentExpression() {
         Node result = parseOrExpression();
         if (lexer.token() == CalculatorToken.ASSIGN) {
-            CalculatorToken op = lexer.token();
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseOrExpression());
+            result = new CalculatorFunctionApplicationNode(functions.get("define"), Arrays.asList(result, parseOrExpression()));
         }
         return result;
         
@@ -241,7 +241,6 @@ public class Calculator {
     private Node parseExponentiationExpression() {
         Node result = parseFactorialExpression();
         if (lexer.token() == CalculatorToken.POW) {
-            CalculatorToken op = lexer.token();
             lexer.nextToken();
             result = new CalculatorFunctionApplicationNode(functions.get("power"), Arrays.asList(result, parseExponentiationExpression()));
         }

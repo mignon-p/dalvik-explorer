@@ -57,17 +57,6 @@ public class CalculatorOpNode implements Node {
         case SHL: return fromBigInteger(lhs.value(environment).toBigInteger().shiftLeft(rhs.value(environment).intValue()));
         case SHR: return fromBigInteger(lhs.value(environment).toBigInteger().shiftRight(rhs.value(environment).intValue()));
             
-        case ASSIGN:
-            {
-                if (!(lhs instanceof CalculatorVariableNode)) {
-                    throw new CalculatorError("lhs of an assignment must be a variable name (user-defined functions not yet implemented)");
-                }
-                CalculatorVariableNode variable = (CalculatorVariableNode) lhs;
-                BigDecimal value = rhs.value(environment);
-                environment.setVariable(variable.name(), new CalculatorNumberNode(value));
-                return value;
-            }
-            
         default:
             throw new CalculatorError("operator " + op + " not yet implemented");
         }
