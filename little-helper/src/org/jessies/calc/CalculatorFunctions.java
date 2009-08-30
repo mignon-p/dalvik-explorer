@@ -162,6 +162,12 @@ public class CalculatorFunctions {
         }
     }
     
+    private static int cmp(Calculator environment, List<Node> args) {
+        final Node lhs = args.get(0);
+        final Node rhs = args.get(1);
+        return lhs.value(environment).compareTo(rhs.value(environment));
+    }
+    
     public static class Cos extends CalculatorFunction {
         public Cos() {
             super("cos", 1);
@@ -197,6 +203,16 @@ public class CalculatorFunctions {
             BigDecimal value = rhs.value(environment);
             environment.setVariable(variable.name(), new CalculatorNumberNode(value));
             return value;
+        }
+    }
+    
+    public static class Equal extends CalculatorFunction {
+        public Equal() {
+            super("Equal", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBoolean(cmp(environment, args) == 0);
         }
     }
     
@@ -256,6 +272,26 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Greater extends CalculatorFunction {
+        public Greater() {
+            super("Greater", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBoolean(cmp(environment, args) > 0);
+        }
+    }
+    
+    public static class GreaterEqual extends CalculatorFunction {
+        public GreaterEqual() {
+            super("GreaterEqual", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBoolean(cmp(environment, args) >= 0);
+        }
+    }
+    
     public static class Hypot extends CalculatorFunction {
         public Hypot() {
             super("hypot", 2);
@@ -309,6 +345,26 @@ public class CalculatorFunctions {
             }
         }
         return true;
+    }
+    
+    public static class Less extends CalculatorFunction {
+        public Less() {
+            super("Less", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBoolean(cmp(environment, args) < 0);
+        }
+    }
+    
+    public static class LessEqual extends CalculatorFunction {
+        public LessEqual() {
+            super("LessEqual", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBoolean(cmp(environment, args) <= 0);
+        }
     }
     
     // log(base, n).
@@ -495,6 +551,16 @@ public class CalculatorFunctions {
         
         public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.tanh(args.get(0).value(environment).doubleValue()));
+        }
+    }
+    
+    public static class Unequal extends CalculatorFunction {
+        public Unequal() {
+            super("Unequal", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBoolean(cmp(environment, args) != 0);
         }
     }
 }

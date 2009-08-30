@@ -47,20 +47,9 @@ public class CalculatorOpNode implements Node {
         case MOD:
             return lhs.value(environment).remainder(rhs.value(environment));
             
-        case LT: return fromBoolean(cmp(environment) < 0);
-        case LE: return fromBoolean(cmp(environment) <= 0);
-        case GT: return fromBoolean(cmp(environment) > 0);
-        case GE: return fromBoolean(cmp(environment) >= 0);
-        case EQ: return fromBoolean(cmp(environment) == 0);
-        case NE: return fromBoolean(cmp(environment) != 0);
-            
         default:
             throw new CalculatorError("operator " + op + " not yet implemented");
         }
-    }
-    
-    private int cmp(Calculator environment) {
-        return lhs.value(environment).compareTo(rhs.value(environment));
     }
     
     @Override public String toString() {
