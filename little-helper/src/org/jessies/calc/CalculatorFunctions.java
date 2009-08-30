@@ -110,6 +110,26 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class BitShiftLeft extends CalculatorFunction {
+        public BitShiftLeft() {
+            super("BitShiftLeft", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftLeft(args.get(1).value(environment).intValue()));
+        }
+    }
+    
+    public static class BitShiftRight extends CalculatorFunction {
+        public BitShiftRight() {
+            super("BitShiftRight", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftRight(args.get(1).value(environment).intValue()));
+        }
+    }
+    
     public static class BitXor extends CalculatorFunction {
         public BitXor() {
             super("BitXor", 2);
@@ -386,26 +406,6 @@ public class CalculatorFunctions {
         
         public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.round(args.get(0).value(environment).doubleValue()));
-        }
-    }
-    
-    public static class ShiftLeft extends CalculatorFunction {
-        public ShiftLeft() {
-            super("ShiftLeft", 2);
-        }
-        
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftLeft(args.get(1).value(environment).intValue()));
-        }
-    }
-    
-    public static class ShiftRight extends CalculatorFunction {
-        public ShiftRight() {
-            super("ShiftRight", 2);
-        }
-        
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftRight(args.get(1).value(environment).intValue()));
         }
     }
     
