@@ -21,13 +21,13 @@ package org.jessies.calc;
 import java.math.*;
 import static org.jessies.calc.BigDecimals.*;
 
-public class CalculatorOpNode implements CalculatorAstNode {
+public class CalculatorOpNode implements Node {
     // Unary operators may have rhs null.
     private final CalculatorToken op;
-    private final CalculatorAstNode lhs;
-    private final CalculatorAstNode rhs;
+    private final Node lhs;
+    private final Node rhs;
     
-    public CalculatorOpNode(CalculatorToken op, CalculatorAstNode lhs, CalculatorAstNode rhs) {
+    public CalculatorOpNode(CalculatorToken op, Node lhs, Node rhs) {
         this.op = op;
         this.lhs = lhs;
         this.rhs = rhs;

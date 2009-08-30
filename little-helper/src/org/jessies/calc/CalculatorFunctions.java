@@ -30,7 +30,7 @@ public class CalculatorFunctions {
             super("abs", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return args.get(0).value(environment).abs(MATH_CONTEXT);
         }
     }
@@ -40,7 +40,7 @@ public class CalculatorFunctions {
             super("acos", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.acos(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -50,7 +50,7 @@ public class CalculatorFunctions {
             super("asin", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.asin(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -60,7 +60,7 @@ public class CalculatorFunctions {
             super("atan", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.atan(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -70,7 +70,7 @@ public class CalculatorFunctions {
             super("atan2", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.atan2(args.get(0).value(environment).doubleValue(), args.get(1).value(environment).doubleValue()));
         }
     }
@@ -80,7 +80,7 @@ public class CalculatorFunctions {
             super("BitAnd", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             final BigInteger lhs = args.get(0).value(environment).toBigInteger();
             final BigInteger rhs = args.get(1).value(environment).toBigInteger();
             return fromBigInteger(lhs.and(rhs));
@@ -92,7 +92,7 @@ public class CalculatorFunctions {
             super("BitNot", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             final BigInteger lhs = args.get(0).value(environment).toBigInteger();
             return fromBigInteger(lhs.not());
         }
@@ -103,7 +103,7 @@ public class CalculatorFunctions {
             super("BitOr", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             final BigInteger lhs = args.get(0).value(environment).toBigInteger();
             final BigInteger rhs = args.get(1).value(environment).toBigInteger();
             return fromBigInteger(lhs.or(rhs));
@@ -115,7 +115,7 @@ public class CalculatorFunctions {
             super("BitXor", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             final BigInteger lhs = args.get(0).value(environment).toBigInteger();
             final BigInteger rhs = args.get(1).value(environment).toBigInteger();
             return fromBigInteger(lhs.xor(rhs));
@@ -127,7 +127,7 @@ public class CalculatorFunctions {
             super("cbrt", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.cbrt(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -137,7 +137,7 @@ public class CalculatorFunctions {
             super("ceiling", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.ceil(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -147,7 +147,7 @@ public class CalculatorFunctions {
             super("cos", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.cos(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -157,7 +157,7 @@ public class CalculatorFunctions {
             super("cosh", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.cosh(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -167,7 +167,7 @@ public class CalculatorFunctions {
             super("exp", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.exp(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -177,7 +177,7 @@ public class CalculatorFunctions {
             super("factorial", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return factorial(args.get(0).value(environment));
         }
     }
@@ -213,7 +213,7 @@ public class CalculatorFunctions {
             super("floor", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.floor(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -223,7 +223,7 @@ public class CalculatorFunctions {
             super("hypot", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.hypot(args.get(0).value(environment).doubleValue(), args.get(1).value(environment).doubleValue()));
         }
     }
@@ -233,7 +233,7 @@ public class CalculatorFunctions {
             super("is_prime", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromBoolean(isPrime(args.get(0).value(environment)));
         }
     }
@@ -279,7 +279,7 @@ public class CalculatorFunctions {
             super("log", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.log(args.get(1).value(environment).doubleValue()) / Math.log(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -289,7 +289,7 @@ public class CalculatorFunctions {
             super("log2", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.log(args.get(0).value(environment).doubleValue()) / Math.log(2.0));
         }
     }
@@ -299,7 +299,7 @@ public class CalculatorFunctions {
             super("logE", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.log(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -309,7 +309,7 @@ public class CalculatorFunctions {
             super("log10", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.log10(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -319,7 +319,7 @@ public class CalculatorFunctions {
             super("product", 3);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return series(environment, args, BigDecimal.ONE, false);
         }
     }
@@ -329,7 +329,7 @@ public class CalculatorFunctions {
             super("random", 0);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.random());
         }
     }
@@ -339,15 +339,15 @@ public class CalculatorFunctions {
             super("round", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.round(args.get(0).value(environment).doubleValue()));
         }
     }
     
-    private static BigDecimal series(Calculator environment, List<CalculatorAstNode> args, BigDecimal initial, boolean isSum) {
+    private static BigDecimal series(Calculator environment, List<Node> args, BigDecimal initial, boolean isSum) {
         final BigDecimal iMin = args.get(0).value(environment);
         final BigDecimal iMax = args.get(1).value(environment);
-        final CalculatorAstNode expr = args.get(2);
+        final Node expr = args.get(2);
         
         if (iMin.compareTo(iMax) > 0) {
             throw new CalculatorError("minimum (" + iMin + ") greater than maximum (" + iMax + ")");
@@ -355,7 +355,7 @@ public class CalculatorFunctions {
         
         // FIXME: support infinite sums/products, adding convergence testing.
         
-        final CalculatorAstNode originalI = environment.getVariable("i");
+        final Node originalI = environment.getVariable("i");
         try {
             BigDecimal result = initial;
             for (BigDecimal i = iMin; i.compareTo(iMax) <= 0; i = i.add(BigDecimal.ONE)) {
@@ -378,7 +378,7 @@ public class CalculatorFunctions {
             super("sum", 3);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return series(environment, args, BigDecimal.ZERO, true);
         }
     }
@@ -388,7 +388,7 @@ public class CalculatorFunctions {
             super("sin", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.sin(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -398,7 +398,7 @@ public class CalculatorFunctions {
             super("sinh", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.sinh(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -408,7 +408,7 @@ public class CalculatorFunctions {
             super("sqrt", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.sqrt(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -418,7 +418,7 @@ public class CalculatorFunctions {
             super("tan", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.tan(args.get(0).value(environment).doubleValue()));
         }
     }
@@ -428,7 +428,7 @@ public class CalculatorFunctions {
             super("tanh", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<CalculatorAstNode> args) {
+        public BigDecimal apply(Calculator environment, List<Node> args) {
             return fromDouble(Math.tanh(args.get(0).value(environment).doubleValue()));
         }
     }

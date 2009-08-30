@@ -27,16 +27,16 @@ import org.jessies.test.*;
 // FIXME: integer division (//).
 // FIXME: logical not (prefix !).
 public class Calculator {
-    private final Map<String, CalculatorAstNode> constants;
+    private final Map<String, Node> constants;
     private final Map<String, CalculatorFunction> functions;
-    private final Map<String, CalculatorAstNode> variables;
+    private final Map<String, Node> variables;
     
     private CalculatorLexer lexer;
     
     public Calculator() {
-        this.constants = new HashMap<String, CalculatorAstNode>();
+        this.constants = new HashMap<String, Node>();
         this.functions = new HashMap<String, CalculatorFunction>();
-        this.variables = new HashMap<String, CalculatorAstNode>();
+        this.variables = new HashMap<String, Node>();
         
         initBuiltInConstants();
         initBuiltInFunctions();
@@ -46,7 +46,7 @@ public class Calculator {
         // FIXME: use higher-precision string forms?
         constants.put("e", new CalculatorNumberNode(new BigDecimal(Math.E)));
         
-        final CalculatorAstNode pi = new CalculatorNumberNode(new BigDecimal(Math.PI));
+        final Node pi = new CalculatorNumberNode(new BigDecimal(Math.PI));
         constants.put("pi", pi);
         constants.put("\u03c0", pi);
     }
@@ -101,7 +101,7 @@ public class Calculator {
     public String evaluate(String expression) throws CalculatorError {
         this.lexer = new CalculatorLexer(expression);
         
-        CalculatorAstNode ast = parseExpr();
+        Node ast = parseExpr();
         expect(CalculatorToken.END_OF_INPUT);
         
         //System.err.println(ast);
@@ -110,23 +110,23 @@ public class Calculator {
         return value.toString();
     }
     
-    public CalculatorAstNode getVariable(String name) {
+    public Node getVariable(String name) {
         return variables.get(name);
     }
     
-    public void setVariable(String name, CalculatorAstNode newValue) {
+    public void setVariable(String name, Node newValue) {
         variables.put(name, newValue);
     }
     
-    private CalculatorAstNode parseExpr() {
+    private Node parseExpr() {
         return parseAssignmentExpression();
     }
     
     // Mathematica operator precedence: http://reference.wolfram.com/mathematica/tutorial/OperatorInputForms.html
     
     // = (assignment)
-    private CalculatorAstNode parseAssignmentExpression() {
-        CalculatorAstNode result = parseOrExpression();
+    private Node parseAssignmentExpression() {
+        Node result = parseOrExpression();
         if (lexer.token() == CalculatorToken.ASSIGN) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
@@ -137,8 +137,8 @@ public class Calculator {
     }
     
     // |
-    private CalculatorAstNode parseOrExpression() {
-        CalculatorAstNode result = parseAndExpression();
+    private Node parseOrExpression() {
+        Node result = parseAndExpression();
         while (lexer.token() == CalculatorToken.B_OR) {
             lexer.nextToken();
             // FIXME: make BitOr varargs.
@@ -148,8 +148,8 @@ public class Calculator {
     }
     
     // &
-    private CalculatorAstNode parseAndExpression() {
-        CalculatorAstNode result = parseNotExpression();
+    private Node parseAndExpression() {
+        Node result = parseNotExpression();
         while (lexer.token() == CalculatorToken.B_AND) {
             lexer.nextToken();
             // FIXME: make BitAnd varargs.
@@ -159,7 +159,7 @@ public class Calculator {
     }
     
     // !
-    private CalculatorAstNode parseNotExpression() {
+    private Node parseNotExpression() {
         if (lexer.token() == CalculatorToken.PLING) {
             lexer.nextToken();
             return new CalculatorOpNode(CalculatorToken.L_NOT, parseNotExpression(), null);
@@ -169,8 +169,8 @@ public class Calculator {
     }
     
     // == >= > <= < !=
-    private CalculatorAstNode parseRelationalExpression() {
-        CalculatorAstNode result = parseShiftExpression();
+    private Node parseRelationalExpression() {
+        Node result = parseShiftExpression();
         while (lexer.token() == CalculatorToken.EQ || lexer.token() == CalculatorToken.GE || lexer.token() == CalculatorToken.GT || lexer.token() == CalculatorToken.LE || lexer.token() == CalculatorToken.LT || lexer.token() == CalculatorToken.NE) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
@@ -180,8 +180,8 @@ public class Calculator {
     }
     
     // << >>
-    private CalculatorAstNode parseShiftExpression() {
-        CalculatorAstNode result = parseAdditiveExpression();
+    private Node parseShiftExpression() {
+        Node result = parseAdditiveExpression();
         while (lexer.token() == CalculatorToken.SHL || lexer.token() == CalculatorToken.SHR) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
@@ -191,8 +191,8 @@ public class Calculator {
     }
     
     // + -
-    private CalculatorAstNode parseAdditiveExpression() {
-        CalculatorAstNode result = parseMultiplicativeExpression();
+    private Node parseAdditiveExpression() {
+        Node result = parseMultiplicativeExpression();
         while (lexer.token() == CalculatorToken.PLUS || lexer.token() == CalculatorToken.MINUS) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
@@ -202,8 +202,8 @@ public class Calculator {
     }
     
     // * / %
-    private CalculatorAstNode parseMultiplicativeExpression() {
-        CalculatorAstNode result = parseUnaryExpression();
+    private Node parseMultiplicativeExpression() {
+        Node result = parseUnaryExpression();
         while (lexer.token() == CalculatorToken.MUL || lexer.token() == CalculatorToken.DIV || lexer.token() == CalculatorToken.MOD) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
@@ -213,7 +213,7 @@ public class Calculator {
     }
     
     // ~ -
-    private CalculatorAstNode parseUnaryExpression() {
+    private Node parseUnaryExpression() {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (0-f) for simplicity.
@@ -226,7 +226,7 @@ public class Calculator {
     }
     
     // sqrt
-    private CalculatorAstNode parseSqrtExpression() {
+    private Node parseSqrtExpression() {
         if (lexer.token() == CalculatorToken.SQRT) {
             lexer.nextToken();
             return new CalculatorFunctionApplicationNode(functions.get("sqrt"), Collections.singletonList(parseSqrtExpression()));
@@ -236,8 +236,8 @@ public class Calculator {
     }
     
     // ^
-    private CalculatorAstNode parseExponentiationExpression() {
-        CalculatorAstNode result = parseFactorialExpression();
+    private Node parseExponentiationExpression() {
+        Node result = parseFactorialExpression();
         if (lexer.token() == CalculatorToken.POW) {
             CalculatorToken op = lexer.token();
             lexer.nextToken();
@@ -247,8 +247,8 @@ public class Calculator {
     }
     
     // postfix-!
-    private CalculatorAstNode parseFactorialExpression() {
-        CalculatorAstNode result = parseFactor();
+    private Node parseFactorialExpression() {
+        Node result = parseFactor();
         if (lexer.token() == CalculatorToken.PLING) {
             expect(CalculatorToken.PLING);
             result = new CalculatorOpNode(CalculatorToken.FACTORIAL, result, null);
@@ -256,20 +256,20 @@ public class Calculator {
         return result;
     }
     
-    private CalculatorAstNode parseFactor() {
+    private Node parseFactor() {
         if (lexer.token() == CalculatorToken.OPEN_PARENTHESIS) {
             expect(CalculatorToken.OPEN_PARENTHESIS);
-            CalculatorAstNode result = parseExpr();
+            Node result = parseExpr();
             expect(CalculatorToken.CLOSE_PARENTHESIS);
             return result;
         } else if (lexer.token() == CalculatorToken.NUMBER) {
-            CalculatorAstNode result = new CalculatorNumberNode(lexer.number());
+            Node result = new CalculatorNumberNode(lexer.number());
             expect(CalculatorToken.NUMBER);
             return result;
         } else if (lexer.token() == CalculatorToken.IDENTIFIER) {
             final String identifier = lexer.identifier();
             expect(CalculatorToken.IDENTIFIER);
-            CalculatorAstNode result = constants.get(identifier);
+            Node result = constants.get(identifier);
             if (result == null) {
                 final CalculatorFunction fn = functions.get(identifier);
                 if (fn != null) {
@@ -285,8 +285,8 @@ public class Calculator {
     }
     
     // '(' expr [ ',' expr ] ')'
-    private List<CalculatorAstNode> parseArgs() {
-        final List<CalculatorAstNode> result = new LinkedList<CalculatorAstNode>();
+    private List<Node> parseArgs() {
+        final List<Node> result = new LinkedList<Node>();
         expect(CalculatorToken.OPEN_PARENTHESIS);
         while (lexer.token() != CalculatorToken.CLOSE_PARENTHESIS) {
             result.add(parseExpr());

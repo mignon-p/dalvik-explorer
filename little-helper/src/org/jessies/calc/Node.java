@@ -20,6 +20,6 @@ package org.jessies.calc;
 
 import java.math.*;
 
-public interface CalculatorAstNode {
+public interface Node {
     public BigDecimal value(Calculator environment);
 }

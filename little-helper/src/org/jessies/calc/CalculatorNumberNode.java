@@ -20,7 +20,7 @@ package org.jessies.calc;
 
 import java.math.*;
 
-public class CalculatorNumberNode implements CalculatorAstNode {
+public class CalculatorNumberNode implements Node {
     private final BigDecimal number;
     
     public CalculatorNumberNode(BigDecimal number) {

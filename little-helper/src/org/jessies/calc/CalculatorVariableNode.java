@@ -20,7 +20,7 @@ package org.jessies.calc;
 
 import java.math.*;
 
-public class CalculatorVariableNode implements CalculatorAstNode {
+public class CalculatorVariableNode implements Node {
     private final String name;
     
     public CalculatorVariableNode(String name) {

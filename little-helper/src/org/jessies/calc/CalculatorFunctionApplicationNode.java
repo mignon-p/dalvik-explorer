@@ -24,11 +24,11 @@ import java.util.*;
 /**
  * Represents a function application.
  */
-public class CalculatorFunctionApplicationNode implements CalculatorAstNode {
+public class CalculatorFunctionApplicationNode implements Node {
     private final CalculatorFunction function;
-    private final List<CalculatorAstNode> args;
+    private final List<Node> args;
     
-    public CalculatorFunctionApplicationNode(CalculatorFunction function, List<CalculatorAstNode> args) {
+    public CalculatorFunctionApplicationNode(CalculatorFunction function, List<Node> args) {
         this.function = function;
         this.args = args;
         if (function.arity() != args.size()) {
