@@ -389,6 +389,26 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class ShiftLeft extends CalculatorFunction {
+        public ShiftLeft() {
+            super("ShiftLeft", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftLeft(args.get(1).value(environment).intValue()));
+        }
+    }
+    
+    public static class ShiftRight extends CalculatorFunction {
+        public ShiftRight() {
+            super("ShiftRight", 2);
+        }
+        
+        public BigDecimal apply(Calculator environment, List<Node> args) {
+            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftRight(args.get(1).value(environment).intValue()));
+        }
+    }
+    
     private static BigDecimal series(Calculator environment, List<Node> args, BigDecimal initial, boolean isSum) {
         final BigDecimal iMin = args.get(0).value(environment);
         final BigDecimal iMax = args.get(1).value(environment);

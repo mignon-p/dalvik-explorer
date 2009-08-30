@@ -53,52 +53,54 @@ public class Calculator {
     
     private void initBuiltInFunctions() {
         // FIXME: acosh, asinh, atanh, chop, clip, sign(um), int(eger_part), frac(tional_part)
-        functions.put("abs",       new CalculatorFunctions.Abs());
-        functions.put("acos",      new CalculatorFunctions.Acos());
-        functions.put("asin",      new CalculatorFunctions.Asin());
-        functions.put("atan",      new CalculatorFunctions.Atan());
-        functions.put("atan2",     new CalculatorFunctions.Atan2());
-        functions.put("BitAnd",    new CalculatorFunctions.BitAnd());
-        functions.put("BitNot",    new CalculatorFunctions.BitNot());
-        functions.put("BitOr",     new CalculatorFunctions.BitOr());
-        functions.put("BitXor",    new CalculatorFunctions.BitXor());
-        functions.put("cbrt",      new CalculatorFunctions.Cbrt());
+        functions.put("abs",        new CalculatorFunctions.Abs());
+        functions.put("acos",       new CalculatorFunctions.Acos());
+        functions.put("asin",       new CalculatorFunctions.Asin());
+        functions.put("atan",       new CalculatorFunctions.Atan());
+        functions.put("atan2",      new CalculatorFunctions.Atan2());
+        functions.put("BitAnd",     new CalculatorFunctions.BitAnd());
+        functions.put("BitNot",     new CalculatorFunctions.BitNot());
+        functions.put("BitOr",      new CalculatorFunctions.BitOr());
+        functions.put("BitXor",     new CalculatorFunctions.BitXor());
+        functions.put("cbrt",       new CalculatorFunctions.Cbrt());
         final CalculatorFunction ceiling = new CalculatorFunctions.Ceiling();
-        functions.put("ceil",      ceiling);
-        functions.put("ceiling",   ceiling);
-        functions.put("cos",       new CalculatorFunctions.Cos());
-        functions.put("cosh",      new CalculatorFunctions.Cosh());
-        functions.put("define",    new CalculatorFunctions.Define());
-        functions.put("exp",       new CalculatorFunctions.Exp());
-        functions.put("factorial", new CalculatorFunctions.Factorial());
-        functions.put("floor",     new CalculatorFunctions.Floor());
-        functions.put("hypot",     new CalculatorFunctions.Hypot());
-        functions.put("is_prime",  new CalculatorFunctions.IsPrime());
-        functions.put("log",       new CalculatorFunctions.Log());
-        functions.put("log10",     new CalculatorFunctions.Log10());
-        functions.put("log2",      new CalculatorFunctions.Log2());
-        functions.put("logE",      new CalculatorFunctions.LogE());
-        functions.put("not",       new CalculatorFunctions.Not());
-        functions.put("power",     new CalculatorFunctions.Power());
+        functions.put("ceil",       ceiling);
+        functions.put("ceiling",    ceiling);
+        functions.put("cos",        new CalculatorFunctions.Cos());
+        functions.put("cosh",       new CalculatorFunctions.Cosh());
+        functions.put("define",     new CalculatorFunctions.Define());
+        functions.put("exp",        new CalculatorFunctions.Exp());
+        functions.put("factorial",  new CalculatorFunctions.Factorial());
+        functions.put("floor",      new CalculatorFunctions.Floor());
+        functions.put("hypot",      new CalculatorFunctions.Hypot());
+        functions.put("is_prime",   new CalculatorFunctions.IsPrime());
+        functions.put("log",        new CalculatorFunctions.Log());
+        functions.put("log10",      new CalculatorFunctions.Log10());
+        functions.put("log2",       new CalculatorFunctions.Log2());
+        functions.put("logE",       new CalculatorFunctions.LogE());
+        functions.put("not",        new CalculatorFunctions.Not());
+        functions.put("power",      new CalculatorFunctions.Power());
         final CalculatorFunction random = new CalculatorFunctions.Random();
-        functions.put("rand",      random);
-        functions.put("random",    random);
-        functions.put("round",     new CalculatorFunctions.Round());
-        functions.put("sin",       new CalculatorFunctions.Sin());
-        functions.put("sinh",      new CalculatorFunctions.Sinh());
-        functions.put("sqrt",      new CalculatorFunctions.Sqrt());
-        functions.put("tan",       new CalculatorFunctions.Tan());
-        functions.put("tanh",      new CalculatorFunctions.Tanh());
+        functions.put("rand",       random);
+        functions.put("random",     random);
+        functions.put("round",      new CalculatorFunctions.Round());
+        functions.put("ShiftLeft",  new CalculatorFunctions.ShiftLeft());
+        functions.put("ShiftRight", new CalculatorFunctions.ShiftRight());
+        functions.put("sin",        new CalculatorFunctions.Sin());
+        functions.put("sinh",       new CalculatorFunctions.Sinh());
+        functions.put("sqrt",       new CalculatorFunctions.Sqrt());
+        functions.put("tan",        new CalculatorFunctions.Tan());
+        functions.put("tanh",       new CalculatorFunctions.Tanh());
         
         final CalculatorFunction sum = new CalculatorFunctions.Sum();
-        functions.put("sum",       sum);
-        functions.put("\u03a3",    sum); // Unicode Greek capital letter sigma.
-        functions.put("\u2211",    sum); // Unicode summation sign.
+        functions.put("sum",        sum);
+        functions.put("\u03a3",     sum); // Unicode Greek capital letter sigma.
+        functions.put("\u2211",     sum); // Unicode summation sign.
         
         final CalculatorFunction product = new CalculatorFunctions.Product();
-        functions.put("product",   product);
-        functions.put("\u03a0",    product); // Unicode Greek capital letter pi.
-        functions.put("\u220f",    product); // Unicode product sign.
+        functions.put("product",    product);
+        functions.put("\u03a0",     product); // Unicode Greek capital letter pi.
+        functions.put("\u220f",     product); // Unicode product sign.
     }
     
     public String evaluate(String expression) throws CalculatorError {
@@ -185,9 +187,9 @@ public class Calculator {
     private Node parseShiftExpression() {
         Node result = parseAdditiveExpression();
         while (lexer.token() == CalculatorToken.SHL || lexer.token() == CalculatorToken.SHR) {
-            CalculatorToken op = lexer.token();
+            CalculatorFunction function = functions.get((lexer.token() == CalculatorToken.SHL) ? "ShiftLeft" : "ShiftRight");
             lexer.nextToken();
-            result = new CalculatorOpNode(op, result, parseAdditiveExpression());
+            result = new CalculatorFunctionApplicationNode(function, Arrays.asList(result, parseAdditiveExpression()));
         }
         return result;
     }
