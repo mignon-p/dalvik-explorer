@@ -23,6 +23,7 @@ public interface NumberNode extends Node {
     public NumberNode divide(NumberNode rhs);
     public NumberNode increment();
     public NumberNode plus(NumberNode rhs);
+    public NumberNode power(NumberNode rhs);
     public NumberNode subtract(NumberNode rhs);
     public NumberNode times(NumberNode rhs);
     public RealNode toReal();

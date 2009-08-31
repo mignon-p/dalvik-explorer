@@ -449,11 +449,7 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, List<Node> args) {
             final NumberNode lhs = toNumber("power", environment, args.get(0));
             final NumberNode rhs = toNumber("power", environment, args.get(1));
-            if (lhs instanceof IntegerNode && rhs instanceof IntegerNode) {
-                return ((IntegerNode) lhs).power((IntegerNode) rhs);
-            } else {
-                return lhs.toReal().power(rhs.toReal());
-            }
+            return lhs.power(rhs);
         }
     }
     

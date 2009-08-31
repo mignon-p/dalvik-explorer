@@ -111,15 +111,18 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         return new RealNode(fromDouble(Math.log10(value.doubleValue())));
     }
     
-    public RealNode power(RealNode exponent) {
-        return new RealNode(fromDouble(Math.pow(value.doubleValue(), exponent.value.doubleValue())));
-    }
-    
     public NumberNode plus(NumberNode rhs) {
         if (rhs instanceof IntegerNode) {
             rhs = rhs.toReal();
         }
         return new RealNode(value.add(((RealNode) rhs).value));
+    }
+    
+    public NumberNode power(NumberNode rhs) {
+        if (rhs instanceof IntegerNode) {
+            rhs = rhs.toReal();
+        }
+        return new RealNode(fromDouble(Math.pow(value.doubleValue(), ((RealNode) rhs).value.doubleValue())));
     }
     
     public RealNode round() {

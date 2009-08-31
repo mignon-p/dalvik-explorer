@@ -139,7 +139,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         return new IntegerNode(value.add(((IntegerNode) rhs).value));
     }
     
-    public IntegerNode power(IntegerNode exponent) {
+    public NumberNode power(NumberNode rhs) {
+        if (rhs instanceof RealNode) {
+            return toReal().power(rhs);
+        }
+        final IntegerNode exponent = (IntegerNode) rhs;
         if (exponent.value.bitLength() > 32) {
             throw new CalculatorError("can't raise " + value + " to the " + exponent + "th power");
         }
