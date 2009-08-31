@@ -34,8 +34,4 @@ public class BigDecimals {
     public static BigDecimal fromDouble(double d) {
         return new BigDecimal(d, MATH_CONTEXT);
     }
-    
-    public static BigDecimal fromBoolean(boolean b) {
-        return b ? BigDecimal.ONE : BigDecimal.ZERO;
-    }
 }

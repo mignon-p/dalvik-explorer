@@ -18,20 +18,29 @@ package org.jessies.calc;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.math.*;
-
-public class CalculatorNumberNode implements Node {
-    private final BigDecimal number;
+public class BooleanNode implements Node {
+    private final boolean value;
     
-    public CalculatorNumberNode(BigDecimal number) {
-        this.number = number;
+    public static final BooleanNode TRUE = new BooleanNode(true);
+    public static final BooleanNode FALSE = new BooleanNode(false);
+    
+    private BooleanNode(boolean value) {
+        this.value = value;
     }
     
-    public BigDecimal value(Calculator environment) {
-        return number;
+    public Node evaluate(Calculator environment) {
+        return this;
+    }
+    
+    public BooleanNode not() {
+        return value ? FALSE : TRUE;
+    }
+    
+    public static BooleanNode valueOf(boolean value) {
+        return value ? TRUE : FALSE;
     }
     
     @Override public String toString() {
-        return number.toString();
+        return value ? "true" : "false";
     }
 }

@@ -18,24 +18,12 @@ package org.jessies.calc;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.math.*;
-
-public class CalculatorVariableNode implements Node {
-    private final String name;
-    
-    public CalculatorVariableNode(String name) {
-        this.name = name;
-    }
-    
-    public String name() {
-        return name;
-    }
-    
-    public Node evaluate(Calculator environment) {
-        final Node value = environment.getVariable(name);
-        if (value == null) {
-            throw new CalculatorError("use of undefined variable '" + name + "'");
-        }
-        return value;
-    }
+public interface NumberNode extends Node {
+    public NumberNode abs();
+    public NumberNode divide(NumberNode rhs);
+    public NumberNode increment();
+    public NumberNode plus(NumberNode rhs);
+    public NumberNode subtract(NumberNode rhs);
+    public NumberNode times(NumberNode rhs);
+    public RealNode toReal();
 }

@@ -32,7 +32,7 @@ public class CalculatorLexer {
     
     private CalculatorToken token;
     private String identifier;
-    private BigDecimal number;
+    private Node number;
     
     public CalculatorLexer(String expression) {
         this(new StringReader(expression), null);
@@ -171,9 +171,9 @@ public class CalculatorLexer {
                 reader.unread(ch);
                 
                 if (isReal) {
-                    number = /*BigDecimals.*/fromString(text.toString());
+                    number = new RealNode(/*BigDecimals.*/fromString(text.toString()));
                 } else {
-                    number = new BigDecimal(new BigInteger(text.toString(), base), /*BigDecimals.*/MATH_CONTEXT);
+                    number = new IntegerNode(new BigInteger(text.toString(), base));
                 }
                 
                 return CalculatorToken.NUMBER;
@@ -233,7 +233,7 @@ public class CalculatorLexer {
         return identifier;
     }
     
-    public BigDecimal number() {
+    public Node number() {
         if (token != CalculatorToken.NUMBER) {
             throw new CalculatorError("Lexer.number called when current token was " + token);
         }

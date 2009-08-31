@@ -25,13 +25,47 @@ import static org.jessies.calc.BigDecimals.*;
 public class CalculatorFunctions {
     private CalculatorFunctions() {}
     
+    private static BooleanNode toBoolean(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof BooleanNode) {
+            return (BooleanNode) node;
+        }
+        throw new CalculatorError("'" + function + "' expected boolean argument");
+    }
+    
+    private static NumberNode toNumber(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof NumberNode) {
+            return (NumberNode) node;
+        }
+        throw new CalculatorError("'" + function + "' expected numeric argument");
+    }
+    
+    private static IntegerNode toInteger(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof IntegerNode) {
+            return (IntegerNode) node;
+        }
+        throw new CalculatorError("'" + function + "' expected integer argument");
+    }
+    
+    private static RealNode toReal(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof RealNode) {
+            return (RealNode) node;
+        } else if (node instanceof IntegerNode) {
+            return ((IntegerNode) node).toReal();
+        }
+        throw new CalculatorError("'" + function + "' expected real argument");
+    }
+    
     public static class Abs extends CalculatorFunction {
         public Abs() {
             super("abs", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return args.get(0).value(environment).abs(MATH_CONTEXT);
+        public Node apply(Calculator environment, List<Node> args) {
+            return toNumber("abs", environment, args.get(0)).abs();
         }
     }
     
@@ -40,8 +74,8 @@ public class CalculatorFunctions {
             super("acos", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.acos(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("acos", environment, args.get(0)).acos();
         }
     }
     
@@ -50,8 +84,8 @@ public class CalculatorFunctions {
             super("asin", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.asin(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("asin", environment, args.get(0)).asin();
         }
     }
     
@@ -60,8 +94,8 @@ public class CalculatorFunctions {
             super("atan", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.atan(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("atan", environment, args.get(0)).atan();
         }
     }
     
@@ -70,8 +104,8 @@ public class CalculatorFunctions {
             super("atan2", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.atan2(args.get(0).value(environment).doubleValue(), args.get(1).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("atan2", environment, args.get(0)).atan2(toReal("atan2", environment, args.get(1)));
         }
     }
     
@@ -80,10 +114,10 @@ public class CalculatorFunctions {
             super("BitAnd", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
-            final BigInteger rhs = args.get(1).value(environment).toBigInteger();
-            return fromBigInteger(lhs.and(rhs));
+        public Node apply(Calculator environment, List<Node> args) {
+            final IntegerNode lhs = toInteger("BitAnd", environment, args.get(0));
+            final IntegerNode rhs = toInteger("BitAnd", environment, args.get(1));
+            return lhs.bitAnd(rhs);
         }
     }
     
@@ -92,9 +126,9 @@ public class CalculatorFunctions {
             super("BitNot", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
-            return fromBigInteger(lhs.not());
+        public Node apply(Calculator environment, List<Node> args) {
+            final IntegerNode lhs = toInteger("BitNot", environment, args.get(0));
+            return lhs.bitNot();
         }
     }
     
@@ -103,10 +137,10 @@ public class CalculatorFunctions {
             super("BitOr", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
-            final BigInteger rhs = args.get(1).value(environment).toBigInteger();
-            return fromBigInteger(lhs.or(rhs));
+        public Node apply(Calculator environment, List<Node> args) {
+            final IntegerNode lhs = toInteger("BitOr", environment, args.get(0));
+            final IntegerNode rhs = toInteger("BitOr", environment, args.get(1));
+            return lhs.bitOr(rhs);
         }
     }
     
@@ -115,8 +149,10 @@ public class CalculatorFunctions {
             super("BitShiftLeft", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftLeft(args.get(1).value(environment).intValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            final IntegerNode lhs = toInteger("BitShiftLeft", environment, args.get(0));
+            final IntegerNode rhs = toInteger("BitShiftLeft", environment, args.get(1));
+            return lhs.bitShiftLeft(rhs);
         }
     }
     
@@ -125,8 +161,10 @@ public class CalculatorFunctions {
             super("BitShiftRight", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBigInteger(args.get(0).value(environment).toBigInteger().shiftRight(args.get(1).value(environment).intValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            final IntegerNode lhs = toInteger("BitShiftRight", environment, args.get(0));
+            final IntegerNode rhs = toInteger("BitShiftRight", environment, args.get(1));
+            return lhs.bitShiftRight(rhs);
         }
     }
     
@@ -135,10 +173,10 @@ public class CalculatorFunctions {
             super("BitXor", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final BigInteger lhs = args.get(0).value(environment).toBigInteger();
-            final BigInteger rhs = args.get(1).value(environment).toBigInteger();
-            return fromBigInteger(lhs.xor(rhs));
+        public Node apply(Calculator environment, List<Node> args) {
+            final IntegerNode lhs = toInteger("BitXor", environment, args.get(0));
+            final IntegerNode rhs = toInteger("BitXot", environment, args.get(1));
+            return lhs.bitXor(rhs);
         }
     }
     
@@ -147,8 +185,8 @@ public class CalculatorFunctions {
             super("cbrt", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.cbrt(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("cbrt", environment, args.get(0)).cbrt();
         }
     }
     
@@ -157,15 +195,23 @@ public class CalculatorFunctions {
             super("ceiling", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.ceil(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("ceiling", environment, args.get(0)).ceiling();
         }
     }
     
     private static int cmp(Calculator environment, List<Node> args) {
-        final Node lhs = args.get(0);
-        final Node rhs = args.get(1);
-        return lhs.value(environment).compareTo(rhs.value(environment));
+        final NumberNode lhs = toNumber("cmp", environment, args.get(0));
+        final NumberNode rhs = toNumber("cmp", environment, args.get(1));
+        return cmp(lhs, rhs);
+    }
+    
+    private static int cmp(NumberNode lhs, NumberNode rhs) {
+        if (lhs instanceof IntegerNode && rhs instanceof IntegerNode) {
+            return ((IntegerNode) lhs).compareTo((IntegerNode) rhs);
+        } else {
+            return lhs.toReal().compareTo(rhs.toReal());
+        }
     }
     
     public static class Cos extends CalculatorFunction {
@@ -173,8 +219,8 @@ public class CalculatorFunctions {
             super("cos", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.cos(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("cos", environment, args.get(0)).cos();
         }
     }
     
@@ -183,8 +229,8 @@ public class CalculatorFunctions {
             super("cosh", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.cosh(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("cosh", environment, args.get(0)).cosh();
         }
     }
     
@@ -193,15 +239,15 @@ public class CalculatorFunctions {
             super("define", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment, List<Node> args) {
             final Node lhs = args.get(0);
             final Node rhs = args.get(1);
             if (!(lhs instanceof CalculatorVariableNode)) {
                 throw new CalculatorError("lhs of an assignment must be a variable name (user-defined functions not yet implemented)");
             }
-            CalculatorVariableNode variable = (CalculatorVariableNode) lhs;
-            BigDecimal value = rhs.value(environment);
-            environment.setVariable(variable.name(), new CalculatorNumberNode(value));
+            final CalculatorVariableNode variable = (CalculatorVariableNode) lhs;
+            final Node value = rhs.evaluate(environment);
+            environment.setVariable(variable.name(), value);
             return value;
         }
     }
@@ -211,10 +257,10 @@ public class CalculatorFunctions {
             super("Divide", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final Node lhs = args.get(0);
-            final Node rhs = args.get(1);
-            return lhs.value(environment).divide(rhs.value(environment), MATH_CONTEXT);
+        public Node apply(Calculator environment, List<Node> args) {
+            final NumberNode lhs = toNumber("Divide", environment, args.get(0));
+            final NumberNode rhs = toNumber("Divide", environment, args.get(1));
+            return lhs.divide(rhs);
         }
     }
     
@@ -223,8 +269,8 @@ public class CalculatorFunctions {
             super("Equal", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(cmp(environment, args) == 0);
+        public Node apply(Calculator environment, List<Node> args) {
+            return BooleanNode.valueOf(cmp(environment, args) == 0);
         }
     }
     
@@ -233,8 +279,8 @@ public class CalculatorFunctions {
             super("exp", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.exp(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("exp", environment, args.get(0)).exp();
         }
     }
     
@@ -243,35 +289,9 @@ public class CalculatorFunctions {
             super("factorial", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return factorial(args.get(0).value(environment));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toInteger("factorial", environment, args.get(0)).factorial();
         }
-    }
-    
-    public static BigDecimal factorial(BigDecimal arg) {
-        BigInteger n;
-        try {
-            n = arg.toBigIntegerExact();
-        } catch (ArithmeticException ex) {
-            throw new CalculatorError("factorial requires an integer argument; got " + arg + " instead");
-        }
-        
-        final int signum = n.signum();
-        if (signum < 0) {
-            throw new CalculatorError("factorial requires a non-negative integer argument; got " + arg + " instead");
-        } else if (signum == 0) {
-            return BigDecimal.ONE;
-        }
-        // Based on fact6 from Richard J Fateman's "Comments on Factorial Programs".
-        return fromBigInteger(factorialHelper(n, BigInteger.ONE));
-    }
-    
-    private static BigInteger factorialHelper(BigInteger n, BigInteger m) {
-        if (n.compareTo(m) <= 0) {
-            return n;
-        }
-        final BigInteger twoM = BigInteger.valueOf(2).multiply(m); // This seems consistently faster than m.shiftLeft(1)!
-        return factorialHelper(n, twoM).multiply(factorialHelper(n.subtract(m), twoM));
     }
     
     public static class Floor extends CalculatorFunction {
@@ -279,8 +299,8 @@ public class CalculatorFunctions {
             super("floor", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.floor(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("floor", environment, args.get(0)).floor();
         }
     }
     
@@ -289,8 +309,8 @@ public class CalculatorFunctions {
             super("Greater", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(cmp(environment, args) > 0);
+        public Node apply(Calculator environment, List<Node> args) {
+            return BooleanNode.valueOf(cmp(environment, args) > 0);
         }
     }
     
@@ -299,8 +319,8 @@ public class CalculatorFunctions {
             super("GreaterEqual", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(cmp(environment, args) >= 0);
+        public Node apply(Calculator environment, List<Node> args) {
+            return BooleanNode.valueOf(cmp(environment, args) >= 0);
         }
     }
     
@@ -309,8 +329,8 @@ public class CalculatorFunctions {
             super("hypot", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.hypot(args.get(0).value(environment).doubleValue(), args.get(1).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("hypot", environment, args.get(0)).hypot(toReal("hypot", environment, args.get(1)));
         }
     }
     
@@ -319,44 +339,9 @@ public class CalculatorFunctions {
             super("is_prime", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(isPrime(args.get(0).value(environment)));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toInteger("is_prime", environment, args.get(0)).isPrime();
         }
-    }
-    
-    public static boolean isPrime(BigDecimal arg) {
-        int n;
-        try {
-            n = arg.intValueExact();
-        } catch (ArithmeticException ex) {
-            try {
-                final BigInteger bn = arg.toBigIntegerExact();
-            } catch (ArithmeticException ex2) {
-                // It's a real.
-                return false;
-            }
-            // It's just too big for us.
-            throw new CalculatorError("is_prime uses a naive algorithm unsuitable for huge numbers");
-        }
-        
-        // FIXME: replace the naive algorithm with something better.
-        n = Math.abs(n);
-        if (n == 1) {
-            return false;
-        }
-        if (n == 2) {
-            return true;
-        }
-        if ((n % 2) == 0) {
-            return false;
-        }
-        final int max = (int) Math.sqrt(n);
-        for (int i = 3; i <= max; i += 2) {
-            if (n % i == 0) {
-                return false;
-            }
-        }
-        return true;
     }
     
     public static class Less extends CalculatorFunction {
@@ -364,8 +349,8 @@ public class CalculatorFunctions {
             super("Less", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(cmp(environment, args) < 0);
+        public Node apply(Calculator environment, List<Node> args) {
+            return BooleanNode.valueOf(cmp(environment, args) < 0);
         }
     }
     
@@ -374,8 +359,8 @@ public class CalculatorFunctions {
             super("LessEqual", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(cmp(environment, args) <= 0);
+        public Node apply(Calculator environment, List<Node> args) {
+            return BooleanNode.valueOf(cmp(environment, args) <= 0);
         }
     }
     
@@ -385,8 +370,10 @@ public class CalculatorFunctions {
             super("log", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.log(args.get(1).value(environment).doubleValue()) / Math.log(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            final RealNode base = toReal("log2", environment, args.get(0));
+            final RealNode n = toReal("log2", environment, args.get(1));
+            return n.log(base);
         }
     }
     
@@ -395,8 +382,8 @@ public class CalculatorFunctions {
             super("log2", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.log(args.get(0).value(environment).doubleValue()) / Math.log(2.0));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("log2", environment, args.get(0)).log2();
         }
     }
     
@@ -405,8 +392,8 @@ public class CalculatorFunctions {
             super("logE", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.log(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("logE", environment, args.get(0)).logE();
         }
     }
     
@@ -415,8 +402,8 @@ public class CalculatorFunctions {
             super("log10", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.log10(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("log10", environment, args.get(0)).log10();
         }
     }
     
@@ -425,10 +412,10 @@ public class CalculatorFunctions {
             super("Mod", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final Node lhs = args.get(0);
-            final Node rhs = args.get(1);
-            return lhs.value(environment).remainder(rhs.value(environment));
+        public Node apply(Calculator environment, List<Node> args) {
+            final IntegerNode lhs = toInteger("Mod", environment, args.get(0));
+            final IntegerNode rhs = toInteger("Mod", environment, args.get(1));
+            return lhs.mod(rhs);
         }
     }
     
@@ -437,8 +424,8 @@ public class CalculatorFunctions {
             super("not", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(args.get(0).value(environment).toBigInteger().equals(BigInteger.ZERO));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toBoolean("not", environment, args.get(0)).not();
         }
     }
     
@@ -447,27 +434,25 @@ public class CalculatorFunctions {
             super("Plus", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final Node lhs = args.get(0);
-            final Node rhs = args.get(1);
-            return lhs.value(environment).add(rhs.value(environment));
+        public Node apply(Calculator environment, List<Node> args) {
+            final NumberNode lhs = toNumber("Plus", environment, args.get(0));
+            final NumberNode rhs = toNumber("Plus", environment, args.get(1));
+            return lhs.plus(rhs);
         }
     }
-    
     
     public static class Power extends CalculatorFunction {
         public Power() {
             super("power", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final Node lhs = args.get(0);
-            final Node rhs = args.get(1);
-            try {
-                int n = rhs.value(environment).intValueExact();
-                return lhs.value(environment).pow(n);
-            } catch (ArithmeticException ex) {
-                return fromDouble(Math.pow(lhs.value(environment).doubleValue(), rhs.value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            final NumberNode lhs = toNumber("power", environment, args.get(0));
+            final NumberNode rhs = toNumber("power", environment, args.get(1));
+            if (lhs instanceof IntegerNode && rhs instanceof IntegerNode) {
+                return ((IntegerNode) lhs).power((IntegerNode) rhs);
+            } else {
+                return lhs.toReal().power(rhs.toReal());
             }
         }
     }
@@ -477,8 +462,8 @@ public class CalculatorFunctions {
             super("product", 3);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return series(environment, args, BigDecimal.ONE, false);
+        public Node apply(Calculator environment, List<Node> args) {
+            return series(environment, args, IntegerNode.ONE, false);
         }
     }
     
@@ -487,8 +472,8 @@ public class CalculatorFunctions {
             super("random", 0);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.random());
+        public Node apply(Calculator environment, List<Node> args) {
+            return new RealNode(fromDouble(Math.random()));
         }
     }
     
@@ -497,32 +482,40 @@ public class CalculatorFunctions {
             super("round", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.round(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("round", environment, args.get(0)).round();
         }
     }
     
-    private static BigDecimal series(Calculator environment, List<Node> args, BigDecimal initial, boolean isSum) {
-        final BigDecimal iMin = args.get(0).value(environment);
-        final BigDecimal iMax = args.get(1).value(environment);
+    private static NumberNode series(Calculator environment, List<Node> args, IntegerNode initial, boolean isSum) {
+        NumberNode iMin = toNumber("series", environment, args.get(0));
+        NumberNode iMax = toNumber("series", environment, args.get(1));
         final Node expr = args.get(2);
         
-        if (iMin.compareTo(iMax) > 0) {
+        // Ensure we have two integers or two reals.
+        if (iMin instanceof RealNode || iMax instanceof RealNode) {
+            iMin = iMin.toReal();
+            iMax = iMax.toReal();
+        }
+        
+        if (cmp(iMin, iMax) > 0) {
             throw new CalculatorError("minimum (" + iMin + ") greater than maximum (" + iMax + ")");
         }
         
         // FIXME: support infinite sums/products, adding convergence testing.
         
+        // FIXME: let the user specify the sum variable.
         final Node originalI = environment.getVariable("i");
         try {
-            BigDecimal result = initial;
-            for (BigDecimal i = iMin; i.compareTo(iMax) <= 0; i = i.add(BigDecimal.ONE)) {
-                environment.setVariable("i", new CalculatorNumberNode(i));
-                final BigDecimal term = expr.value(environment);
+            NumberNode result = initial;
+            for (NumberNode i = iMin; cmp(i, iMax) <= 0; i = i.increment()) {
+                environment.setVariable("i", i);
+                // FIXME: handle undefined and non-numeric terms.
+                final NumberNode term = (NumberNode) expr.evaluate(environment);
                 if (isSum) {
-                    result = result.add(term);
+                    result = result.plus(term);
                 } else {
-                    result = result.multiply(term);
+                    result = result.times(term);
                 }
             }
             return result;
@@ -536,8 +529,8 @@ public class CalculatorFunctions {
             super("sum", 3);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return series(environment, args, BigDecimal.ZERO, true);
+        public Node apply(Calculator environment, List<Node> args) {
+            return series(environment, args, IntegerNode.ZERO, true);
         }
     }
     
@@ -546,8 +539,8 @@ public class CalculatorFunctions {
             super("sin", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.sin(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("sin", environment, args.get(0)).sin();
         }
     }
     
@@ -556,8 +549,8 @@ public class CalculatorFunctions {
             super("sinh", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.sinh(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("sinh", environment, args.get(0)).sinh();
         }
     }
     
@@ -566,8 +559,8 @@ public class CalculatorFunctions {
             super("sqrt", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.sqrt(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("sqrt", environment, args.get(0)).sqrt();
         }
     }
     
@@ -576,10 +569,10 @@ public class CalculatorFunctions {
             super("Subtract", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final Node lhs = args.get(0);
-            final Node rhs = args.get(1);
-            return lhs.value(environment).subtract(rhs.value(environment));
+        public Node apply(Calculator environment, List<Node> args) {
+            final NumberNode lhs = toNumber("Subtract", environment, args.get(0));
+            final NumberNode rhs = toNumber("Subtract", environment, args.get(1));
+            return lhs.subtract(rhs);
         }
     }
     
@@ -588,8 +581,8 @@ public class CalculatorFunctions {
             super("tan", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.tan(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("tan", environment, args.get(0)).tan();
         }
     }
     
@@ -598,8 +591,8 @@ public class CalculatorFunctions {
             super("tanh", 1);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromDouble(Math.tanh(args.get(0).value(environment).doubleValue()));
+        public Node apply(Calculator environment, List<Node> args) {
+            return toReal("tanh", environment, args.get(0)).tanh();
         }
     }
     
@@ -608,10 +601,10 @@ public class CalculatorFunctions {
             super("Times", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            final Node lhs = args.get(0);
-            final Node rhs = args.get(1);
-            return lhs.value(environment).multiply(rhs.value(environment));
+        public Node apply(Calculator environment, List<Node> args) {
+            final NumberNode lhs = toNumber("Times", environment, args.get(0));
+            final NumberNode rhs = toNumber("Times", environment, args.get(1));
+            return lhs.times(rhs);
         }
     }
     
@@ -620,8 +613,8 @@ public class CalculatorFunctions {
             super("Unequal", 2);
         }
         
-        public BigDecimal apply(Calculator environment, List<Node> args) {
-            return fromBoolean(cmp(environment, args) != 0);
+        public Node apply(Calculator environment, List<Node> args) {
+            return BooleanNode.valueOf(cmp(environment, args) != 0);
         }
     }
 }

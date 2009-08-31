@@ -36,7 +36,7 @@ public class CalculatorFunctionApplicationNode implements Node {
         }
     }
     
-    public BigDecimal value(Calculator environment) {
+    public Node evaluate(Calculator environment) {
         return function.apply(environment, args);
     }
 }

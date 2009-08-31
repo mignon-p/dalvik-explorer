@@ -46,11 +46,14 @@ public class Calculator {
     
     private void initBuiltInConstants() {
         // FIXME: use higher-precision string forms?
-        constants.put("e", new CalculatorNumberNode(new BigDecimal(Math.E)));
+        constants.put("e", new RealNode(new BigDecimal(Math.E)));
         
-        final Node pi = new CalculatorNumberNode(new BigDecimal(Math.PI));
+        final Node pi = new RealNode(new BigDecimal(Math.PI));
         constants.put("pi", pi);
         constants.put("\u03c0", pi);
+        
+        constants.put("false", BooleanNode.FALSE);
+        constants.put("true", BooleanNode.TRUE);
     }
     
     private void initBuiltInFunctions() {
@@ -141,9 +144,9 @@ public class Calculator {
         expect(CalculatorToken.END_OF_INPUT);
         
         //System.err.println(ast);
-        BigDecimal value = ast.value(this);
-        setVariable("Ans", new CalculatorNumberNode(value));
-        return value.toString();
+        Node result = ast.evaluate(this);
+        setVariable("Ans", result);
+        return result.toString();
     }
     
     public Node getVariable(String name) {
@@ -252,7 +255,7 @@ public class Calculator {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (-1*f) for simplicity.
-            return new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.MUL), Arrays.asList(new CalculatorNumberNode(BigDecimal.ONE.negate()), parseUnaryExpression()));
+            return new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.MUL), Arrays.asList(IntegerNode.MINUS_ONE, parseUnaryExpression()));
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
             return new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.B_NOT), Collections.singletonList(parseUnaryExpression()));
@@ -297,7 +300,7 @@ public class Calculator {
             expect(CalculatorToken.CLOSE_PARENTHESIS);
             return result;
         } else if (lexer.token() == CalculatorToken.NUMBER) {
-            Node result = new CalculatorNumberNode(lexer.number());
+            Node result = lexer.number();
             expect(CalculatorToken.NUMBER);
             return result;
         } else if (lexer.token() == CalculatorToken.IDENTIFIER) {
@@ -388,30 +391,32 @@ public class Calculator {
     }
     
     @Test private static void testRelationalOperations() {
-        Assert.equals(new Calculator().evaluate("1<2"), "1");
-        Assert.equals(new Calculator().evaluate("2<2"), "0");
-        Assert.equals(new Calculator().evaluate("2<1"), "0");
-        Assert.equals(new Calculator().evaluate("1<=2"), "1");
-        Assert.equals(new Calculator().evaluate("2<=2"), "1");
-        Assert.equals(new Calculator().evaluate("2<=1"), "0");
-        Assert.equals(new Calculator().evaluate("1>2"), "0");
-        Assert.equals(new Calculator().evaluate("2>2"), "0");
-        Assert.equals(new Calculator().evaluate("2>1"), "1");
-        Assert.equals(new Calculator().evaluate("1>=2"), "0");
-        Assert.equals(new Calculator().evaluate("2>=2"), "1");
-        Assert.equals(new Calculator().evaluate("2>=1"), "1");
-        Assert.equals(new Calculator().evaluate("1==2"), "0");
-        Assert.equals(new Calculator().evaluate("2==2"), "1");
-        Assert.equals(new Calculator().evaluate("2==1"), "0");
-        Assert.equals(new Calculator().evaluate("1!=2"), "1");
-        Assert.equals(new Calculator().evaluate("2!=2"), "0");
-        Assert.equals(new Calculator().evaluate("2!=1"), "1");
+        Assert.equals(new Calculator().evaluate("1<2"), "true");
+        Assert.equals(new Calculator().evaluate("2<2"), "false");
+        Assert.equals(new Calculator().evaluate("2<1"), "false");
+        Assert.equals(new Calculator().evaluate("1<=2"), "true");
+        Assert.equals(new Calculator().evaluate("2<=2"), "true");
+        Assert.equals(new Calculator().evaluate("2<=1"), "false");
+        Assert.equals(new Calculator().evaluate("1>2"), "false");
+        Assert.equals(new Calculator().evaluate("2>2"), "false");
+        Assert.equals(new Calculator().evaluate("2>1"), "true");
+        Assert.equals(new Calculator().evaluate("1>=2"), "false");
+        Assert.equals(new Calculator().evaluate("2>=2"), "true");
+        Assert.equals(new Calculator().evaluate("2>=1"), "true");
+        Assert.equals(new Calculator().evaluate("1==2"), "false");
+        Assert.equals(new Calculator().evaluate("2==2"), "true");
+        Assert.equals(new Calculator().evaluate("2==1"), "false");
+        Assert.equals(new Calculator().evaluate("1!=2"), "true");
+        Assert.equals(new Calculator().evaluate("2!=2"), "false");
+        Assert.equals(new Calculator().evaluate("2!=1"), "true");
     }
     
     @Test private static void testNot() {
-        Assert.equals(new Calculator().evaluate("!(1==2)"), "1");
-        Assert.equals(new Calculator().evaluate("!(2==2)"), "0");
-        Assert.equals(new Calculator().evaluate("!!(2==2)"), "1");
+        Assert.equals(new Calculator().evaluate("!false"), "true");
+        Assert.equals(new Calculator().evaluate("!true"), "false");
+        Assert.equals(new Calculator().evaluate("!(1==2)"), "true");
+        Assert.equals(new Calculator().evaluate("!(2==2)"), "false");
+        Assert.equals(new Calculator().evaluate("!!(2==2)"), "true");
     }
     
     @Test private static void testShifts() {
@@ -420,10 +425,10 @@ public class Calculator {
     }
     
     @Test private static void testBitOperations() {
-        Assert.equals(new Calculator().evaluate("(0x1234 & 0xff0) == 0x230"), "1");
-        Assert.equals(new Calculator().evaluate("(0x1200 | 0x34) == 0x1234"), "1");
+        Assert.equals(new Calculator().evaluate("(0x1234 & 0xff0) == 0x230"), "true");
+        Assert.equals(new Calculator().evaluate("(0x1200 | 0x34) == 0x1234"), "true");
         Assert.equals(new Calculator().evaluate("BitXor(5, 3)"), "6");
-        Assert.equals(new Calculator().evaluate("((0x1234 & ~0xff) | 0x56) == 0x1256"), "1");
+        Assert.equals(new Calculator().evaluate("((0x1234 & ~0xff) | 0x56) == 0x1256"), "true");
         Assert.equals(new Calculator().evaluate("~3"), "-4");
         Assert.equals(new Calculator().evaluate("~~3"), "3");
     }
@@ -439,7 +444,7 @@ public class Calculator {
     @Test private static void testConstants() {
         Assert.equals(Double.valueOf(new Calculator().evaluate("e")), Math.E, 0.000001);
         Assert.equals(Double.valueOf(new Calculator().evaluate("pi")), Math.PI, 0.000001);
-        Assert.equals(new Calculator().evaluate("pi == \u03c0"), "1");
+        Assert.equals(new Calculator().evaluate("pi == \u03c0"), "true");
     }
     
     @Test private static void testFunctions() {
@@ -448,7 +453,7 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("abs(-2)"), "2");
         Assert.equals(new Calculator().evaluate("acos(1)"), "0");
         Assert.equals(new Calculator().evaluate("asin(0)"), "0");
-        Assert.equals(new Calculator().evaluate("acos(0) == asin(1)"), "1");
+        Assert.equals(new Calculator().evaluate("acos(0) == asin(1)"), "true");
         Assert.equals(new Calculator().evaluate("atan(0)"), "0");
         Assert.equals(new Calculator().evaluate("cbrt(27)"), "3");
         Assert.equals(new Calculator().evaluate("ceil(1.2)"), "2");
@@ -457,18 +462,18 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("cosh(0)"), "1");
         Assert.equals(Double.valueOf(new Calculator().evaluate("exp(1)/e")), 1.0, 0.000001);
         Assert.equals(new Calculator().evaluate("factorial(5)"), "120");
-        Assert.equals(new Calculator().evaluate("factorial(5) == 5!"), "1");
+        Assert.equals(new Calculator().evaluate("factorial(5) == 5!"), "true");
         Assert.equals(new Calculator().evaluate("floor(1.2)"), "1");
         Assert.equals(new Calculator().evaluate("hypot(3, 4)"), "5");
         
-        Assert.equals(new Calculator().evaluate("is_prime(0)"), "0");
-        Assert.equals(new Calculator().evaluate("is_prime(1)"), "0");
-        Assert.equals(new Calculator().evaluate("is_prime(2)"), "1");
-        Assert.equals(new Calculator().evaluate("is_prime(3)"), "1");
-        Assert.equals(new Calculator().evaluate("is_prime(4)"), "0");
-        Assert.equals(new Calculator().evaluate("is_prime(5)"), "1");
-        Assert.equals(new Calculator().evaluate("is_prime(-4)"), "0");
-        Assert.equals(new Calculator().evaluate("is_prime(-5)"), "1");
+        Assert.equals(new Calculator().evaluate("is_prime(0)"), "false");
+        Assert.equals(new Calculator().evaluate("is_prime(1)"), "false");
+        Assert.equals(new Calculator().evaluate("is_prime(2)"), "true");
+        Assert.equals(new Calculator().evaluate("is_prime(3)"), "true");
+        Assert.equals(new Calculator().evaluate("is_prime(4)"), "false");
+        Assert.equals(new Calculator().evaluate("is_prime(5)"), "true");
+        Assert.equals(new Calculator().evaluate("is_prime(-4)"), "false");
+        Assert.equals(new Calculator().evaluate("is_prime(-5)"), "true");
         
         Assert.equals(new Calculator().evaluate("log(2, 1024)"), "10");
         Assert.equals(new Calculator().evaluate("log2(1024)"), "10");
