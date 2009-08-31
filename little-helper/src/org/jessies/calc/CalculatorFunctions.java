@@ -269,7 +269,15 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return BooleanNode.valueOf(cmp(environment, args) == 0);
+            final Node lhs = args.get(0).evaluate(environment);
+            final Node rhs = args.get(1).evaluate(environment);
+            if (lhs instanceof BooleanNode && rhs instanceof BooleanNode) {
+                return BooleanNode.valueOf(lhs == rhs);
+            } else if (lhs instanceof NumberNode && rhs instanceof NumberNode) {
+                return BooleanNode.valueOf(cmp((NumberNode) lhs, (NumberNode) rhs) == 0);
+            } else {
+                throw new CalculatorError("equality only applies to booleans and numbers");
+            }
         }
     }
     
@@ -609,7 +617,15 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return BooleanNode.valueOf(cmp(environment, args) != 0);
+            final Node lhs = args.get(0).evaluate(environment);
+            final Node rhs = args.get(1).evaluate(environment);
+            if (lhs instanceof BooleanNode && rhs instanceof BooleanNode) {
+                return BooleanNode.valueOf(lhs != rhs);
+            } else if (lhs instanceof NumberNode && rhs instanceof NumberNode) {
+                return BooleanNode.valueOf(cmp((NumberNode) lhs, (NumberNode) rhs) != 0);
+            } else {
+                throw new CalculatorError("inequality only applies to booleans and numbers");
+            }
         }
     }
 }

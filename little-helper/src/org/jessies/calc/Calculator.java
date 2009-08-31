@@ -409,6 +409,14 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("1!=2"), "true");
         Assert.equals(new Calculator().evaluate("2!=2"), "false");
         Assert.equals(new Calculator().evaluate("2!=1"), "true");
+        Assert.equals(new Calculator().evaluate("true==true"), "true");
+        Assert.equals(new Calculator().evaluate("true==false"), "false");
+        Assert.equals(new Calculator().evaluate("false==true"), "false");
+        Assert.equals(new Calculator().evaluate("false==false"), "true");
+        Assert.equals(new Calculator().evaluate("true!=true"), "false");
+        Assert.equals(new Calculator().evaluate("true!=false"), "true");
+        Assert.equals(new Calculator().evaluate("false!=true"), "true");
+        Assert.equals(new Calculator().evaluate("false!=false"), "false");
     }
     
     @Test private static void testNot() {
