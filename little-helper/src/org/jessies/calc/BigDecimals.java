@@ -30,8 +30,4 @@ public class BigDecimals {
     public static BigDecimal fromBigInteger(BigInteger i) {
         return new BigDecimal(i, MATH_CONTEXT);
     }
-    
-    public static BigDecimal fromDouble(double d) {
-        return new BigDecimal(d, MATH_CONTEXT);
-    }
 }

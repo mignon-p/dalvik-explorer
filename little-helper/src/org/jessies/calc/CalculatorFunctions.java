@@ -469,7 +469,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return new RealNode(fromDouble(Math.random()));
+            return new RealNode(Math.random());
         }
     }
     

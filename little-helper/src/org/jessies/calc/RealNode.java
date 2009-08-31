@@ -28,6 +28,10 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         this.value = value;
     }
     
+    public RealNode(double value) {
+        this(new BigDecimal(value, MATH_CONTEXT));
+    }
+    
     public Node evaluate(Calculator environment) {
         return this;
     }
@@ -37,27 +41,27 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public RealNode acos() {
-        return new RealNode(fromDouble(Math.acos(value.doubleValue())));
+        return new RealNode(Math.acos(value.doubleValue()));
     }
     
     public RealNode asin() {
-        return new RealNode(fromDouble(Math.asin(value.doubleValue())));
+        return new RealNode(Math.asin(value.doubleValue()));
     }
     
     public RealNode atan() {
-        return new RealNode(fromDouble(Math.atan(value.doubleValue())));
+        return new RealNode(Math.atan(value.doubleValue()));
     }
     
     public RealNode atan2(RealNode x) {
-        return new RealNode(fromDouble(Math.atan2(value.doubleValue(), x.value.doubleValue())));
+        return new RealNode(Math.atan2(value.doubleValue(), x.value.doubleValue()));
     }
     
     public RealNode cbrt() {
-        return new RealNode(fromDouble(Math.cbrt(value.doubleValue())));
+        return new RealNode(Math.cbrt(value.doubleValue()));
     }
     
     public RealNode ceiling() {
-        return new RealNode(fromDouble(Math.ceil(value.doubleValue())));
+        return new RealNode(Math.ceil(value.doubleValue()));
     }
     
     public int compareTo(RealNode rhs) {
@@ -65,11 +69,11 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public RealNode cos() {
-        return new RealNode(fromDouble(Math.cos(value.doubleValue())));
+        return new RealNode(Math.cos(value.doubleValue()));
     }
     
     public RealNode cosh() {
-        return new RealNode(fromDouble(Math.cosh(value.doubleValue())));
+        return new RealNode(Math.cosh(value.doubleValue()));
     }
     
     public NumberNode divide(NumberNode rhs) {
@@ -80,15 +84,15 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public RealNode exp() {
-        return new RealNode(fromDouble(Math.exp(value.doubleValue())));
+        return new RealNode(Math.exp(value.doubleValue()));
     }
     
     public RealNode floor() {
-        return new RealNode(fromDouble(Math.floor(value.doubleValue())));
+        return new RealNode(Math.floor(value.doubleValue()));
     }
     
     public RealNode hypot(RealNode y) {
-        return new RealNode(fromDouble(Math.hypot(value.doubleValue(), y.value.doubleValue())));
+        return new RealNode(Math.hypot(value.doubleValue(), y.value.doubleValue()));
     }
     
     public RealNode increment() {
@@ -96,19 +100,19 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public RealNode log(RealNode base) {
-        return new RealNode(fromDouble(Math.log(value.doubleValue()) / Math.log(base.value.doubleValue())));
+        return new RealNode(Math.log(value.doubleValue()) / Math.log(base.value.doubleValue()));
     }
     
     public RealNode log2() {
-        return new RealNode(fromDouble(Math.log(value.doubleValue()) / Math.log(2.0)));
+        return new RealNode(Math.log(value.doubleValue()) / Math.log(2.0));
     }
     
     public RealNode logE() {
-        return new RealNode(fromDouble(Math.log(value.doubleValue())));
+        return new RealNode(Math.log(value.doubleValue()));
     }
     
     public RealNode log10() {
-        return new RealNode(fromDouble(Math.log10(value.doubleValue())));
+        return new RealNode(Math.log10(value.doubleValue()));
     }
     
     public NumberNode plus(NumberNode rhs) {
@@ -122,23 +126,23 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         if (rhs instanceof IntegerNode) {
             rhs = rhs.toReal();
         }
-        return new RealNode(fromDouble(Math.pow(value.doubleValue(), ((RealNode) rhs).value.doubleValue())));
+        return new RealNode(Math.pow(value.doubleValue(), ((RealNode) rhs).value.doubleValue()));
     }
     
     public RealNode round() {
-        return new RealNode(fromDouble(Math.round(value.doubleValue())));
+        return new RealNode(Math.round(value.doubleValue()));
     }
     
     public RealNode sin() {
-        return new RealNode(fromDouble(Math.sin(value.doubleValue())));
+        return new RealNode(Math.sin(value.doubleValue()));
     }
     
     public RealNode sinh() {
-        return new RealNode(fromDouble(Math.sinh(value.doubleValue())));
+        return new RealNode(Math.sinh(value.doubleValue()));
     }
     
     public RealNode sqrt() {
-        return new RealNode(fromDouble(Math.sqrt(value.doubleValue())));
+        return new RealNode(Math.sqrt(value.doubleValue()));
     }
     
     public NumberNode subtract(NumberNode rhs) {
@@ -149,11 +153,11 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public RealNode tan() {
-        return new RealNode(fromDouble(Math.tan(value.doubleValue())));
+        return new RealNode(Math.tan(value.doubleValue()));
     }
     
     public RealNode tanh() {
-        return new RealNode(fromDouble(Math.tanh(value.doubleValue())));
+        return new RealNode(Math.tanh(value.doubleValue()));
     }
     
     public NumberNode times(NumberNode rhs) {
