@@ -165,7 +165,8 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public RealNode toReal() {
-        return new RealNode(fromBigInteger(value));
+        // FIXME: why is MATH_CONTEXT necessary here?
+        return new RealNode(new BigDecimal(value, MATH_CONTEXT));
     }
     
     @Override public String toString() {

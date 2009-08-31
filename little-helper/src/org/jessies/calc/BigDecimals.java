@@ -22,8 +22,4 @@ import java.math.*;
 
 public class BigDecimals {
     public static final MathContext MATH_CONTEXT = new MathContext(20, RoundingMode.HALF_UP);
-    
-    public static BigDecimal fromBigInteger(BigInteger i) {
-        return new BigDecimal(i, MATH_CONTEXT);
-    }
 }
