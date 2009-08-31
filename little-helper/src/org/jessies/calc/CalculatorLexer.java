@@ -171,7 +171,7 @@ public class CalculatorLexer {
                 reader.unread(ch);
                 
                 if (isReal) {
-                    number = new RealNode(/*BigDecimals.*/fromString(text.toString()));
+                    number = new RealNode(new BigDecimal(text.toString()));
                 } else {
                     number = new IntegerNode(new BigInteger(text.toString(), base));
                 }
