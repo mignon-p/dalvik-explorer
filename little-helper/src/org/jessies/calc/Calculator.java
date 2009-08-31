@@ -46,9 +46,9 @@ public class Calculator {
     
     private void initBuiltInConstants() {
         // FIXME: use higher-precision string forms?
-        constants.put("e", new RealNode(new BigDecimal(Math.E)));
+        constants.put("e", new RealNode(Math.E));
         
-        final Node pi = new RealNode(new BigDecimal(Math.PI));
+        final Node pi = new RealNode(Math.PI);
         constants.put("pi", pi);
         constants.put("\u03c0", pi);
         
