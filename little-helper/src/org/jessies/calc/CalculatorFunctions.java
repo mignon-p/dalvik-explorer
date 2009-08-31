@@ -20,7 +20,6 @@ package org.jessies.calc;
 
 import java.math.*;
 import java.util.*;
-import static org.jessies.calc.BigDecimals.*;
 
 public class CalculatorFunctions {
     private CalculatorFunctions() {}
