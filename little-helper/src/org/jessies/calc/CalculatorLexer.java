@@ -92,8 +92,8 @@ public class CalculatorLexer {
         case '~': return CalculatorToken.B_NOT;
         case '^': return CalculatorToken.POW;
             
-        case '&': return CalculatorToken.B_AND;
-        case '|': return CalculatorToken.B_OR;
+        case '&': return maybe('&', CalculatorToken.L_AND, CalculatorToken.B_AND);
+        case '|': return maybe('|', CalculatorToken.L_OR, CalculatorToken.B_OR);
             
         case '*':
         case '\u00d7': // Unicode multiplication sign.

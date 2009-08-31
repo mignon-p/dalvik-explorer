@@ -52,6 +52,8 @@ public enum CalculatorToken {
     
     B_AND("&"),
     B_OR("|"),
+    L_AND("&&"),
+    L_OR("||"),
     
     // Prefix unary.
     

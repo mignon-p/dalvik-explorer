@@ -60,6 +60,7 @@ public class Calculator {
         // FIXME: acosh, asinh, atanh, chop, clip, sign(um), int(eger_part), frac(tional_part)
         functions.put("abs",             new CalculatorFunctions.Abs());
         functions.put("acos",            new CalculatorFunctions.Acos());
+        functions.put("And",             new CalculatorFunctions.And());
         functions.put("asin",            new CalculatorFunctions.Asin());
         functions.put("atan",            new CalculatorFunctions.Atan());
         functions.put("atan2",           new CalculatorFunctions.Atan2());
@@ -92,7 +93,8 @@ public class Calculator {
         functions.put("log2",            new CalculatorFunctions.Log2());
         functions.put("logE",            new CalculatorFunctions.LogE());
         functions.put("Mod",             new CalculatorFunctions.Mod());
-        functions.put("not",             new CalculatorFunctions.Not());
+        functions.put("Not",             new CalculatorFunctions.Not());
+        functions.put("Or",              new CalculatorFunctions.Or());
         functions.put("Plus",            new CalculatorFunctions.Plus());
         functions.put("Power",           new CalculatorFunctions.Power());
         final CalculatorFunction random = new CalculatorFunctions.Random();
@@ -125,7 +127,9 @@ public class Calculator {
         operators.put(CalculatorToken.EQ,    functions.get("Equal"));
         operators.put(CalculatorToken.GE,    functions.get("GreaterEqual"));
         operators.put(CalculatorToken.GT,    functions.get("Greater"));
+        operators.put(CalculatorToken.L_AND, functions.get("And"));
         operators.put(CalculatorToken.LE,    functions.get("LessEqual"));
+        operators.put(CalculatorToken.L_OR,  functions.get("Or"));
         operators.put(CalculatorToken.LT,    functions.get("Less"));
         operators.put(CalculatorToken.MINUS, functions.get("Subtract"));
         operators.put(CalculatorToken.MOD,   functions.get("Mod"));
@@ -174,19 +178,41 @@ public class Calculator {
         
     }
     
-    // |
+    // ||
     private Node parseOrExpression() {
         Node result = parseAndExpression();
+        while (lexer.token() == CalculatorToken.L_OR) {
+            lexer.nextToken();
+            // FIXME: make Or varargs.
+            result = new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.L_OR), Arrays.asList(result, parseAndExpression()));
+        }
+        return result;
+    }
+    
+    // &&
+    private Node parseAndExpression() {
+        Node result = parseBitOrExpression();
+        while (lexer.token() == CalculatorToken.L_AND) {
+            lexer.nextToken();
+            // FIXME: make And varargs.
+            result = new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.L_AND), Arrays.asList(result, parseBitOrExpression()));
+        }
+        return result;
+    }
+    
+    // |
+    private Node parseBitOrExpression() {
+        Node result = parseBitAndExpression();
         while (lexer.token() == CalculatorToken.B_OR) {
             lexer.nextToken();
             // FIXME: make BitOr varargs.
-            result = new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.B_OR), Arrays.asList(result, parseAndExpression()));
+            result = new CalculatorFunctionApplicationNode(operators.get(CalculatorToken.B_OR), Arrays.asList(result, parseBitAndExpression()));
         }
         return result;
     }
     
     // &
-    private Node parseAndExpression() {
+    private Node parseBitAndExpression() {
         Node result = parseNotExpression();
         while (lexer.token() == CalculatorToken.B_AND) {
             lexer.nextToken();
@@ -200,7 +226,7 @@ public class Calculator {
     private Node parseNotExpression() {
         if (lexer.token() == CalculatorToken.PLING) {
             lexer.nextToken();
-            return new CalculatorFunctionApplicationNode(functions.get("not"), Collections.singletonList(parseNotExpression()));
+            return new CalculatorFunctionApplicationNode(functions.get("Not"), Collections.singletonList(parseNotExpression()));
         } else {
             return parseRelationalExpression();
         }
@@ -419,12 +445,26 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("false!=false"), "false");
     }
     
-    @Test private static void testNot() {
+    @Test private static void testLogicalNot() {
         Assert.equals(new Calculator().evaluate("!false"), "true");
         Assert.equals(new Calculator().evaluate("!true"), "false");
         Assert.equals(new Calculator().evaluate("!(1==2)"), "true");
         Assert.equals(new Calculator().evaluate("!(2==2)"), "false");
         Assert.equals(new Calculator().evaluate("!!(2==2)"), "true");
+    }
+    
+    @Test private static void testLogicalAnd() {
+        Assert.equals(new Calculator().evaluate("false&&false"), "false");
+        Assert.equals(new Calculator().evaluate("false&&true"), "false");
+        Assert.equals(new Calculator().evaluate("true&&false"), "false");
+        Assert.equals(new Calculator().evaluate("true&&true"), "true");
+    }
+    
+    @Test private static void testLogicalOr() {
+        Assert.equals(new Calculator().evaluate("false||false"), "false");
+        Assert.equals(new Calculator().evaluate("false||true"), "true");
+        Assert.equals(new Calculator().evaluate("true||false"), "true");
+        Assert.equals(new Calculator().evaluate("true||true"), "true");
     }
     
     @Test private static void testShifts() {

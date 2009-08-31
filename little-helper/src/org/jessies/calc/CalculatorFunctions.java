@@ -78,6 +78,16 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class And extends CalculatorFunction {
+        public And() {
+            super("And", 2);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            return toBoolean("And", environment, args.get(0)).and(toBoolean("And", environment, args.get(1)));
+        }
+    }
+    
     public static class Asin extends CalculatorFunction {
         public Asin() {
             super("asin", 1);
@@ -428,11 +438,21 @@ public class CalculatorFunctions {
     
     public static class Not extends CalculatorFunction {
         public Not() {
-            super("not", 1);
+            super("Not", 1);
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return toBoolean("not", environment, args.get(0)).not();
+            return toBoolean("Not", environment, args.get(0)).not();
+        }
+    }
+    
+    public static class Or extends CalculatorFunction {
+        public Or() {
+            super("Or", 2);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            return toBoolean("Or", environment, args.get(0)).or(toBoolean("Or", environment, args.get(1)));
         }
     }
     

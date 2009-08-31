@@ -18,7 +18,7 @@ package org.jessies.calc;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class BooleanNode implements Node {
+public final class BooleanNode implements Node {
     private final boolean value;
     
     public static final BooleanNode TRUE = new BooleanNode(true);
@@ -28,8 +28,16 @@ public class BooleanNode implements Node {
         this.value = value;
     }
     
+    public BooleanNode and(BooleanNode rhs) {
+        return valueOf(value && rhs.value);
+    }
+    
     public Node evaluate(Calculator environment) {
         return this;
+    }
+    
+    public BooleanNode or(BooleanNode rhs) {
+        return valueOf(value || rhs.value);
     }
     
     public BooleanNode not() {
