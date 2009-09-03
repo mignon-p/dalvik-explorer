@@ -219,6 +219,7 @@ public class CalculatorFunctions {
         if (lhs instanceof IntegerNode && rhs instanceof IntegerNode) {
             return ((IntegerNode) lhs).compareTo((IntegerNode) rhs);
         } else {
+            // FIXME: what about an integer too large to be represented as a real, compared to a real?
             return lhs.toReal().compareTo(rhs.toReal());
         }
     }
@@ -441,6 +442,30 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment, List<Node> args) {
             return toReal("log10", environment, args.get(0)).log10();
+        }
+    }
+    
+    public static class Max extends CalculatorFunction {
+        public Max() {
+            super("Max", 2);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            final NumberNode lhs = toNumber("Max", environment, args.get(0));
+            final NumberNode rhs = toNumber("Max", environment, args.get(1));
+            return cmp(lhs, rhs) >= 0 ? lhs : rhs;
+        }
+    }
+    
+    public static class Min extends CalculatorFunction {
+        public Min() {
+            super("Min", 2);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            final NumberNode lhs = toNumber("Min", environment, args.get(0));
+            final NumberNode rhs = toNumber("Min", environment, args.get(1));
+            return cmp(lhs, rhs) < 0 ? lhs : rhs;
         }
     }
     

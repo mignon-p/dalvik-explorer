@@ -94,6 +94,8 @@ public class Calculator {
         functions.put("log10",           new CalculatorFunctions.Log10());
         functions.put("log2",            new CalculatorFunctions.Log2());
         functions.put("logE",            new CalculatorFunctions.LogE());
+        functions.put("Max",             new CalculatorFunctions.Max());
+        functions.put("Min",             new CalculatorFunctions.Min());
         functions.put("Mod",             new CalculatorFunctions.Mod());
         functions.put("Not",             new CalculatorFunctions.Not());
         functions.put("Or",              new CalculatorFunctions.Or());
@@ -549,6 +551,22 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("FractionalPart(1)"), "0");
         Assert.equals(new Calculator().evaluate("FractionalPart(-2.4)"), "0.4");
         Assert.equals(new Calculator().evaluate("FractionalPart(-2)"), "0");
+        
+        Assert.equals(new Calculator().evaluate("IntegerPart(1.2) + FractionalPart(1.2)"), "1.2");
+    }
+    
+    @Test private static void testMaxAndMin() {
+        Assert.equals(new Calculator().evaluate("Max(-123, 123)"), "123");
+        Assert.equals(new Calculator().evaluate("Max(123, 123)"), "123");
+        Assert.equals(new Calculator().evaluate("Max(123, 124)"), "124");
+        Assert.equals(new Calculator().evaluate("Max(0.1, 0.2)"), "0.2");
+        Assert.equals(new Calculator().evaluate("Max(123, 123.1)"), "123.1");
+        
+        Assert.equals(new Calculator().evaluate("Min(-123, 123)"), "-123");
+        Assert.equals(new Calculator().evaluate("Min(123, 123)"), "123");
+        Assert.equals(new Calculator().evaluate("Min(123, 124)"), "123");
+        Assert.equals(new Calculator().evaluate("Min(0.1, 0.2)"), "0.1");
+        Assert.equals(new Calculator().evaluate("Min(123, 123.1)"), "123");
     }
     
     @Test private static void testSqrt() {
