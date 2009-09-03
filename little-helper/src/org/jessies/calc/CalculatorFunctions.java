@@ -321,6 +321,16 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class FractionalPart extends CalculatorFunction {
+        public FractionalPart() {
+            super("FractionalPart", 1);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            return toNumber("FractionalPart", environment, args.get(0)).fractionalPart();
+        }
+    }
+    
     public static class Greater extends CalculatorFunction {
         public Greater() {
             super("Greater", 2);
@@ -348,6 +358,16 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment, List<Node> args) {
             return toReal("hypot", environment, args.get(0)).hypot(toReal("hypot", environment, args.get(1)));
+        }
+    }
+    
+    public static class IntegerPart extends CalculatorFunction {
+        public IntegerPart() {
+            super("IntegerPart", 1);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            return toNumber("IntegerPart", environment, args.get(0)).integerPart();
         }
     }
     

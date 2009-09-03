@@ -57,7 +57,7 @@ public class Calculator {
     }
     
     private void initBuiltInFunctions() {
-        // FIXME: acosh, asinh, atanh, chop, clip, sign(um), int(eger_part), frac(tional_part)
+        // FIXME: acosh, asinh, atanh, chop, clip, sign(um)
         functions.put("abs",             new CalculatorFunctions.Abs());
         functions.put("acos",            new CalculatorFunctions.Acos());
         functions.put("And",             new CalculatorFunctions.And());
@@ -82,9 +82,11 @@ public class Calculator {
         functions.put("exp",             new CalculatorFunctions.Exp());
         functions.put("factorial",       new CalculatorFunctions.Factorial());
         functions.put("floor",           new CalculatorFunctions.Floor());
+        functions.put("FractionalPart",  new CalculatorFunctions.FractionalPart());
         functions.put("Greater",         new CalculatorFunctions.Greater());
         functions.put("GreaterEqual",    new CalculatorFunctions.GreaterEqual());
         functions.put("hypot",           new CalculatorFunctions.Hypot());
+        functions.put("IntegerPart",     new CalculatorFunctions.IntegerPart());
         functions.put("is_prime",        new CalculatorFunctions.IsPrime());
         functions.put("Less",            new CalculatorFunctions.Less());
         functions.put("LessEqual",       new CalculatorFunctions.LessEqual());
@@ -535,6 +537,18 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("sqrt(81)"), "9");
         Assert.equals(new Calculator().evaluate("tan(0)"), "0");
         Assert.equals(new Calculator().evaluate("tanh(0)"), "0");
+    }
+    
+    @Test private static void testIntegerPartAndFractionalPart() {
+        Assert.equals(new Calculator().evaluate("IntegerPart(1.2)"), "1");
+        Assert.equals(new Calculator().evaluate("IntegerPart(1)"), "1");
+        Assert.equals(new Calculator().evaluate("IntegerPart(-2.4)"), "-2");
+        Assert.equals(new Calculator().evaluate("IntegerPart(-2)"), "-2");
+        
+        Assert.equals(new Calculator().evaluate("FractionalPart(1.2)"), "0.2");
+        Assert.equals(new Calculator().evaluate("FractionalPart(1)"), "0");
+        Assert.equals(new Calculator().evaluate("FractionalPart(-2.4)"), "0.4");
+        Assert.equals(new Calculator().evaluate("FractionalPart(-2)"), "0");
     }
     
     @Test private static void testSqrt() {

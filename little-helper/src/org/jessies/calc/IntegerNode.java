@@ -99,8 +99,16 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         return factorialHelper(n, twoM).multiply(factorialHelper(n.subtract(m), twoM));
     }
     
+    public RealNode fractionalPart() {
+        return RealNode.ZERO;
+    }
+    
     public IntegerNode increment() {
         return new IntegerNode(value.add(BigInteger.ONE));
+    }
+    
+    public IntegerNode integerPart() {
+        return this;
     }
     
     public BooleanNode isPrime() {

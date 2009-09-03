@@ -22,6 +22,8 @@ import java.math.*;
 import static org.jessies.calc.BigDecimals.*;
 
 public class RealNode implements Comparable<RealNode>, NumberNode {
+    public static final RealNode ZERO = new RealNode(0);
+    
     private final BigDecimal value;
     
     public RealNode(BigDecimal value) {
@@ -91,12 +93,26 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         return new RealNode(Math.floor(value.doubleValue()));
     }
     
+    public RealNode fractionalPart() {
+        RealNode result = new RealNode(value.remainder(BigDecimal.ONE));
+        return (value.signum() < 0) ? new RealNode(result.value.negate()) : result;
+    }
+    
     public RealNode hypot(RealNode y) {
         return new RealNode(Math.hypot(value.doubleValue(), y.value.doubleValue()));
     }
     
     public RealNode increment() {
         return new RealNode(value.add(BigDecimal.ONE));
+    }
+    
+    public IntegerNode integerPart() {
+        String s = value.toPlainString();
+        int decimalPoint = s.indexOf('.');
+        if (decimalPoint != -1) {
+            s = s.substring(0, decimalPoint);
+        }
+        return new IntegerNode(new BigInteger(s));
     }
     
     public RealNode log(RealNode base) {

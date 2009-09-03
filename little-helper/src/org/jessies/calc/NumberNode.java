@@ -21,7 +21,9 @@ package org.jessies.calc;
 public interface NumberNode extends Node {
     public NumberNode abs();
     public NumberNode divide(NumberNode rhs);
+    public RealNode fractionalPart();
     public NumberNode increment();
+    public IntegerNode integerPart();
     public NumberNode plus(NumberNode rhs);
     public NumberNode power(NumberNode rhs);
     public NumberNode subtract(NumberNode rhs);
