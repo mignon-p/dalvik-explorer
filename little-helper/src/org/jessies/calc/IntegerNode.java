@@ -19,7 +19,6 @@ package org.jessies.calc;
  */
 
 import java.math.*;
-import static org.jessies.calc.BigDecimals.*;
 
 public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     // Cache common values, equivalent to what the JLS mandates for boxed integers in Java.
@@ -281,7 +280,7 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public NumberNode power(NumberNode rhs) {
-        if (rhs instanceof RealNode) {
+        if (rhs instanceof RealNode || rhs.sign().compareTo(IntegerNode.valueOf(-1)) == 0) {
             return toReal().power(rhs);
         }
         // FIXME: special-case small enough fixnums?
@@ -291,6 +290,19 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
         return new IntegerNode(big().pow(exponent.intValue()));
         
+    }
+    
+    public IntegerNode sign() {
+        if (isBig()) {
+            return IntegerNode.valueOf(bignum.signum());
+        }
+        if (fixnum < 0) {
+            return IntegerNode.valueOf(-1);
+        } else if (fixnum > 0) {
+            return IntegerNode.valueOf(1);
+        } else {
+            return IntegerNode.valueOf(0);
+        }
     }
     
     public NumberNode subtract(NumberNode rhs) {
@@ -344,7 +356,7 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         if (result == Double.NEGATIVE_INFINITY || result == Double.POSITIVE_INFINITY) {
             throw new RuntimeException("Integer value too large");
         }
-        return new RealNode(new BigDecimal(result));
+        return new RealNode(result);
     }
     
     @Override public String toString() {

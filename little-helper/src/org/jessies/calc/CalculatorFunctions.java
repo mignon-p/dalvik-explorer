@@ -592,13 +592,13 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Sum extends CalculatorFunction {
-        public Sum() {
-            super("sum", 3);
+    public static class Sign extends CalculatorFunction {
+        public Sign() {
+            super("Sign", 1);
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return series(environment, args, IntegerNode.valueOf(0), true);
+            return toNumber("Sign", environment, args.get(0)).sign();
         }
     }
     
@@ -641,6 +641,16 @@ public class CalculatorFunctions {
             final NumberNode lhs = toNumber("Subtract", environment, args.get(0));
             final NumberNode rhs = toNumber("Subtract", environment, args.get(1));
             return lhs.subtract(rhs);
+        }
+    }
+    
+    public static class Sum extends CalculatorFunction {
+        public Sum() {
+            super("sum", 3);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            return series(environment, args, IntegerNode.valueOf(0), true);
         }
     }
     

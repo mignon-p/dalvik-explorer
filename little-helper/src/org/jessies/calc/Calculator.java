@@ -103,6 +103,7 @@ public class Calculator {
         functions.put("rand",            random);
         functions.put("random",          random);
         functions.put("round",           new CalculatorFunctions.Round());
+        functions.put("Sign",            new CalculatorFunctions.Sign());
         functions.put("sin",             new CalculatorFunctions.Sin());
         functions.put("sinh",            new CalculatorFunctions.Sinh());
         functions.put("sqrt",            new CalculatorFunctions.Sqrt());
@@ -177,14 +178,15 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("1"), "1");
         Assert.equals(new Calculator().evaluate("-1"), "-1");
         Assert.equals(new Calculator().evaluate("--1"), "1");
-        Assert.equals(new Calculator().evaluate("1.00"), "1.00");
+        Assert.equals(new Calculator().evaluate("1.00"), "1.0");
         
         Assert.equals(new Calculator().evaluate(".2"), "0.2");
         
-        Assert.equals(new Calculator().evaluate("1.2E3"), "1.2E+3");
-        Assert.equals(new Calculator().evaluate("1E3"), "1E+3");
-        Assert.equals(new Calculator().evaluate("1.E3"), "1E+3");
-        Assert.equals(new Calculator().evaluate(".1E3"), "1E+2");
+        Assert.equals(new Calculator().evaluate("1.2E3"), "1200.0");
+        Assert.equals(new Calculator().evaluate("1E3"), "1000");
+        Assert.equals(new Calculator().evaluate("1E-3"), "0.0010");
+        Assert.equals(new Calculator().evaluate("1.E3"), "1000.0");
+        Assert.equals(new Calculator().evaluate(".1E3"), "100.0");
         
         Assert.equals(new Calculator().evaluate("1+2+3"), "6");
         Assert.equals(new Calculator().evaluate("1+-2"), "-1");
@@ -277,7 +279,7 @@ public class Calculator {
     @Test private static void testExponentiation() {
         Assert.equals(new Calculator().evaluate("2^3"), "8");
         Assert.equals(new Calculator().evaluate("2^3^4"), "2417851639229258349412352");
-        Assert.equals(new Calculator().evaluate("4^0.5"), "2");
+        Assert.equals(new Calculator().evaluate("4^0.5"), "2.0");
         Assert.equals(new Calculator().evaluate("-10^2"), "-100");
         Assert.equals(new Calculator().evaluate("(-10)^2"), "100");
     }
@@ -310,18 +312,18 @@ public class Calculator {
         // FIXME: better tests?
         Assert.equals(new Calculator().evaluate("Abs(2)"), "2");
         Assert.equals(new Calculator().evaluate("Abs(-2)"), "2");
-        Assert.equals(new Calculator().evaluate("acos(1)"), "0");
-        Assert.equals(new Calculator().evaluate("asin(0)"), "0");
+        Assert.equals(new Calculator().evaluate("acos(1)"), "0.0");
+        Assert.equals(new Calculator().evaluate("asin(0)"), "0.0");
         Assert.equals(new Calculator().evaluate("acos(0) == asin(1)"), "true");
-        Assert.equals(new Calculator().evaluate("atan(0)"), "0");
-        Assert.equals(new Calculator().evaluate("cbrt(27)"), "3");
-        Assert.equals(new Calculator().evaluate("ceil(1.2)"), "2");
-        Assert.equals(new Calculator().evaluate("cos(0)"), "1");
-        Assert.equals(new Calculator().evaluate("cos(pi)"), "-1");
-        Assert.equals(new Calculator().evaluate("cosh(0)"), "1");
+        Assert.equals(new Calculator().evaluate("atan(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("cbrt(27)"), "3.0");
+        Assert.equals(new Calculator().evaluate("ceil(1.2)"), "2.0");
+        Assert.equals(new Calculator().evaluate("cos(0)"), "1.0");
+        Assert.equals(new Calculator().evaluate("cos(pi)"), "-1.0");
+        Assert.equals(new Calculator().evaluate("cosh(0)"), "1.0");
         Assert.equals(Double.valueOf(new Calculator().evaluate("exp(1)/e")), 1.0, 0.000001);
-        Assert.equals(new Calculator().evaluate("floor(1.2)"), "1");
-        Assert.equals(new Calculator().evaluate("hypot(3, 4)"), "5");
+        Assert.equals(new Calculator().evaluate("floor(1.2)"), "1.0");
+        Assert.equals(new Calculator().evaluate("hypot(3, 4)"), "5.0");
         
         Assert.equals(new Calculator().evaluate("is_prime(0)"), "false");
         Assert.equals(new Calculator().evaluate("is_prime(1)"), "false");
@@ -332,18 +334,18 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("is_prime(-4)"), "false");
         Assert.equals(new Calculator().evaluate("is_prime(-5)"), "true");
         
-        Assert.equals(new Calculator().evaluate("log(2, 1024)"), "10");
-        Assert.equals(new Calculator().evaluate("log2(1024)"), "10");
-        Assert.equals(new Calculator().evaluate("logE(exp(4))"), "4");
-        Assert.equals(new Calculator().evaluate("log10(1000)"), "3");
+        Assert.equals(new Calculator().evaluate("log(2, 1024)"), "10.0");
+        Assert.equals(new Calculator().evaluate("log2(1024)"), "10.0");
+        Assert.equals(new Calculator().evaluate("logE(exp(4))"), "4.0");
+        Assert.equals(new Calculator().evaluate("log10(1000)"), "3.0");
         Assert.equals(new Calculator().evaluate("round(1.2)"), "1");
         Assert.equals(new Calculator().evaluate("round(1.8)"), "2");
-        Assert.equals(new Calculator().evaluate("sin(0)"), "0");
-        Assert.equals(new Calculator().evaluate("sin(pi/2)"), "1");
-        Assert.equals(new Calculator().evaluate("sinh(0)"), "0");
-        Assert.equals(new Calculator().evaluate("sqrt(81)"), "9");
-        Assert.equals(new Calculator().evaluate("tan(0)"), "0");
-        Assert.equals(new Calculator().evaluate("tanh(0)"), "0");
+        Assert.equals(new Calculator().evaluate("sin(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("sin(pi/2)"), "1.0");
+        Assert.equals(new Calculator().evaluate("sinh(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("sqrt(81)"), "9.0");
+        Assert.equals(new Calculator().evaluate("tan(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("tanh(0)"), "0.0");
     }
     
     @Test private static void testFactorial() {
@@ -366,9 +368,9 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("IntegerPart(-2)"), "-2");
         
         Assert.equals(new Calculator().evaluate("FractionalPart(1.2)"), "0.2");
-        Assert.equals(new Calculator().evaluate("FractionalPart(1)"), "0");
+        Assert.equals(new Calculator().evaluate("FractionalPart(1)"), "0.0");
         Assert.equals(new Calculator().evaluate("FractionalPart(-2.4)"), "0.4");
-        Assert.equals(new Calculator().evaluate("FractionalPart(-2)"), "0");
+        Assert.equals(new Calculator().evaluate("FractionalPart(-2)"), "0.0");
         
         Assert.equals(new Calculator().evaluate("IntegerPart(1.2) + FractionalPart(1.2)"), "1.2");
     }
@@ -387,15 +389,24 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("Min(123, 123.1)"), "123");
     }
     
+    @Test private static void testSign() {
+        Assert.equals(new Calculator().evaluate("Sign(-123)"), "-1");
+        Assert.equals(new Calculator().evaluate("Sign(-123.0)"), "-1");
+        Assert.equals(new Calculator().evaluate("Sign(0)"), "0");
+        Assert.equals(new Calculator().evaluate("Sign(0.0)"), "0");
+        Assert.equals(new Calculator().evaluate("Sign(123)"), "1");
+        Assert.equals(new Calculator().evaluate("Sign(123.0)"), "1");
+    }
+    
     @Test private static void testSqrt() {
-        Assert.equals(new Calculator().evaluate("\u221a4"), "2");
+        Assert.equals(new Calculator().evaluate("\u221a4"), "2.0");
         // Check /3*2 == 2*/3 (where / is ASCII-safe \u221a).
         Assert.startsWith(new Calculator().evaluate("\u221a3*2"), "3.464");
     }
     
     @Test private static void testSum() {
         Assert.equals(new Calculator().evaluate("sum(0, 10, i)"), "55");
-        Assert.equals(new Calculator().evaluate("sum(0, 10.2, i)"), "55");
+        Assert.equals(new Calculator().evaluate("sum(0, 10.2, i)"), "55.0");
         Assert.equals(new Calculator().evaluate("sum(0, 10, i^2)"), "385");
         Assert.equals(Double.valueOf(new Calculator().evaluate("sum(0,30,1/i!)-e")), 0.0, 0.000001);
         // FIXME: failure test for min > max.
@@ -403,7 +414,7 @@ public class Calculator {
     
     @Test private static void testProduct() {
         Assert.equals(new Calculator().evaluate("product(1, 10, i)"), "3628800");
-        Assert.equals(new Calculator().evaluate("product(1, 10.2, i)"), "3628800");
+        Assert.equals(new Calculator().evaluate("product(1, 10.2, i)"), "3628800.0");
         Assert.equals(new Calculator().evaluate("product(1, 6, i^2)"), "518400");
         // FIXME: failure test for min > max.
     }

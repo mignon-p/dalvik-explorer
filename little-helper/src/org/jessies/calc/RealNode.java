@@ -19,19 +19,25 @@ package org.jessies.calc;
  */
 
 import java.math.*;
-import static org.jessies.calc.BigDecimals.*;
 
+/**
+ * Represents an approximate number.
+ * 
+ * We would be better off using rational arithmetic until we need to display.
+ * User-supplied approximate numbers could be converted to "equivalent" rationals on entry.
+ * The downside to such an approach would be worse performance.
+ */
 public class RealNode implements Comparable<RealNode>, NumberNode {
     public static final RealNode ZERO = new RealNode(0);
     
-    private final BigDecimal value;
+    private final double value;
     
-    public RealNode(BigDecimal value) {
+    public RealNode(double value) {
         this.value = value;
     }
     
-    public RealNode(double value) {
-        this(new BigDecimal(value, MATH_CONTEXT));
+    public RealNode(String s) {
+        this(Double.parseDouble(s));
     }
     
     public Node evaluate(Calculator environment) {
@@ -39,148 +45,154 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public RealNode abs() {
-        return new RealNode(value.abs());
+        return new RealNode(Math.abs(value));
     }
     
     public RealNode acos() {
-        return new RealNode(Math.acos(value.doubleValue()));
+        return new RealNode(Math.acos(value));
     }
     
     public RealNode asin() {
-        return new RealNode(Math.asin(value.doubleValue()));
+        return new RealNode(Math.asin(value));
     }
     
     public RealNode atan() {
-        return new RealNode(Math.atan(value.doubleValue()));
+        return new RealNode(Math.atan(value));
     }
     
     public RealNode atan2(RealNode x) {
-        return new RealNode(Math.atan2(value.doubleValue(), x.value.doubleValue()));
+        return new RealNode(Math.atan2(value, x.value));
     }
     
     public RealNode cbrt() {
-        return new RealNode(Math.cbrt(value.doubleValue()));
+        return new RealNode(Math.cbrt(value));
     }
     
     public RealNode ceiling() {
-        return new RealNode(Math.ceil(value.doubleValue()));
+        return new RealNode(Math.ceil(value));
     }
     
     public int compareTo(RealNode rhs) {
-        return value.compareTo(rhs.value);
+        return Double.compare(value, rhs.value);
     }
     
     public RealNode cos() {
-        return new RealNode(Math.cos(value.doubleValue()));
+        return new RealNode(Math.cos(value));
     }
     
     public RealNode cosh() {
-        return new RealNode(Math.cosh(value.doubleValue()));
+        return new RealNode(Math.cosh(value));
     }
     
     public NumberNode divide(NumberNode rhs) {
         if (rhs instanceof IntegerNode) {
             rhs = rhs.toReal();
         }
-        return new RealNode(value.divide(((RealNode) rhs).value, MATH_CONTEXT));
+        return new RealNode(value/ ((RealNode) rhs).value);
     }
     
     public RealNode exp() {
-        return new RealNode(Math.exp(value.doubleValue()));
+        return new RealNode(Math.exp(value));
     }
     
     public RealNode floor() {
-        return new RealNode(Math.floor(value.doubleValue()));
+        // FIXME: would be nice to return an IntegerNode.
+        return new RealNode(Math.floor(value));
     }
     
     public RealNode fractionalPart() {
-        RealNode result = new RealNode(value.remainder(BigDecimal.ONE));
-        return (value.signum() < 0) ? new RealNode(result.value.negate()) : result;
+        String s = Double.toString(value);
+        int i = 0;
+        while (s.charAt(i) == '-' || Character.isDigit(s.charAt(i))) {
+            ++i;
+        }
+        s = s.substring(i);
+        double fractionalPart = Double.parseDouble(s);
+        return (fractionalPart == value) ? this : new RealNode(fractionalPart);
     }
     
     public RealNode hypot(RealNode y) {
-        return new RealNode(Math.hypot(value.doubleValue(), y.value.doubleValue()));
+        return new RealNode(Math.hypot(value, y.value));
     }
     
     public RealNode increment() {
-        return new RealNode(value.add(BigDecimal.ONE));
+        return new RealNode(value + 1);
     }
     
     public IntegerNode integerPart() {
-        String s = value.toPlainString();
-        int decimalPoint = s.indexOf('.');
-        if (decimalPoint != -1) {
-            s = s.substring(0, decimalPoint);
-        }
-        return new IntegerNode(s, 10);
+        return IntegerNode.valueOf((long) value);
     }
     
     public RealNode log(RealNode base) {
-        return new RealNode(Math.log(value.doubleValue()) / Math.log(base.value.doubleValue()));
+        return new RealNode(Math.log(value) / Math.log(base.value));
     }
     
     public RealNode log2() {
-        return new RealNode(Math.log(value.doubleValue()) / Math.log(2.0));
+        return new RealNode(Math.log(value) / Math.log(2.0));
     }
     
     public RealNode logE() {
-        return new RealNode(Math.log(value.doubleValue()));
+        return new RealNode(Math.log(value));
     }
     
     public RealNode log10() {
-        return new RealNode(Math.log10(value.doubleValue()));
+        return new RealNode(Math.log10(value));
     }
     
     public NumberNode plus(NumberNode rhs) {
         if (rhs instanceof IntegerNode) {
             rhs = rhs.toReal();
         }
-        return new RealNode(value.add(((RealNode) rhs).value));
+        return new RealNode(value + ((RealNode) rhs).value);
     }
     
     public NumberNode power(NumberNode rhs) {
         if (rhs instanceof IntegerNode) {
             rhs = rhs.toReal();
         }
-        return new RealNode(Math.pow(value.doubleValue(), ((RealNode) rhs).value.doubleValue()));
+        return new RealNode(Math.pow(value, ((RealNode) rhs).value));
     }
     
-    public RealNode round() {
-        return new RealNode(Math.round(value.doubleValue()));
+    public IntegerNode round() {
+        return IntegerNode.valueOf(Math.round(value));
+    }
+    
+    public IntegerNode sign() {
+        return IntegerNode.valueOf((long) Math.signum(value));
     }
     
     public RealNode sin() {
-        return new RealNode(Math.sin(value.doubleValue()));
+        return new RealNode(Math.sin(value));
     }
     
     public RealNode sinh() {
-        return new RealNode(Math.sinh(value.doubleValue()));
+        return new RealNode(Math.sinh(value));
     }
     
     public RealNode sqrt() {
-        return new RealNode(Math.sqrt(value.doubleValue()));
+        return new RealNode(Math.sqrt(value));
     }
     
     public NumberNode subtract(NumberNode rhs) {
         if (rhs instanceof IntegerNode) {
             rhs = rhs.toReal();
         }
-        return new RealNode(value.subtract(((RealNode) rhs).value));
+        return new RealNode(value - ((RealNode) rhs).value);
     }
     
     public RealNode tan() {
-        return new RealNode(Math.tan(value.doubleValue()));
+        return new RealNode(Math.tan(value));
     }
     
     public RealNode tanh() {
-        return new RealNode(Math.tanh(value.doubleValue()));
+        return new RealNode(Math.tanh(value));
     }
     
     public NumberNode times(NumberNode rhs) {
         if (rhs instanceof IntegerNode) {
             rhs = rhs.toReal();
         }
-        return new RealNode(value.multiply(((RealNode) rhs).value));
+        return new RealNode(value * ((RealNode) rhs).value);
     }
     
     public RealNode toReal() {
@@ -188,6 +200,6 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     @Override public String toString() {
-        return value.toString();
+        return Double.toString(value);
     }
 }
