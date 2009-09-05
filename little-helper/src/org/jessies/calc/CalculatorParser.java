@@ -155,7 +155,7 @@ public class CalculatorParser {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (-1*f) for simplicity.
-            return new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.MUL), Arrays.asList(IntegerNode.MINUS_ONE, parseUnaryExpression()));
+            return new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.MUL), Arrays.asList(IntegerNode.valueOf(-1), parseUnaryExpression()));
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
             return new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.B_NOT), Collections.singletonList(parseUnaryExpression()));
@@ -188,7 +188,7 @@ public class CalculatorParser {
         Node result = parseFactor();
         if (lexer.token() == CalculatorToken.PLING) {
             expect(CalculatorToken.PLING);
-            result = new CalculatorFunctionApplicationNode(getFunction("factorial"), Collections.singletonList(result));
+            result = new CalculatorFunctionApplicationNode(getFunction("Factorial"), Collections.singletonList(result));
         }
         return result;
     }

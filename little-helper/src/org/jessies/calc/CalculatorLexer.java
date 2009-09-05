@@ -173,7 +173,7 @@ public class CalculatorLexer {
                 if (isReal) {
                     number = new RealNode(new BigDecimal(text.toString()));
                 } else {
-                    number = new IntegerNode(new BigInteger(text.toString(), base));
+                    number = new IntegerNode(text.toString(), base);
                 }
                 
                 return CalculatorToken.NUMBER;

@@ -56,7 +56,7 @@ public class Calculator {
     
     private void initBuiltInFunctions() {
         // FIXME: acosh, asinh, atanh, chop, clip, sign(um)
-        functions.put("abs",             new CalculatorFunctions.Abs());
+        functions.put("Abs",             new CalculatorFunctions.Abs());
         functions.put("acos",            new CalculatorFunctions.Acos());
         functions.put("And",             new CalculatorFunctions.And());
         functions.put("asin",            new CalculatorFunctions.Asin());
@@ -78,7 +78,7 @@ public class Calculator {
         functions.put("Divide",          new CalculatorFunctions.Divide());
         functions.put("Equal",           new CalculatorFunctions.Equal());
         functions.put("exp",             new CalculatorFunctions.Exp());
-        functions.put("factorial",       new CalculatorFunctions.Factorial());
+        functions.put("Factorial",       new CalculatorFunctions.Factorial());
         functions.put("floor",           new CalculatorFunctions.Floor());
         functions.put("FractionalPart",  new CalculatorFunctions.FractionalPart());
         functions.put("Greater",         new CalculatorFunctions.Greater());
@@ -288,10 +288,28 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("pi == \u03c0"), "true");
     }
     
+    @Test private static void testBigIntegers() {
+        // Arithmetic tests (from http://www.isthe.com/chongo/tech/comp/calc/calc-whatis.html).
+        Assert.equals(new Calculator().evaluate("3 * 19^43 - 1"), "29075426613099201338473141505176993450849249622191102976");
+        Assert.equals(new Calculator().evaluate("Mod(2^23209-1, 2^127-1)"), "39614081257132168796771975167");
+        
+        // Check switches from fix to big.
+        Assert.equals(new Calculator().evaluate("Abs(-(0x8000)) == 0x8000"), "true");
+        Assert.equals(new Calculator().evaluate("Abs(-(0x8000000000000000)) == 0x8000000000000000"), "true");
+        Assert.equals(new Calculator().evaluate("-(0x8000000000000000) == -0x8000000000000000"), "true");
+        Assert.equals(new Calculator().evaluate("-1 * 0x8000000000000000 == -0x8000000000000000"), "true");
+        Assert.equals(new Calculator().evaluate("0x7fffffffffffffff + 1 == 0x8000000000000000"), "true");
+        Assert.equals(new Calculator().evaluate("(-(0x8000000000000000)) - 1 == -0x8000000000000001"), "true");
+        Assert.equals(new Calculator().evaluate("-1 * 0x8000000000000000 - 1 == -0x8000000000000001"), "true");
+        Assert.equals(new Calculator().evaluate("-(-(0x8000000000000000)) == 0x8000000000000000"), "true");
+        Assert.equals(new Calculator().evaluate("-1 * -1 * 0x8000000000000000 == 0x8000000000000000"), "true");
+        Assert.equals(new Calculator().evaluate("0x8000000000000000/-1 == -0x8000000000000000"), "true");
+    }
+    
     @Test private static void testFunctions() {
         // FIXME: better tests?
-        Assert.equals(new Calculator().evaluate("abs(2)"), "2");
-        Assert.equals(new Calculator().evaluate("abs(-2)"), "2");
+        Assert.equals(new Calculator().evaluate("Abs(2)"), "2");
+        Assert.equals(new Calculator().evaluate("Abs(-2)"), "2");
         Assert.equals(new Calculator().evaluate("acos(1)"), "0");
         Assert.equals(new Calculator().evaluate("asin(0)"), "0");
         Assert.equals(new Calculator().evaluate("acos(0) == asin(1)"), "true");
@@ -302,8 +320,6 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("cos(pi)"), "-1");
         Assert.equals(new Calculator().evaluate("cosh(0)"), "1");
         Assert.equals(Double.valueOf(new Calculator().evaluate("exp(1)/e")), 1.0, 0.000001);
-        Assert.equals(new Calculator().evaluate("factorial(5)"), "120");
-        Assert.equals(new Calculator().evaluate("factorial(5) == 5!"), "true");
         Assert.equals(new Calculator().evaluate("floor(1.2)"), "1");
         Assert.equals(new Calculator().evaluate("hypot(3, 4)"), "5");
         
@@ -328,6 +344,19 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("sqrt(81)"), "9");
         Assert.equals(new Calculator().evaluate("tan(0)"), "0");
         Assert.equals(new Calculator().evaluate("tanh(0)"), "0");
+    }
+    
+    @Test private static void testFactorial() {
+        Assert.equals(new Calculator().evaluate("Factorial(0)"), "1");
+        Assert.equals(new Calculator().evaluate("Factorial(1)"), "1");
+        Assert.equals(new Calculator().evaluate("Factorial(2)"), "2");
+        Assert.equals(new Calculator().evaluate("Factorial(3)"), "6");
+        Assert.equals(new Calculator().evaluate("Factorial(4)"), "24");
+        Assert.equals(new Calculator().evaluate("Factorial(5)"), "120");
+        
+        Assert.equals(new Calculator().evaluate("Factorial(170)"), "7257415615307998967396728211129263114716991681296451376543577798900561843401706157852350749242617459511490991237838520776666022565442753025328900773207510902400430280058295603966612599658257104398558294257568966313439612262571094946806711205568880457193340212661452800000000000000000000000000000000000000000");
+        
+        Assert.equals(new Calculator().evaluate("Factorial(5) == 5!"), "true");
     }
     
     @Test private static void testIntegerPartAndFractionalPart() {

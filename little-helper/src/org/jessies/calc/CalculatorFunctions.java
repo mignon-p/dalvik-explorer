@@ -60,11 +60,11 @@ public class CalculatorFunctions {
     
     public static class Abs extends CalculatorFunction {
         public Abs() {
-            super("abs", 1);
+            super("Abs", 1);
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return toNumber("abs", environment, args.get(0)).abs();
+            return toNumber("Abs", environment, args.get(0)).abs();
         }
     }
     
@@ -304,11 +304,11 @@ public class CalculatorFunctions {
     
     public static class Factorial extends CalculatorFunction {
         public Factorial() {
-            super("factorial", 1);
+            super("Factorial", 1);
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return toInteger("factorial", environment, args.get(0)).factorial();
+            return toInteger("Factorial", environment, args.get(0)).factorial();
         }
     }
     
@@ -531,7 +531,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return series(environment, args, IntegerNode.ONE, false);
+            return series(environment, args, IntegerNode.valueOf(1), false);
         }
     }
     
@@ -598,7 +598,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return series(environment, args, IntegerNode.ZERO, true);
+            return series(environment, args, IntegerNode.valueOf(0), true);
         }
     }
     

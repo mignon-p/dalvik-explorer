@@ -112,7 +112,7 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         if (decimalPoint != -1) {
             s = s.substring(0, decimalPoint);
         }
-        return new IntegerNode(new BigInteger(s));
+        return new IntegerNode(s, 10);
     }
     
     public RealNode log(RealNode base) {
