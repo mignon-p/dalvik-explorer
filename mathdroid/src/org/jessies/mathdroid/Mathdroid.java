@@ -222,7 +222,7 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         queryView.setText(existingText.substring(0, startOffset) + newText + existingText.substring(endOffset));
         // Put the caret back in the right place.
         int newCaretOffset;
-        if (newText.endsWith(")")) {
+        if (newText.length() > 1 && newText.endsWith(")")) {
             // For functions, we automatically insert both parentheses, so we need to move the caret back between them.
             newCaretOffset = startOffset + newText.length() - 1;
         } else {
