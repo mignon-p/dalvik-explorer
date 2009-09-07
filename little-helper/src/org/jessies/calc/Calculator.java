@@ -85,7 +85,7 @@ public class Calculator {
         functions.put("Greater",         new CalculatorFunctions.Greater());
         functions.put("hypot",           new CalculatorFunctions.Hypot());
         functions.put("IntegerPart",     new CalculatorFunctions.IntegerPart());
-        functions.put("is_prime",        new CalculatorFunctions.IsPrime());
+        functions.put("IsPrime",        new CalculatorFunctions.IsPrime());
         functions.put("LessEqual",       new CalculatorFunctions.LessEqual());
         functions.put("Less",            new CalculatorFunctions.Less());
         functions.put("log10",           new CalculatorFunctions.Log10());
@@ -325,14 +325,14 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("floor(1.2)"), "1.0");
         Assert.equals(new Calculator().evaluate("hypot(3, 4)"), "5.0");
         
-        Assert.equals(new Calculator().evaluate("is_prime(0)"), "false");
-        Assert.equals(new Calculator().evaluate("is_prime(1)"), "false");
-        Assert.equals(new Calculator().evaluate("is_prime(2)"), "true");
-        Assert.equals(new Calculator().evaluate("is_prime(3)"), "true");
-        Assert.equals(new Calculator().evaluate("is_prime(4)"), "false");
-        Assert.equals(new Calculator().evaluate("is_prime(5)"), "true");
-        Assert.equals(new Calculator().evaluate("is_prime(-4)"), "false");
-        Assert.equals(new Calculator().evaluate("is_prime(-5)"), "true");
+        Assert.equals(new Calculator().evaluate("IsPrime(0)"), "false");
+        Assert.equals(new Calculator().evaluate("IsPrime(1)"), "false");
+        Assert.equals(new Calculator().evaluate("IsPrime(2)"), "true");
+        Assert.equals(new Calculator().evaluate("IsPrime(3)"), "true");
+        Assert.equals(new Calculator().evaluate("IsPrime(4)"), "false");
+        Assert.equals(new Calculator().evaluate("IsPrime(5)"), "true");
+        Assert.equals(new Calculator().evaluate("IsPrime(-4)"), "false");
+        Assert.equals(new Calculator().evaluate("IsPrime(-5)"), "true");
         
         Assert.equals(new Calculator().evaluate("log(2, 1024)"), "10.0");
         Assert.equals(new Calculator().evaluate("log2(1024)"), "10.0");

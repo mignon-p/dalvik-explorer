@@ -374,11 +374,11 @@ public class CalculatorFunctions {
     
     public static class IsPrime extends CalculatorFunction {
         public IsPrime() {
-            super("is_prime", 1);
+            super("IsPrime", 1);
         }
         
         public Node apply(Calculator environment, List<Node> args) {
-            return toInteger("is_prime", environment, args.get(0)).isPrime();
+            return toInteger("IsPrime", environment, args.get(0)).isPrime();
         }
     }
     

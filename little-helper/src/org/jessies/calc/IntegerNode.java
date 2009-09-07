@@ -227,7 +227,7 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     
     public BooleanNode isPrime() {
         if (isBig() || fixnum > Integer.MAX_VALUE || fixnum <= Integer.MIN_VALUE) {
-            throw new CalculatorError("is_prime uses a naive algorithm unsuitable for huge numbers");
+            throw new CalculatorError("IsPrime uses a naive algorithm unsuitable for huge numbers");
         }
         
         // FIXME: replace the naive algorithm with something better.
