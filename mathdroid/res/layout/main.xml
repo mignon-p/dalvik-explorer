@@ -35,8 +35,8 @@
             <Button android:id="@+id/open"     android:text="("      style="@style/text_button_style" />
             <Button android:id="@+id/close"    android:text=")"      style="@style/text_button_style" />
             <Button android:id="@+id/pow"      android:text="^"      style="@style/text_button_style" />
-            <Button android:id="@+id/log10"    android:text="log10"  style="@style/text_button_style" />
-            <Button android:id="@+id/logE"     android:text="logE"   style="@style/text_button_style" />
+            <Button android:id="@+id/log10"    android:text="Log10"  style="@style/text_button_style" />
+            <Button android:id="@+id/logE"     android:text="LogE"   style="@style/text_button_style" />
         </LinearLayout>
 
     </LinearLayout>
@@ -55,7 +55,7 @@
             <Button android:id="@+id/x"        android:text="x"      style="@style/text_button_style" />
             <Button android:id="@+id/comma"    android:text=","      style="@style/text_button_style" />
             <Button android:id="@+id/sqrt"     android:text="\u221a" style="@style/text_button_style" />
-            <Button android:id="@+id/log"      android:text="log"    style="@style/text_button_style" />
+            <Button android:id="@+id/log"      android:text="Log"    style="@style/text_button_style" />
             <Button android:id="@+id/e"        android:text="e"      style="@style/text_button_style" />
         </LinearLayout>
 

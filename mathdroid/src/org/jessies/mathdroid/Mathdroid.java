@@ -12,12 +12,14 @@ import android.widget.*;
 import java.util.HashMap;
 import org.jessies.calc.Calculator;
 import org.jessies.calc.CalculatorError;
+import org.jessies.calc.CalculatorPlotData;
+import org.jessies.calc.CalculatorPlotter;
 import org.jessies.calc.UnitsConverter;
 
-public class Mathdroid extends Activity implements TextView.OnEditorActionListener, View.OnClickListener {
+public class Mathdroid extends Activity implements CalculatorPlotter, TextView.OnEditorActionListener, View.OnClickListener {
     private static final String TAG = "Mathdroid";
     
-    // Constants for the options menu items.
+    // Constants identifying the options menu items.
     private static final int OPTIONS_MENU_CLEAR = 0;
     private static final int OPTIONS_MENU_HELP  = 1;
     
@@ -25,13 +27,22 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     private static final int CONTEXT_MENU_COPY_LAST = 0;
     private static final int CONTEXT_MENU_COPY_ALL  = 1;
     
-    private final Calculator calculator = new Calculator();
+    // Constants identifying dialogs.
+    private static final int DIALOG_PLOT = 0;
+    
+    private Calculator calculator;
+    
+    private CalculatorPlotData plotData;
     
     private final HashMap<Integer, String> buttonMap = new HashMap<Integer, String>();
     
     // Called when the activity is first created.
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        calculator = new Calculator();
+        calculator.setPlotter(this);
+        
         setContentView(R.layout.main);
         
         final EditText queryView = (EditText) findViewById(R.id.q);
@@ -84,9 +95,9 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         buttonMap.put(R.id.dot,    ".");
         buttonMap.put(R.id.e,      "e");
         buttonMap.put(R.id.eng,    "E");
-        buttonMap.put(R.id.log10,  "log10()");
-        buttonMap.put(R.id.logE,   "logE()");
-        buttonMap.put(R.id.log,    "log()");
+        buttonMap.put(R.id.log10,  "Log10()");
+        buttonMap.put(R.id.logE,   "LogE()");
+        buttonMap.put(R.id.log,    "Log()");
         buttonMap.put(R.id.minus,  "-");
         buttonMap.put(R.id.open,   "(");
         buttonMap.put(R.id.pi,     "\u03c0");
@@ -117,6 +128,39 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         default:
             return super.onOptionsItemSelected(item);
         }
+    }
+    
+    @Override protected Dialog onCreateDialog(int id) {
+        switch (id) {
+        case DIALOG_PLOT:
+            return createPlotDialog();
+        default:
+            return null;
+        }
+    }
+    
+    @Override protected void onPrepareDialog(int id, Dialog dialog) {
+        switch (id) {
+        case DIALOG_PLOT:
+            final PlotView plotView = (PlotView) dialog.findViewById(R.id.plot);
+            plotView.preparePlot(calculator, plotData);
+            //plotData = null;
+            return;
+        default:
+            return;
+        }
+    }
+    
+    private Dialog createPlotDialog() {
+        final LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        final View layout = inflater.inflate(R.layout.plot, (ViewGroup) findViewById(R.id.plot));
+        
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(layout);
+        builder.setCancelable(true);
+        
+        final Dialog dialog = builder.create();
+        return dialog;
     }
     
     @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -355,6 +399,11 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
                 scrollToBottomOfTranscript();
             }
         });
+        
+        String serializedPlotData = state.getString("plotData", null);
+        if (serializedPlotData != null) {
+            plotData = CalculatorPlotData.fromString(serializedPlotData);
+        }
     }
     
     private void saveState() {
@@ -364,6 +413,7 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
         state.putInt("version", 2);
         state.putString("query", queryView.getText().toString());
         state.putString("transcript", transcriptView().getText().toString());
+        state.putString("plotData", (plotData != null) ? plotData.toString() : "");
         state.commit();
     }
     
@@ -373,5 +423,10 @@ public class Mathdroid extends Activity implements TextView.OnEditorActionListen
     
     private void showHelp() {
         startActivity(new Intent(this, MathdroidHelp.class));
+    }
+    
+    public void showPlot(CalculatorPlotData plotData) {
+        this.plotData = plotData;
+        showDialog(DIALOG_PLOT);
     }
 }
