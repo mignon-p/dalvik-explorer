@@ -206,16 +206,19 @@ public class CalculatorParser {
         } else if (lexer.token() == CalculatorToken.IDENTIFIER) {
             final String identifier = lexer.identifier();
             expect(CalculatorToken.IDENTIFIER);
-            Node result = calculator.getConstant(identifier);
-            if (result == null) {
+            if (lexer.token() == CalculatorToken.OPEN_PARENTHESIS) {
                 final CalculatorFunction fn = getFunction(identifier);
-                if (fn != null) {
-                    result = new CalculatorFunctionApplicationNode(fn, parseArgs());
-                } else {
+                if (fn == null) {
+                    throw new CalculatorError("undefined  function '" + identifier + "'");
+                }
+                return new CalculatorFunctionApplicationNode(fn, parseArgs());
+            } else {
+                Node result = calculator.getConstant(identifier);
+                if (result == null) {
                     result = new CalculatorVariableNode(identifier);
                 }
+                return result;
             }
-            return result;
         } else {
             throw new CalculatorError("unexpected " + quoteTokenForErrorMessage(lexer.token()));
         }
