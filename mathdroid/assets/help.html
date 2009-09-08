@@ -2,6 +2,8 @@
 <body>
 <h1>Mathdroid</h1>
 
+<h2>Overview</h2>
+
 <p>Mathdroid is an algebraic calculator that supports:
 
 <ul>
@@ -14,32 +16,54 @@
 <li>Relational operators (==, !=, &lt;, &lt;=, >, >=).
 <li>Shifts (&lt;&lt;, >>).
 <li>Assignment (=).
+<li>A wide range of mathematical functions (see below).
 </ul>
 
 <p>Usual operator precedence ("order of operations") is followed, and parentheses are supported.
 
 <p>Numbers can be given in decimal (123), binary (0b1011), octal (0o777), and hex (0xfffe).
 
-<p>The constants e (2.718...) and pi (3.14...) are predefined.
-
-<p>Multiplication and division can be represented with &times; and &divide; as well as * and /.
-
-<p>There are also all the usual built-in functions:
-
-<ul>
-<li>abs.
-<li>acos, asin, atan, atan2, cos, cosh, hypot, sin, sinh, sqrt, tan, tanh.
-<li>cbrt, sqrt.
-<li>ceiling, floor, round.
-<li>is_prime.
-<li>exp.
-<li>log(b, n), log10, log2, logE.
-<li>random.
-</ul>
+<p>The constants e (2.718...), pi (3.14...), true, and false are predefined.
 
 <p>The special variable Ans returns the result of the previous calculation.
 
+<h2>Built-in functions</h2>
+
+<p>There are also all the usual built-in functions. Here's an alphabetical list:
+
+<ul>
+<li>Abs, Acos, And (&amp;&amp;), Asin, Atan2, Atan.
+<li>BitAnd (&amp;), BitNot (~), BitOr (|), BitShiftLeft (&lt;&lt;), BitShiftRight (&gt;&gt;), BitXor.
+<li>Cbrt, Ceil (Ceiling), Cosh, Cos.
+<li>Define, Divide (/, &divide;).
+<li>Equal (==), Exp.
+<li>Factorial (!), Floor, FractionalPart.
+<li>GreaterEqual (&gt;=), Greater (&gt;).
+<li>Hypot.
+<li>IntegerPart, IsPrime.
+<li>LessEqual (&lt;=), Less (&lt;), Log10, Log2, LogE (Ln), Log.
+<li>Max, Min, Mod (%).
+<li>Not (!).
+<li>Or (||).
+<li>Plus (+), Power (^), Product.
+<li>Random (Rand), Round.
+<li>Sign, Sinh, Sin, Sqrt, Subtract, Sum.
+<li>Tanh, Tan, Times (*, &times;).
+<li>Unequal (!=).
+</ul>
+
+<p>Where a function has an operator form or alternate spelling, the alternatives are given in parentheses.
+For example, "BitShiftLeft(1, 32)" and "1 << 32" are equivalent, as are "Ceil(1.2)" and "Ceiling(1.2)".
+
+<p>Although the function names given above contain capital letters, "abs" is equivalent to "Abs", and "is_prime" is equivalent to "IsPrime".
+
+<p>All trigonometric functions use radians.
+
+<h2>Copy and paste</h2>
+
 <p>A long press on the history brings up a context menu that lets you "Copy last" or "Copy all" to the clipboard.
+
+<h2>Finding out more</h2>
 
 <p>Mathdroid is free software. You can find the source code or report bugs at <a href="http://code.google.com/p/enh/">http://code.google.com/p/enh/</a>.
 </body>
