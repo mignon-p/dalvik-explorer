@@ -195,6 +195,10 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         return new RealNode(value * ((RealNode) rhs).value);
     }
     
+    public double toDouble() {
+        return value;
+    }
+    
     public RealNode toReal() {
         return this;
     }

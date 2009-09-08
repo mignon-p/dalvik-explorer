@@ -30,6 +30,7 @@ public class Calculator {
     private final Map<String, CalculatorFunction> functions;
     private final Map<CalculatorToken, CalculatorFunction> operators;
     private final Map<String, Node> variables;
+    private CalculatorPlotter plotter;
     
     public Calculator() {
         this.constants = new HashMap<String, Node>();
@@ -39,6 +40,14 @@ public class Calculator {
         
         initBuiltInConstants();
         initBuiltInFunctions();
+    }
+    
+    public void setPlotter(CalculatorPlotter plotter) {
+        this.plotter = plotter;
+    }
+    
+    public CalculatorPlotter getPlotter() {
+        return plotter;
     }
     
     private void initBuiltInConstants() {
@@ -94,6 +103,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Mod(),            "Mod", "mod");
         addFunction(new CalculatorFunctions.Not(),            "Not", "not");
         addFunction(new CalculatorFunctions.Or(),             "Or", "or");
+        addFunction(new CalculatorFunctions.Plot(),           "Plot", "plot");
         addFunction(new CalculatorFunctions.Plus(),           "Plus", "plus");
         addFunction(new CalculatorFunctions.Power(),          "Power", "power");
         addFunction(new CalculatorFunctions.Product(),        "Product", "product", /* Unicode Greek capital letter pi */ "\u03a0", /* Unicode product sign */ "\u220f");

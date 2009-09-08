@@ -501,6 +501,70 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Plot extends CalculatorFunction {
+        public Plot() {
+            super("Plot", 4);
+        }
+        
+        public Node apply(Calculator environment, List<Node> args) {
+            CalculatorPlotter plotter = environment.getPlotter();
+            if (plotter == null) {
+                throw new CalculatorError("this system is not capable of plotting");
+            }
+            
+            // 0: expression
+            // 1: variable
+            // 2: xMin
+            // 3: xMax
+            // Example: plot(sin(x), x, 0, 2*pi)
+            // FIXME: automatic guesses? (trig => pi? differentiate to find minima? solve to find axis crossings?).
+            
+            final Node expression = args.get(0);
+            if (args.get(1) instanceof CalculatorVariableNode == false) {
+                throw new CalculatorError("expected a variable as the second argument to Plot");
+            }
+            final CalculatorVariableNode variable = (CalculatorVariableNode) args.get(1);
+            final RealNode xMin = toReal("Plot", environment, args.get(2));
+            final RealNode xMax = toReal("Plot", environment, args.get(3));
+            
+            final int pixelWidth = 300;
+            CalculatorPlotData plotData = new CalculatorPlotData(pixelWidth, xMin, xMax);
+            
+            try {
+                Node free = variable.evaluate(environment);
+                throw new CalculatorError("variable '" + variable.name() + "' is not free");
+            } catch (CalculatorError ex) {
+                // That's what we hoped...
+            }
+            final String variableName = variable.name();
+            try {
+                double x = plotData.xMin;
+                double xStep = plotData.xRange / pixelWidth;
+                for (int i = 0; i < pixelWidth; ++i) {
+                    try {
+                        environment.setVariable(variableName, new RealNode(x));
+                        double y = Double.parseDouble(expression.evaluate(environment).toString());
+                        if (Double.isInfinite(y)) {
+                            y = Double.NaN; // Infinity confuses the range calculations.
+                        }
+                        plotData.data[i] = y;
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        plotData.data[i] = Double.NaN;
+                    }
+                    x += xStep;
+                }
+            } finally {
+                environment.setVariable(variableName, null);
+            }
+            
+            plotData.calculateRange();
+            plotter.showPlot(plotData);
+            
+            return BooleanNode.TRUE; // FIXME: "void"?
+        }
+    }
+    
     public static class Plus extends CalculatorFunction {
         public Plus() {
             super("Plus", 2);
