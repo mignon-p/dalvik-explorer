@@ -25,7 +25,6 @@ import org.jessies.test.*;
 // FIXME: Mac OS' calculator offers -d variants of all the trig functions for degrees. that, or offer constants to multiply by to convert to degrees/radians?
 // FIXME: higher-order built-in functions like http://www.vitanuova.com/inferno/man/1/calc.html (sum, product, integral, differential, solve).
 // FIXME: integer division (//).
-// FIXME: logical not (prefix !).
 public class Calculator {
     private final Map<String, Node> constants;
     private final Map<String, CalculatorFunction> functions;
@@ -55,73 +54,61 @@ public class Calculator {
     }
     
     private void initBuiltInFunctions() {
-        // FIXME: acosh, asinh, atanh, chop, clip, sign(um)
-        functions.put("Abs",             new CalculatorFunctions.Abs());
-        functions.put("acos",            new CalculatorFunctions.Acos());
-        functions.put("And",             new CalculatorFunctions.And());
-        functions.put("asin",            new CalculatorFunctions.Asin());
-        functions.put("atan2",           new CalculatorFunctions.Atan2());
-        functions.put("atan",            new CalculatorFunctions.Atan());
-        functions.put("BitAnd",          new CalculatorFunctions.BitAnd());
-        functions.put("BitNot",          new CalculatorFunctions.BitNot());
-        functions.put("BitOr",           new CalculatorFunctions.BitOr());
-        functions.put("BitShiftLeft",    new CalculatorFunctions.BitShiftLeft());
-        functions.put("BitShiftRight",   new CalculatorFunctions.BitShiftRight());
-        functions.put("BitXor",          new CalculatorFunctions.BitXor());
-        functions.put("cbrt",            new CalculatorFunctions.Cbrt());
-        final CalculatorFunction ceiling = new CalculatorFunctions.Ceiling();
-        functions.put("ceil",            ceiling);
-        functions.put("ceiling",         ceiling);
-        functions.put("cosh",            new CalculatorFunctions.Cosh());
-        functions.put("cos",             new CalculatorFunctions.Cos());
-        functions.put("define",          new CalculatorFunctions.Define());
-        functions.put("Divide",          new CalculatorFunctions.Divide());
-        functions.put("Equal",           new CalculatorFunctions.Equal());
-        functions.put("exp",             new CalculatorFunctions.Exp());
-        functions.put("Factorial",       new CalculatorFunctions.Factorial());
-        functions.put("floor",           new CalculatorFunctions.Floor());
-        functions.put("FractionalPart",  new CalculatorFunctions.FractionalPart());
-        functions.put("GreaterEqual",    new CalculatorFunctions.GreaterEqual());
-        functions.put("Greater",         new CalculatorFunctions.Greater());
-        functions.put("hypot",           new CalculatorFunctions.Hypot());
-        functions.put("IntegerPart",     new CalculatorFunctions.IntegerPart());
-        functions.put("IsPrime",        new CalculatorFunctions.IsPrime());
-        functions.put("LessEqual",       new CalculatorFunctions.LessEqual());
-        functions.put("Less",            new CalculatorFunctions.Less());
-        functions.put("log10",           new CalculatorFunctions.Log10());
-        functions.put("log2",            new CalculatorFunctions.Log2());
-        functions.put("logE",            new CalculatorFunctions.LogE());
-        functions.put("log",             new CalculatorFunctions.Log());
-        functions.put("Max",             new CalculatorFunctions.Max());
-        functions.put("Min",             new CalculatorFunctions.Min());
-        functions.put("Mod",             new CalculatorFunctions.Mod());
-        functions.put("Not",             new CalculatorFunctions.Not());
-        functions.put("Or",              new CalculatorFunctions.Or());
-        functions.put("Plus",            new CalculatorFunctions.Plus());
-        functions.put("Power",           new CalculatorFunctions.Power());
-        final CalculatorFunction random = new CalculatorFunctions.Random();
-        functions.put("random",          random);
-        functions.put("rand",            random);
-        functions.put("round",           new CalculatorFunctions.Round());
-        functions.put("Sign",            new CalculatorFunctions.Sign());
-        functions.put("sinh",            new CalculatorFunctions.Sinh());
-        functions.put("sin",             new CalculatorFunctions.Sin());
-        functions.put("sqrt",            new CalculatorFunctions.Sqrt());
-        functions.put("Subtract",        new CalculatorFunctions.Subtract());
-        functions.put("tanh",            new CalculatorFunctions.Tanh());
-        functions.put("tan",             new CalculatorFunctions.Tan());
-        functions.put("Times",           new CalculatorFunctions.Times());
-        functions.put("Unequal",         new CalculatorFunctions.Unequal());
-        
-        final CalculatorFunction sum = new CalculatorFunctions.Sum();
-        functions.put("sum",             sum);
-        functions.put("\u03a3",          sum); // Unicode Greek capital letter sigma.
-        functions.put("\u2211",          sum); // Unicode summation sign.
-        
-        final CalculatorFunction product = new CalculatorFunctions.Product();
-        functions.put("product",         product);
-        functions.put("\u03a0",          product); // Unicode Greek capital letter pi.
-        functions.put("\u220f",          product); // Unicode product sign.
+        // FIXME: acosh, asinh, atanh, chop, clip.
+        addFunction(new CalculatorFunctions.Abs(),            "Abs", "abs");
+        addFunction(new CalculatorFunctions.Acos(),           "Acos", "acos");
+        addFunction(new CalculatorFunctions.And(),            "And", "and");
+        addFunction(new CalculatorFunctions.Asin(),           "Asin", "asin");
+        addFunction(new CalculatorFunctions.Atan2(),          "Atan2", "atan2");
+        addFunction(new CalculatorFunctions.Atan(),           "Atan", "atan");
+        addFunction(new CalculatorFunctions.BitAnd(),         "BitAnd", "bit_and");
+        addFunction(new CalculatorFunctions.BitNot(),         "BitNot", "bit_not");
+        addFunction(new CalculatorFunctions.BitOr(),          "BitOr", "bit_or");
+        addFunction(new CalculatorFunctions.BitShiftRight() , "BitShiftRight", "bit_shift_right");
+        addFunction(new CalculatorFunctions.BitShiftLeft(),   "BitShiftLeft", "bit_shift_left");
+        addFunction(new CalculatorFunctions.BitXor(),         "BitXor", "bit_xor");
+        addFunction(new CalculatorFunctions.Cbrt(),           "Cbrt", "cbrt");
+        addFunction(new CalculatorFunctions.Ceiling(),        "Ceiling", "Ceil", "ceiling", "ceil");
+        addFunction(new CalculatorFunctions.Cosh(),           "Cosh", "cosh");
+        addFunction(new CalculatorFunctions.Cos(),            "Cos", "cos");
+        addFunction(new CalculatorFunctions.Define(),         "Define", "define");
+        addFunction(new CalculatorFunctions.Divide(),         "Divide", "divide");
+        addFunction(new CalculatorFunctions.Equal(),          "Equal", "equal");
+        addFunction(new CalculatorFunctions.Exp(),            "Exp", "exp");
+        addFunction(new CalculatorFunctions.Factorial(),      "Factorial", "factorial");
+        addFunction(new CalculatorFunctions.Floor(),          "Floor", "floor");
+        addFunction(new CalculatorFunctions.FractionalPart(), "FractionalPart", "fractional_part");
+        addFunction(new CalculatorFunctions.GreaterEqual(),   "GreaterEqual", "greater_equal");
+        addFunction(new CalculatorFunctions.Greater(),        "Greater", "greater");
+        addFunction(new CalculatorFunctions.Hypot(),          "Hypot", "hypot");
+        addFunction(new CalculatorFunctions.IntegerPart(),    "IntegerPart", "integer_part");
+        addFunction(new CalculatorFunctions.IsPrime(),        "IsPrime", "is_prime");
+        addFunction(new CalculatorFunctions.LessEqual(),      "LessEqual", "less_equal");
+        addFunction(new CalculatorFunctions.Less(),           "Less", "less");
+        addFunction(new CalculatorFunctions.Log10(),          "Log10", "log10");
+        addFunction(new CalculatorFunctions.Log2(),           "Log2", "log2");
+        addFunction(new CalculatorFunctions.LogE(),           "LogE", "Ln", "ln");
+        addFunction(new CalculatorFunctions.Log(),            "Log", "log");
+        addFunction(new CalculatorFunctions.Max(),            "Max", "max");
+        addFunction(new CalculatorFunctions.Min(),            "Min", "min");
+        addFunction(new CalculatorFunctions.Mod(),            "Mod", "mod");
+        addFunction(new CalculatorFunctions.Not(),            "Not", "not");
+        addFunction(new CalculatorFunctions.Or(),             "Or", "or");
+        addFunction(new CalculatorFunctions.Plus(),           "Plus", "plus");
+        addFunction(new CalculatorFunctions.Power(),          "Power", "power");
+        addFunction(new CalculatorFunctions.Product(),        "Product", "product", /* Unicode Greek capital letter pi */ "\u03a0", /* Unicode product sign */ "\u220f");
+        addFunction(new CalculatorFunctions.Random(),         "Random", "random");
+        addFunction(new CalculatorFunctions.Round(),          "Round", "round");
+        addFunction(new CalculatorFunctions.Sign(),           "Sign", "sign");
+        addFunction(new CalculatorFunctions.Sinh(),           "Sinh", "sinh");
+        addFunction(new CalculatorFunctions.Sin(),            "Sin", "sin");
+        addFunction(new CalculatorFunctions.Sqrt(),           "Sqrt", "sqrt");
+        addFunction(new CalculatorFunctions.Sum(),            "Sum", "sum", /* Unicode Greek capital letter sigma */ "\u03a3", /* Unicode summation sign */ "\u2211");
+        addFunction(new CalculatorFunctions.Subtract(),       "Subtract", "subtract");
+        addFunction(new CalculatorFunctions.Tanh(),           "Tanh", "tanh");
+        addFunction(new CalculatorFunctions.Tan(),            "Tan", "tan");
+        addFunction(new CalculatorFunctions.Times(),          "Times", "times");
+        addFunction(new CalculatorFunctions.Unequal(),        "Unequal", "unequal");
         
         operators.put(CalculatorToken.B_AND, functions.get("BitAnd"));
         operators.put(CalculatorToken.B_NOT, functions.get("BitNot"));
@@ -142,6 +129,12 @@ public class Calculator {
         operators.put(CalculatorToken.POW,   functions.get("Power"));
         operators.put(CalculatorToken.SHL,   functions.get("BitShiftLeft"));
         operators.put(CalculatorToken.SHR,   functions.get("BitShiftRight"));
+    }
+    
+    private void addFunction(CalculatorFunction function, String... names) {
+        for (String name : names) {
+            functions.put(name, function);
+        }
     }
     
     public String evaluate(String stringExpression) throws CalculatorError {
@@ -312,18 +305,18 @@ public class Calculator {
         // FIXME: better tests?
         Assert.equals(new Calculator().evaluate("Abs(2)"), "2");
         Assert.equals(new Calculator().evaluate("Abs(-2)"), "2");
-        Assert.equals(new Calculator().evaluate("acos(1)"), "0.0");
-        Assert.equals(new Calculator().evaluate("asin(0)"), "0.0");
-        Assert.equals(new Calculator().evaluate("acos(0) == asin(1)"), "true");
-        Assert.equals(new Calculator().evaluate("atan(0)"), "0.0");
-        Assert.equals(new Calculator().evaluate("cbrt(27)"), "3.0");
-        Assert.equals(new Calculator().evaluate("ceil(1.2)"), "2.0");
-        Assert.equals(new Calculator().evaluate("cos(0)"), "1.0");
-        Assert.equals(new Calculator().evaluate("cos(pi)"), "-1.0");
-        Assert.equals(new Calculator().evaluate("cosh(0)"), "1.0");
-        Assert.equals(Double.valueOf(new Calculator().evaluate("exp(1)/e")), 1.0, 0.000001);
-        Assert.equals(new Calculator().evaluate("floor(1.2)"), "1.0");
-        Assert.equals(new Calculator().evaluate("hypot(3, 4)"), "5.0");
+        Assert.equals(new Calculator().evaluate("Acos(1)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Asin(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Acos(0) == Asin(1)"), "true");
+        Assert.equals(new Calculator().evaluate("Atan(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Cbrt(27)"), "3.0");
+        Assert.equals(new Calculator().evaluate("Ceil(1.2)"), "2.0");
+        Assert.equals(new Calculator().evaluate("Cos(0)"), "1.0");
+        Assert.equals(new Calculator().evaluate("Cos(pi)"), "-1.0");
+        Assert.equals(new Calculator().evaluate("Cosh(0)"), "1.0");
+        Assert.equals(Double.valueOf(new Calculator().evaluate("Exp(1)/e")), 1.0, 0.000001);
+        Assert.equals(new Calculator().evaluate("Floor(1.2)"), "1.0");
+        Assert.equals(new Calculator().evaluate("Hypot(3, 4)"), "5.0");
         
         Assert.equals(new Calculator().evaluate("IsPrime(0)"), "false");
         Assert.equals(new Calculator().evaluate("IsPrime(1)"), "false");
@@ -334,18 +327,18 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("IsPrime(-4)"), "false");
         Assert.equals(new Calculator().evaluate("IsPrime(-5)"), "true");
         
-        Assert.equals(new Calculator().evaluate("log(2, 1024)"), "10.0");
-        Assert.equals(new Calculator().evaluate("log2(1024)"), "10.0");
-        Assert.equals(new Calculator().evaluate("logE(exp(4))"), "4.0");
-        Assert.equals(new Calculator().evaluate("log10(1000)"), "3.0");
-        Assert.equals(new Calculator().evaluate("round(1.2)"), "1");
-        Assert.equals(new Calculator().evaluate("round(1.8)"), "2");
-        Assert.equals(new Calculator().evaluate("sin(0)"), "0.0");
-        Assert.equals(new Calculator().evaluate("sin(pi/2)"), "1.0");
-        Assert.equals(new Calculator().evaluate("sinh(0)"), "0.0");
-        Assert.equals(new Calculator().evaluate("sqrt(81)"), "9.0");
-        Assert.equals(new Calculator().evaluate("tan(0)"), "0.0");
-        Assert.equals(new Calculator().evaluate("tanh(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Log(2, 1024)"), "10.0");
+        Assert.equals(new Calculator().evaluate("Log2(1024)"), "10.0");
+        Assert.equals(new Calculator().evaluate("LogE(exp(4))"), "4.0");
+        Assert.equals(new Calculator().evaluate("Log10(1000)"), "3.0");
+        Assert.equals(new Calculator().evaluate("Round(1.2)"), "1");
+        Assert.equals(new Calculator().evaluate("Round(1.8)"), "2");
+        Assert.equals(new Calculator().evaluate("Sin(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Sin(pi/2)"), "1.0");
+        Assert.equals(new Calculator().evaluate("Sinh(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Sqrt(81)"), "9.0");
+        Assert.equals(new Calculator().evaluate("Tan(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Tanh(0)"), "0.0");
     }
     
     @Test private static void testFactorial() {
@@ -405,17 +398,17 @@ public class Calculator {
     }
     
     @Test private static void testSum() {
-        Assert.equals(new Calculator().evaluate("sum(0, 10, i)"), "55");
-        Assert.equals(new Calculator().evaluate("sum(0, 10.2, i)"), "55.0");
-        Assert.equals(new Calculator().evaluate("sum(0, 10, i^2)"), "385");
-        Assert.equals(Double.valueOf(new Calculator().evaluate("sum(0,30,1/i!)-e")), 0.0, 0.000001);
+        Assert.equals(new Calculator().evaluate("Sum(0, 10, i)"), "55");
+        Assert.equals(new Calculator().evaluate("Sum(0, 10.2, i)"), "55.0");
+        Assert.equals(new Calculator().evaluate("Sum(0, 10, i^2)"), "385");
+        Assert.equals(Double.valueOf(new Calculator().evaluate("Sum(0,30,1/i!)-e")), 0.0, 0.000001);
         // FIXME: failure test for min > max.
     }
     
     @Test private static void testProduct() {
-        Assert.equals(new Calculator().evaluate("product(1, 10, i)"), "3628800");
-        Assert.equals(new Calculator().evaluate("product(1, 10.2, i)"), "3628800.0");
-        Assert.equals(new Calculator().evaluate("product(1, 6, i^2)"), "518400");
+        Assert.equals(new Calculator().evaluate("Product(1, 10, i)"), "3628800");
+        Assert.equals(new Calculator().evaluate("Product(1, 10.2, i)"), "3628800.0");
+        Assert.equals(new Calculator().evaluate("Product(1, 6, i^2)"), "518400");
         // FIXME: failure test for min > max.
     }
     
