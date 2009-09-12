@@ -409,8 +409,8 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
             }
         });
         
-        final String serializedPlotData = state.getString("plotData", null);
-        if (serializedPlotData != null) {
+        final String serializedPlotData = state.getString("plotData", "");
+        if (serializedPlotData.length() > 0) {
             plotData = CalculatorPlotData.fromString(serializedPlotData);
         }
     }
