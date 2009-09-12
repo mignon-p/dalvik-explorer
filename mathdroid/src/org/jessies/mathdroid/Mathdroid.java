@@ -62,7 +62,14 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         
         registerForContextMenu(transcriptView());
         
-        loadState();
+        try {
+            loadState();
+        } catch (Exception ex) {
+            // This shouldn't happen, but two users have claimed that Mathdroid "force closes" on start.
+            // Something going wrong in loadState seems the least unlikely culprit.
+            // Without something like this, it's impossible to recover from bad state.
+            ex.printStackTrace();
+        }
     }
     
     private void initButtonClickListener(int id) {
@@ -378,10 +385,12 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         }
         
         final EditText queryView = (EditText) findViewById(R.id.q);
-        queryView.setText(state.getString("query", ""));
+        final String oldQuery = state.getString("query", "");
+        queryView.setText(oldQuery);
         
         final TextView transcriptView = transcriptView();
-        transcriptView.setText(state.getString("transcript", ""));
+        final String oldTranscript = state.getString("transcript", "");
+        transcriptView.setText(oldTranscript);
         
         // We usually style the text as it's appended, but we don't store that information.
         final Editable transcript = transcriptView().getEditableText();
@@ -400,7 +409,7 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
             }
         });
         
-        String serializedPlotData = state.getString("plotData", null);
+        final String serializedPlotData = state.getString("plotData", null);
         if (serializedPlotData != null) {
             plotData = CalculatorPlotData.fromString(serializedPlotData);
         }
