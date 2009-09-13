@@ -63,7 +63,7 @@ public class CalculatorFunctions {
             super("Abs", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toNumber("Abs", environment, args.get(0)).abs();
         }
     }
@@ -73,7 +73,7 @@ public class CalculatorFunctions {
             super("acos", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("acos", environment, args.get(0)).acos();
         }
     }
@@ -83,7 +83,7 @@ public class CalculatorFunctions {
             super("And", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toBoolean("And", environment, args.get(0)).and(toBoolean("And", environment, args.get(1)));
         }
     }
@@ -93,7 +93,7 @@ public class CalculatorFunctions {
             super("asin", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("asin", environment, args.get(0)).asin();
         }
     }
@@ -103,7 +103,7 @@ public class CalculatorFunctions {
             super("atan", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("atan", environment, args.get(0)).atan();
         }
     }
@@ -113,7 +113,7 @@ public class CalculatorFunctions {
             super("atan2", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("atan2", environment, args.get(0)).atan2(toReal("atan2", environment, args.get(1)));
         }
     }
@@ -123,7 +123,7 @@ public class CalculatorFunctions {
             super("BitAnd", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final IntegerNode lhs = toInteger("BitAnd", environment, args.get(0));
             final IntegerNode rhs = toInteger("BitAnd", environment, args.get(1));
             return lhs.bitAnd(rhs);
@@ -135,7 +135,7 @@ public class CalculatorFunctions {
             super("BitNot", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final IntegerNode lhs = toInteger("BitNot", environment, args.get(0));
             return lhs.bitNot();
         }
@@ -146,7 +146,7 @@ public class CalculatorFunctions {
             super("BitOr", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final IntegerNode lhs = toInteger("BitOr", environment, args.get(0));
             final IntegerNode rhs = toInteger("BitOr", environment, args.get(1));
             return lhs.bitOr(rhs);
@@ -158,7 +158,7 @@ public class CalculatorFunctions {
             super("BitShiftLeft", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final IntegerNode lhs = toInteger("BitShiftLeft", environment, args.get(0));
             final IntegerNode rhs = toInteger("BitShiftLeft", environment, args.get(1));
             return lhs.bitShiftLeft(rhs);
@@ -170,7 +170,7 @@ public class CalculatorFunctions {
             super("BitShiftRight", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final IntegerNode lhs = toInteger("BitShiftRight", environment, args.get(0));
             final IntegerNode rhs = toInteger("BitShiftRight", environment, args.get(1));
             return lhs.bitShiftRight(rhs);
@@ -182,7 +182,7 @@ public class CalculatorFunctions {
             super("BitXor", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final IntegerNode lhs = toInteger("BitXor", environment, args.get(0));
             final IntegerNode rhs = toInteger("BitXot", environment, args.get(1));
             return lhs.bitXor(rhs);
@@ -194,7 +194,7 @@ public class CalculatorFunctions {
             super("cbrt", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("cbrt", environment, args.get(0)).cbrt();
         }
     }
@@ -204,7 +204,7 @@ public class CalculatorFunctions {
             super("ceiling", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("ceiling", environment, args.get(0)).ceiling();
         }
     }
@@ -229,7 +229,7 @@ public class CalculatorFunctions {
             super("cos", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("cos", environment, args.get(0)).cos();
         }
     }
@@ -239,7 +239,7 @@ public class CalculatorFunctions {
             super("cosh", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("cosh", environment, args.get(0)).cosh();
         }
     }
@@ -249,7 +249,7 @@ public class CalculatorFunctions {
             super("define", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final Node lhs = args.get(0);
             final Node rhs = args.get(1);
             if (!(lhs instanceof CalculatorVariableNode)) {
@@ -267,7 +267,7 @@ public class CalculatorFunctions {
             super("Divide", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final NumberNode lhs = toNumber("Divide", environment, args.get(0));
             final NumberNode rhs = toNumber("Divide", environment, args.get(1));
             return lhs.divide(rhs);
@@ -279,7 +279,7 @@ public class CalculatorFunctions {
             super("Equal", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final Node lhs = args.get(0).evaluate(environment);
             final Node rhs = args.get(1).evaluate(environment);
             if (lhs instanceof BooleanNode && rhs instanceof BooleanNode) {
@@ -297,7 +297,7 @@ public class CalculatorFunctions {
             super("exp", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("exp", environment, args.get(0)).exp();
         }
     }
@@ -307,7 +307,7 @@ public class CalculatorFunctions {
             super("Factorial", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toInteger("Factorial", environment, args.get(0)).factorial();
         }
     }
@@ -317,7 +317,7 @@ public class CalculatorFunctions {
             super("floor", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("floor", environment, args.get(0)).floor();
         }
     }
@@ -327,7 +327,7 @@ public class CalculatorFunctions {
             super("FractionalPart", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toNumber("FractionalPart", environment, args.get(0)).fractionalPart();
         }
     }
@@ -337,7 +337,7 @@ public class CalculatorFunctions {
             super("Greater", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) > 0);
         }
     }
@@ -347,7 +347,7 @@ public class CalculatorFunctions {
             super("GreaterEqual", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) >= 0);
         }
     }
@@ -357,7 +357,7 @@ public class CalculatorFunctions {
             super("hypot", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("hypot", environment, args.get(0)).hypot(toReal("hypot", environment, args.get(1)));
         }
     }
@@ -367,7 +367,7 @@ public class CalculatorFunctions {
             super("IntegerPart", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toNumber("IntegerPart", environment, args.get(0)).integerPart();
         }
     }
@@ -377,7 +377,7 @@ public class CalculatorFunctions {
             super("IsPrime", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toInteger("IsPrime", environment, args.get(0)).isPrime();
         }
     }
@@ -387,7 +387,7 @@ public class CalculatorFunctions {
             super("Less", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) < 0);
         }
     }
@@ -397,7 +397,7 @@ public class CalculatorFunctions {
             super("LessEqual", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) <= 0);
         }
     }
@@ -408,7 +408,7 @@ public class CalculatorFunctions {
             super("log", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final RealNode base = toReal("log2", environment, args.get(0));
             final RealNode n = toReal("log2", environment, args.get(1));
             return n.log(base);
@@ -420,7 +420,7 @@ public class CalculatorFunctions {
             super("log2", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("log2", environment, args.get(0)).log2();
         }
     }
@@ -430,7 +430,7 @@ public class CalculatorFunctions {
             super("logE", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("logE", environment, args.get(0)).logE();
         }
     }
@@ -440,7 +440,7 @@ public class CalculatorFunctions {
             super("log10", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("log10", environment, args.get(0)).log10();
         }
     }
@@ -450,7 +450,7 @@ public class CalculatorFunctions {
             super("Max", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final NumberNode lhs = toNumber("Max", environment, args.get(0));
             final NumberNode rhs = toNumber("Max", environment, args.get(1));
             return cmp(lhs, rhs) >= 0 ? lhs : rhs;
@@ -462,7 +462,7 @@ public class CalculatorFunctions {
             super("Min", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final NumberNode lhs = toNumber("Min", environment, args.get(0));
             final NumberNode rhs = toNumber("Min", environment, args.get(1));
             return cmp(lhs, rhs) < 0 ? lhs : rhs;
@@ -474,7 +474,7 @@ public class CalculatorFunctions {
             super("Mod", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final IntegerNode lhs = toInteger("Mod", environment, args.get(0));
             final IntegerNode rhs = toInteger("Mod", environment, args.get(1));
             return lhs.mod(rhs);
@@ -486,7 +486,7 @@ public class CalculatorFunctions {
             super("Not", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toBoolean("Not", environment, args.get(0)).not();
         }
     }
@@ -496,7 +496,7 @@ public class CalculatorFunctions {
             super("Or", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toBoolean("Or", environment, args.get(0)).or(toBoolean("Or", environment, args.get(1)));
         }
     }
@@ -506,7 +506,7 @@ public class CalculatorFunctions {
             super("Plot", 4);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             CalculatorPlotter plotter = environment.getPlotter();
             if (plotter == null) {
                 throw new CalculatorError("this system is not capable of plotting");
@@ -570,7 +570,7 @@ public class CalculatorFunctions {
             super("Plus", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final NumberNode lhs = toNumber("Plus", environment, args.get(0));
             final NumberNode rhs = toNumber("Plus", environment, args.get(1));
             return lhs.plus(rhs);
@@ -582,7 +582,7 @@ public class CalculatorFunctions {
             super("power", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final NumberNode lhs = toNumber("power", environment, args.get(0));
             final NumberNode rhs = toNumber("power", environment, args.get(1));
             return lhs.power(rhs);
@@ -594,7 +594,7 @@ public class CalculatorFunctions {
             super("product", 3);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return series(environment, args, IntegerNode.valueOf(1), false);
         }
     }
@@ -604,7 +604,7 @@ public class CalculatorFunctions {
             super("random", 0);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return new RealNode(Math.random());
         }
     }
@@ -614,7 +614,7 @@ public class CalculatorFunctions {
             super("round", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("round", environment, args.get(0)).round();
         }
     }
@@ -661,7 +661,7 @@ public class CalculatorFunctions {
             super("Sign", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toNumber("Sign", environment, args.get(0)).sign();
         }
     }
@@ -671,7 +671,7 @@ public class CalculatorFunctions {
             super("sin", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("sin", environment, args.get(0)).sin();
         }
     }
@@ -681,7 +681,7 @@ public class CalculatorFunctions {
             super("sinh", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("sinh", environment, args.get(0)).sinh();
         }
     }
@@ -691,7 +691,7 @@ public class CalculatorFunctions {
             super("sqrt", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("sqrt", environment, args.get(0)).sqrt();
         }
     }
@@ -701,7 +701,7 @@ public class CalculatorFunctions {
             super("Subtract", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final NumberNode lhs = toNumber("Subtract", environment, args.get(0));
             final NumberNode rhs = toNumber("Subtract", environment, args.get(1));
             return lhs.subtract(rhs);
@@ -713,7 +713,7 @@ public class CalculatorFunctions {
             super("sum", 3);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return series(environment, args, IntegerNode.valueOf(0), true);
         }
     }
@@ -723,7 +723,7 @@ public class CalculatorFunctions {
             super("tan", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("tan", environment, args.get(0)).tan();
         }
     }
@@ -733,7 +733,7 @@ public class CalculatorFunctions {
             super("tanh", 1);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             return toReal("tanh", environment, args.get(0)).tanh();
         }
     }
@@ -743,7 +743,7 @@ public class CalculatorFunctions {
             super("Times", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final NumberNode lhs = toNumber("Times", environment, args.get(0));
             final NumberNode rhs = toNumber("Times", environment, args.get(1));
             return lhs.times(rhs);
@@ -755,7 +755,7 @@ public class CalculatorFunctions {
             super("Unequal", 2);
         }
         
-        public Node apply(Calculator environment, List<Node> args) {
+        public Node apply(Calculator environment) {
             final Node lhs = args.get(0).evaluate(environment);
             final Node rhs = args.get(1).evaluate(environment);
             if (lhs instanceof BooleanNode && rhs instanceof BooleanNode) {

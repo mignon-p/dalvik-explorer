@@ -46,7 +46,7 @@ public class CalculatorParser {
         Node result = parseOrExpression();
         if (lexer.token() == CalculatorToken.ASSIGN) {
             lexer.nextToken();
-            result = new CalculatorFunctionApplicationNode(getFunction("define"), Arrays.asList(result, parseOrExpression()));
+            result = getFunction("define").bind(Arrays.asList(result, parseOrExpression()));
         }
         return result;
         
@@ -58,7 +58,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.L_OR) {
             lexer.nextToken();
             // FIXME: make Or varargs.
-            result = new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.L_OR), Arrays.asList(result, parseAndExpression()));
+            result = getFunction(CalculatorToken.L_OR).bind(Arrays.asList(result, parseAndExpression()));
         }
         return result;
     }
@@ -69,7 +69,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.L_AND) {
             lexer.nextToken();
             // FIXME: make And varargs.
-            result = new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.L_AND), Arrays.asList(result, parseBitOrExpression()));
+            result = getFunction(CalculatorToken.L_AND).bind(Arrays.asList(result, parseBitOrExpression()));
         }
         return result;
     }
@@ -80,7 +80,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.B_OR) {
             lexer.nextToken();
             // FIXME: make BitOr varargs.
-            result = new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.B_OR), Arrays.asList(result, parseBitAndExpression()));
+            result = getFunction(CalculatorToken.B_OR).bind(Arrays.asList(result, parseBitAndExpression()));
         }
         return result;
     }
@@ -91,7 +91,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.B_AND) {
             lexer.nextToken();
             // FIXME: make BitAnd varargs.
-            result = new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.B_AND), Arrays.asList(result, parseNotExpression()));
+            result = getFunction(CalculatorToken.B_AND).bind(Arrays.asList(result, parseNotExpression()));
         }
         return result;
     }
@@ -100,7 +100,7 @@ public class CalculatorParser {
     private Node parseNotExpression() {
         if (lexer.token() == CalculatorToken.PLING) {
             lexer.nextToken();
-            return new CalculatorFunctionApplicationNode(getFunction("Not"), Collections.singletonList(parseNotExpression()));
+            return getFunction("Not").bind(Collections.singletonList(parseNotExpression()));
         } else {
             return parseRelationalExpression();
         }
@@ -112,7 +112,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.EQ || lexer.token() == CalculatorToken.GE || lexer.token() == CalculatorToken.GT || lexer.token() == CalculatorToken.LE || lexer.token() == CalculatorToken.LT || lexer.token() == CalculatorToken.NE) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = new CalculatorFunctionApplicationNode(function, Arrays.asList(result, parseShiftExpression()));
+            result = function.bind(Arrays.asList(result, parseShiftExpression()));
         }
         return result;
     }
@@ -123,7 +123,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.SHL || lexer.token() == CalculatorToken.SHR) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = new CalculatorFunctionApplicationNode(function, Arrays.asList(result, parseAdditiveExpression()));
+            result = function.bind(Arrays.asList(result, parseAdditiveExpression()));
         }
         return result;
     }
@@ -134,7 +134,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.PLUS || lexer.token() == CalculatorToken.MINUS) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = new CalculatorFunctionApplicationNode(function, Arrays.asList(result, parseMultiplicativeExpression()));
+            result = function.bind(Arrays.asList(result, parseMultiplicativeExpression()));
         }
         return result;
     }
@@ -145,7 +145,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.MUL || lexer.token() == CalculatorToken.DIV || lexer.token() == CalculatorToken.MOD) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = new CalculatorFunctionApplicationNode(function, Arrays.asList(result, parseUnaryExpression()));
+            result = function.bind(Arrays.asList(result, parseUnaryExpression()));
         }
         return result;
     }
@@ -155,10 +155,10 @@ public class CalculatorParser {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (-1*f) for simplicity.
-            return new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.MUL), Arrays.asList(IntegerNode.valueOf(-1), parseUnaryExpression()));
+            return getFunction(CalculatorToken.MUL).bind(Arrays.asList(IntegerNode.valueOf(-1), parseUnaryExpression()));
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
-            return new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.B_NOT), Collections.singletonList(parseUnaryExpression()));
+            return getFunction(CalculatorToken.B_NOT).bind(Collections.singletonList(parseUnaryExpression()));
         }
         return parseSqrtExpression();
     }
@@ -167,7 +167,7 @@ public class CalculatorParser {
     private Node parseSqrtExpression() {
         if (lexer.token() == CalculatorToken.SQRT) {
             lexer.nextToken();
-            return new CalculatorFunctionApplicationNode(getFunction("sqrt"), Collections.singletonList(parseSqrtExpression()));
+            return getFunction("sqrt").bind(Collections.singletonList(parseSqrtExpression()));
         } else {
             return parseExponentiationExpression();
         }
@@ -178,7 +178,7 @@ public class CalculatorParser {
         Node result = parseFactorialExpression();
         if (lexer.token() == CalculatorToken.POW) {
             lexer.nextToken();
-            result = new CalculatorFunctionApplicationNode(getFunction(CalculatorToken.POW), Arrays.asList(result, parseExponentiationExpression()));
+            result = getFunction(CalculatorToken.POW).bind(Arrays.asList(result, parseExponentiationExpression()));
         }
         return result;
     }
@@ -188,7 +188,7 @@ public class CalculatorParser {
         Node result = parseFactor();
         if (lexer.token() == CalculatorToken.PLING) {
             expect(CalculatorToken.PLING);
-            result = new CalculatorFunctionApplicationNode(getFunction("Factorial"), Collections.singletonList(result));
+            result = getFunction("Factorial").bind(Collections.singletonList(result));
         }
         return result;
     }
@@ -211,7 +211,7 @@ public class CalculatorParser {
                 if (fn == null) {
                     throw new CalculatorError("undefined  function '" + identifier + "'");
                 }
-                return new CalculatorFunctionApplicationNode(fn, parseArgs());
+                return fn.bind(parseArgs());
             } else {
                 Node result = calculator.getConstant(identifier);
                 if (result == null) {
