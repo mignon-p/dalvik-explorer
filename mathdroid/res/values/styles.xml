@@ -9,13 +9,19 @@
        <item name="android:layout_weight">1</item>
        <item name="android:focusable">true</item>
     </style>
-    
-    <style name="del_button_style" parent="number_button_style">
+
+    <style name="red_button_style" parent="number_button_style">
        <item name="android:background">@drawable/red_button</item>
+       <item name="android:textSize">16dp</item>
     </style>
 
     <style name="exe_button_style" parent="number_button_style">
        <item name="android:background">@drawable/blue_button</item>
+       <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="exp_button_style" parent="number_button_style">
+       <item name="android:textSize">16dp</item>
     </style>
 
     <style name="more_button_style" parent="number_button_style">

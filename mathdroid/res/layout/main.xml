@@ -70,8 +70,8 @@
             <Button android:id="@+id/digit7"   android:text="7"      style="@style/number_button_style" />
             <Button android:id="@+id/digit8"   android:text="8"      style="@style/number_button_style" />
             <Button android:id="@+id/digit9"   android:text="9"      style="@style/number_button_style" />
-            <ImageButton android:id="@+id/del" android:src="@drawable/sym_keyboard_delete"    style="@style/del_button_style" />
-            <Button android:id="@+id/clear"    android:text="AC"     style="@style/del_button_style" />
+            <Button android:id="@+id/del"      android:text="DEL"    style="@style/red_button_style" />
+            <Button android:id="@+id/clear"    android:text="AC"     style="@style/red_button_style" />
         </LinearLayout>
 
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
@@ -93,9 +93,9 @@
         <LinearLayout android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="0px">
             <Button android:id="@+id/digit0"   android:text="0"   style="@style/number_button_style" />
             <Button android:id="@+id/dot"      android:text="."   style="@style/number_button_style" />
-            <Button android:id="@+id/eng"      android:text="EXP" style="@style/number_button_style" />
+            <Button android:id="@+id/eng"      android:text="EXP" style="@style/exp_button_style" />
             <Button android:id="@+id/ans"      android:text="Ans" style="@style/text_button_style" />
-            <ImageButton android:id="@+id/exe" android:src="@drawable/sym_keyboard_return" style="@style/exe_button_style" />
+            <Button android:id="@+id/exe"      android:text="EXE" style="@style/exe_button_style" />
         </LinearLayout>
 
     </LinearLayout>
