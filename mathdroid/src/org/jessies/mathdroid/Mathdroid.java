@@ -2,6 +2,7 @@ package org.jessies.mathdroid;
 
 import android.app.*;
 import android.content.*;
+import android.content.res.*;
 import android.graphics.*;
 import android.os.Bundle;
 import android.text.*;
@@ -70,6 +71,15 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
             // Without something like this, it's impossible to recover from bad state.
             ex.printStackTrace();
         }
+        
+        onConfigurationChanged(getResources().getConfiguration());
+    }
+    
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        final boolean keyboardHidden = (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES);
+        final View onScreenKeyboard = findViewById(R.id.on_screen_keyboard);
+        onScreenKeyboard.setVisibility(keyboardHidden ? View.VISIBLE : View.GONE);
     }
     
     private void initButtonClickListener(int id) {
