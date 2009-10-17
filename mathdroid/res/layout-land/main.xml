@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="fill_parent" >
 
-<ScrollView android:id="@+id/transcript_scroll_view" android:fillViewport="true" android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="fill_parent" >
+    <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_weight="1" >
+        <include layout="@layout/text_area" />
+    </LinearLayout>
 
-  <TextView android:id="@+id/transcript"
-      android:bufferType="editable"
-      android:textSize="20dp"
-      android:layout_width="fill_parent" 
-      android:layout_height="fill_parent" 
-      />
-
-</ScrollView>
-
-<EditText android:id="@+id/q"
-    android:textSize="20dp"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:selectAllOnFocus="true"
-    />
+    <FrameLayout android:id="@+id/on_screen_keyboard" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_weight="0" >
+        <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" >
+            <include layout="@layout/button_area" />
+        </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

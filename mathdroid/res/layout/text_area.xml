@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ScrollView android:id="@+id/transcript_scroll_view" android:fillViewport="true" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1" >
+
+        <TextView android:id="@+id/transcript" android:bufferType="editable" android:textSize="20dp" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+
+    </ScrollView>
+
+    <EditText android:id="@+id/q" android:textSize="20dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:selectAllOnFocus="true" android:layout_weight="0" />
+
+</merge>
