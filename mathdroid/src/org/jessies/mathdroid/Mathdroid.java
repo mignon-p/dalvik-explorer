@@ -37,7 +37,7 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
     
     private final HashMap<Integer, String> buttonMap = new HashMap<Integer, String>();
     
-    // Called when the activity is first created.
+    // Called when the activity is first created or recreated.
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -66,17 +66,17 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         try {
             loadState();
         } catch (Exception ex) {
-            // This shouldn't happen, but two users have claimed that Mathdroid "force closes" on start.
-            // Something going wrong in loadState seems the least unlikely culprit.
-            // Without something like this, it's impossible to recover from bad state.
+            // Without code like this, it's impossible to recover from bad state: Mathdroid will just crash every time you start it.
             ex.printStackTrace();
         }
         
         onConfigurationChanged(getResources().getConfiguration());
     }
     
+    // Called when one of the "configChanges" declared in our manifest occurs.
     @Override public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        // Show our on-screen keyboard if there's no physical keyboard currently available, and hide it when there is.
         final boolean keyboardHidden = (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES);
         final View onScreenKeyboard = findViewById(R.id.on_screen_keyboard);
         onScreenKeyboard.setVisibility(keyboardHidden ? View.VISIBLE : View.GONE);
