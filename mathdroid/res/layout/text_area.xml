@@ -7,6 +7,6 @@
 
     </ScrollView>
 
-    <EditText android:id="@+id/q" android:textSize="20dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:selectAllOnFocus="true" android:layout_weight="0" />
+    <EditText android:id="@+id/q" android:textSize="20dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:selectAllOnFocus="true" android:layout_weight="0" android:nextFocusUp="@+id/q" />
 
 </merge>
