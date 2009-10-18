@@ -191,6 +191,8 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("1.E3"), "1000.0");
         Assert.equals(new Calculator().evaluate(".1E3"), "100.0");
         
+        Assert.equals(new Calculator().evaluate("1.2E3"), new Calculator().evaluate("1.2e3"));
+        
         Assert.equals(new Calculator().evaluate("1+2+3"), "6");
         Assert.equals(new Calculator().evaluate("1+-2"), "-1");
         Assert.equals(new Calculator().evaluate("3-2-1"), "0");

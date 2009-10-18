@@ -154,7 +154,7 @@ public class CalculatorLexer {
                     ch = reader.read();
                 }
                 
-                boolean engineering = (ch == 'E');
+                boolean engineering = (ch == 'E' || ch == 'e');
                 if (engineering && isReal) {
                     text.append('E');
                     ch = reader.read();
