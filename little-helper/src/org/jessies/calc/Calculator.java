@@ -65,11 +65,11 @@ public class Calculator {
     private void initBuiltInFunctions() {
         // FIXME: acosh, asinh, atanh, chop, clip.
         addFunction(new CalculatorFunctions.Abs(),            "Abs", "abs");
-        addFunction(new CalculatorFunctions.Acos(),           "Acos", "acos");
+        addFunction(new CalculatorFunctions.Acos(),           "Acos", "acos", "ArcCos", "arccos");
         addFunction(new CalculatorFunctions.And(),            "And", "and");
-        addFunction(new CalculatorFunctions.Asin(),           "Asin", "asin");
+        addFunction(new CalculatorFunctions.Asin(),           "Asin", "asin", "ArcSin", "arcsin");
         addFunction(new CalculatorFunctions.Atan2(),          "Atan2", "atan2");
-        addFunction(new CalculatorFunctions.Atan(),           "Atan", "atan");
+        addFunction(new CalculatorFunctions.Atan(),           "Atan", "atan", "ArcTan", "arctan");
         addFunction(new CalculatorFunctions.BitAnd(),         "BitAnd", "bit_and");
         addFunction(new CalculatorFunctions.BitNot(),         "BitNot", "bit_not");
         addFunction(new CalculatorFunctions.BitOr(),          "BitOr", "bit_or");
