@@ -107,7 +107,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Plus(),           "Plus", "plus");
         addFunction(new CalculatorFunctions.Power(),          "Power", "power");
         addFunction(new CalculatorFunctions.Product(),        "Product", "product", /* Unicode Greek capital letter pi */ "\u03a0", /* Unicode product sign */ "\u220f");
-        addFunction(new CalculatorFunctions.Random(),         "Random", "random");
+        addFunction(new CalculatorFunctions.Random(),         "Random", "random", "rand");
         addFunction(new CalculatorFunctions.Round(),          "Round", "round");
         addFunction(new CalculatorFunctions.Sign(),           "Sign", "sign");
         addFunction(new CalculatorFunctions.Sinh(),           "Sinh", "sinh");
