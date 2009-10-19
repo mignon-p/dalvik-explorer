@@ -362,6 +362,19 @@ public class CalculatorFunctions {
         }
     }
     
+    // Returns the number of decimal digits in the given integer.
+    public static class IntegerLength extends CalculatorFunction {
+        public IntegerLength() {
+            // FIXME: support IntegerLength(n, base) too!
+            super("IntegerLength", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode n = toInteger("IntegerLength", environment, args.get(0));
+            return IntegerNode.valueOf(n.abs().toString().length());
+        }
+    }
+    
     public static class IntegerPart extends CalculatorFunction {
         public IntegerPart() {
             super("IntegerPart", 1);

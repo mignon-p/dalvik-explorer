@@ -90,6 +90,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.GreaterEqual(),   "GreaterEqual", "greater_equal");
         addFunction(new CalculatorFunctions.Greater(),        "Greater", "greater");
         addFunction(new CalculatorFunctions.Hypot(),          "Hypot", "hypot");
+        addFunction(new CalculatorFunctions.IntegerLength(),  "IntegerLength", "integer_length");
         addFunction(new CalculatorFunctions.IntegerPart(),    "IntegerPart", "integer_part");
         addFunction(new CalculatorFunctions.IsPrime(),        "IsPrime", "is_prime");
         addFunction(new CalculatorFunctions.LessEqual(),      "LessEqual", "less_equal");
@@ -369,6 +370,13 @@ public class Calculator {
         
         Assert.equals(new Calculator().evaluate("3!"), "6");
         Assert.equals(new Calculator().evaluate("3!!"), "720");
+    }
+    
+    @Test private static void testIntegerLength() {
+        Assert.equals(new Calculator().evaluate("IntegerLength(1234)"), "4");
+        Assert.equals(new Calculator().evaluate("IntegerLength(100)"), "3");
+        Assert.equals(new Calculator().evaluate("IntegerLength(-100)"), "3");
+        Assert.equals(new Calculator().evaluate("IntegerLength(170!)"), "307");
     }
     
     @Test private static void testIntegerPartAndFractionalPart() {
