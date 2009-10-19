@@ -87,23 +87,13 @@ public class CalculatorParser {
     
     // &
     private Node parseBitAndExpression() {
-        Node result = parseNotExpression();
+        Node result = parseRelationalExpression();
         while (lexer.token() == CalculatorToken.B_AND) {
             lexer.nextToken();
             // FIXME: make BitAnd varargs.
-            result = getFunction(CalculatorToken.B_AND).bind(Arrays.asList(result, parseNotExpression()));
+            result = getFunction(CalculatorToken.B_AND).bind(Arrays.asList(result, parseRelationalExpression()));
         }
         return result;
-    }
-    
-    // !
-    private Node parseNotExpression() {
-        if (lexer.token() == CalculatorToken.PLING) {
-            lexer.nextToken();
-            return getFunction("Not").bind(Collections.singletonList(parseNotExpression()));
-        } else {
-            return parseRelationalExpression();
-        }
     }
     
     // == >= > <= < !=
@@ -141,26 +131,13 @@ public class CalculatorParser {
     
     // * / %
     private Node parseMultiplicativeExpression() {
-        Node result = parseUnaryExpression();
+        Node result = parseSqrtExpression();
         while (lexer.token() == CalculatorToken.MUL || lexer.token() == CalculatorToken.DIV || lexer.token() == CalculatorToken.MOD) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = function.bind(Arrays.asList(result, parseUnaryExpression()));
+            result = function.bind(Arrays.asList(result, parseSqrtExpression()));
         }
         return result;
-    }
-    
-    // ~ -
-    private Node parseUnaryExpression() {
-        if (lexer.token() == CalculatorToken.MINUS) {
-            lexer.nextToken();
-            // Convert (-f) to (-1*f) for simplicity.
-            return getFunction(CalculatorToken.MUL).bind(Arrays.asList(IntegerNode.valueOf(-1), parseUnaryExpression()));
-        } else if (lexer.token() == CalculatorToken.B_NOT) {
-            lexer.nextToken();
-            return getFunction(CalculatorToken.B_NOT).bind(Collections.singletonList(parseUnaryExpression()));
-        }
-        return parseSqrtExpression();
     }
     
     // sqrt
@@ -175,7 +152,7 @@ public class CalculatorParser {
     
     // ^
     private Node parseExponentiationExpression() {
-        Node result = parseFactorialExpression();
+        Node result = parseUnaryExpression();
         if (lexer.token() == CalculatorToken.POW) {
             lexer.nextToken();
             result = getFunction(CalculatorToken.POW).bind(Arrays.asList(result, parseExponentiationExpression()));
@@ -183,10 +160,25 @@ public class CalculatorParser {
         return result;
     }
     
-    // postfix-!
-    private Node parseFactorialExpression() {
+    // prefix -, prefix ~, prefix !, postfix !
+    private Node parseUnaryExpression() {
+        // Prefix unary operators...
+        if (lexer.token() == CalculatorToken.MINUS) {
+            lexer.nextToken();
+            // Convert (-f) to (-1*f) for simplicity.
+            return getFunction(CalculatorToken.MUL).bind(Arrays.asList(IntegerNode.valueOf(-1), parseUnaryExpression()));
+        } else if (lexer.token() == CalculatorToken.B_NOT) {
+            lexer.nextToken();
+            return getFunction(CalculatorToken.B_NOT).bind(Collections.singletonList(parseUnaryExpression()));
+        } else if (lexer.token() == CalculatorToken.PLING) {
+            lexer.nextToken();
+            return getFunction("Not").bind(Collections.singletonList(parseUnaryExpression()));
+        }
+        
         Node result = parseFactor();
-        if (lexer.token() == CalculatorToken.PLING) {
+        
+        // Postfix unary operators...
+        while (lexer.token() == CalculatorToken.PLING) {
             expect(CalculatorToken.PLING);
             result = getFunction("Factorial").bind(Collections.singletonList(result));
         }

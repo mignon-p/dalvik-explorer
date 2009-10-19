@@ -285,8 +285,10 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("2^3"), "8");
         Assert.equals(new Calculator().evaluate("2^3^4"), "2417851639229258349412352");
         Assert.equals(new Calculator().evaluate("4^0.5"), "2.0");
-        Assert.equals(new Calculator().evaluate("-10^2"), "-100");
+        Assert.equals(new Calculator().evaluate("-10^2"), "100");
         Assert.equals(new Calculator().evaluate("(-10)^2"), "100");
+        Assert.equals(new Calculator().evaluate("10^-2"), "0.01");
+        Assert.equals(new Calculator().evaluate("10^(-2)"), "0.01");
     }
     
     @Test private static void testConstants() {
@@ -364,6 +366,9 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("Factorial(170)"), "7257415615307998967396728211129263114716991681296451376543577798900561843401706157852350749242617459511490991237838520776666022565442753025328900773207510902400430280058295603966612599658257104398558294257568966313439612262571094946806711205568880457193340212661452800000000000000000000000000000000000000000");
         
         Assert.equals(new Calculator().evaluate("Factorial(5) == 5!"), "true");
+        
+        Assert.equals(new Calculator().evaluate("3!"), "6");
+        Assert.equals(new Calculator().evaluate("3!!"), "720");
     }
     
     @Test private static void testIntegerPartAndFractionalPart() {
