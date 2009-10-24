@@ -29,6 +29,7 @@ public class Calculator {
     private final Map<String, CalculatorFunction> functions;
     private final Map<CalculatorToken, CalculatorFunction> operators;
     private final Map<String, Variable> variables;
+    private final Variable ans;
     private CalculatorPlotter plotter;
     
     // Variable names are case-insensitive but case-preserving.
@@ -37,14 +38,14 @@ public class Calculator {
     static class Variable {
         String name;
         Node value;
-        boolean isConstant;
+        boolean isAssignable = true;
     }
     
     public Calculator() {
         this.functions = new HashMap<String, CalculatorFunction>();
         this.operators = new EnumMap<CalculatorToken, CalculatorFunction>(CalculatorToken.class);
         this.variables = new HashMap<String, Variable>();
-        
+        this.ans = initAns();
         initBuiltInConstants();
         initBuiltInFunctions();
     }
@@ -55,6 +56,15 @@ public class Calculator {
     
     public CalculatorPlotter getPlotter() {
         return plotter;
+    }
+    
+    private Variable initAns() {
+        final Variable result = new Variable();
+        result.name = "Ans";
+        result.value = null;
+        result.isAssignable = false;
+        variables.put(result.name.toLowerCase(), result);
+        return result;
     }
     
     private void initBuiltInConstants() {
@@ -73,7 +83,7 @@ public class Calculator {
         final Variable constant = new Variable();
         constant.name = name;
         constant.value = value;
-        constant.isConstant = true;
+        constant.isAssignable = false;
         final String key = name.toLowerCase();
         variables.put(key, constant);
     }
@@ -169,7 +179,7 @@ public class Calculator {
         final Node expression = parser.parse();
         //System.err.println(tree);
         final Node result = expression.evaluate(this);
-        setVariable("Ans", result);
+        ans.value = result;
         return result.toString();
     }
     
@@ -193,8 +203,12 @@ public class Calculator {
             v = new Variable();
             v.name = name;
             variables.put(key, v);
-        } else  if (v.isConstant) {
-            throw new CalculatorError("can't assign a new value to the constant " + v.name);
+        } else  if (!v.isAssignable) {
+            if (v.name.equals("Ans")) {
+                throw new CalculatorError("can't assign a new value to Ans");
+            } else {
+                throw new CalculatorError("can't assign a new value to the constant " + v.name);
+            }
         }
         v.value = newValue;
     }
@@ -472,6 +486,12 @@ public class Calculator {
         Assert.equals(calculator.evaluate("1+Ans"), "2");
         Assert.equals(calculator.evaluate("Ans*2"), "4");
         Assert.equals(calculator.evaluate("ans*2"), "8"); // Tests case-insensitivity.
+        try {
+            new Calculator().evaluate("ans = 3");
+            Assert.failure("no exception was thrown when assigning to Ans");
+        } catch (CalculatorError ex) {
+            Assert.equals(ex.getMessage(), "can't assign a new value to Ans");
+        }
     }
     
     @Test private static void testVariables() {
