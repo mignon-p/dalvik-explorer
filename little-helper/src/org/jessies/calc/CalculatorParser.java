@@ -205,11 +205,7 @@ public class CalculatorParser {
                 }
                 return fn.bind(parseArgs());
             } else {
-                Node result = calculator.getConstant(identifier);
-                if (result == null) {
-                    result = new CalculatorVariableNode(identifier);
-                }
-                return result;
+                return new CalculatorVariableNode(identifier);
             }
         } else {
             throw new CalculatorError("unexpected " + quoteTokenForErrorMessage(lexer.token()));

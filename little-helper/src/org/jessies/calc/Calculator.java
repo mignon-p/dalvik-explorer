@@ -26,17 +26,24 @@ import org.jessies.test.*;
 // FIXME: higher-order built-in functions like http://www.vitanuova.com/inferno/man/1/calc.html (sum, product, integral, differential, solve).
 // FIXME: integer division (//).
 public class Calculator {
-    private final Map<String, Node> constants;
     private final Map<String, CalculatorFunction> functions;
     private final Map<CalculatorToken, CalculatorFunction> operators;
-    private final Map<String, Node> variables;
+    private final Map<String, Variable> variables;
     private CalculatorPlotter plotter;
     
+    // Variable names are case-insensitive but case-preserving.
+    // We implement case-insensitivity by using name.toLowerCase() as the key.
+    // We preserve case by using a pair of the first-encountered name and the variable's value as the map's value type.
+    static class Variable {
+        String name;
+        Node value;
+        boolean isConstant;
+    }
+    
     public Calculator() {
-        this.constants = new HashMap<String, Node>();
         this.functions = new HashMap<String, CalculatorFunction>();
         this.operators = new EnumMap<CalculatorToken, CalculatorFunction>(CalculatorToken.class);
-        this.variables = new HashMap<String, Node>();
+        this.variables = new HashMap<String, Variable>();
         
         initBuiltInConstants();
         initBuiltInFunctions();
@@ -52,14 +59,23 @@ public class Calculator {
     
     private void initBuiltInConstants() {
         // FIXME: use higher-precision string forms?
-        constants.put("e", new RealNode(Math.E));
+        initConstant("e", new RealNode(Math.E));
         
         final Node pi = new RealNode(Math.PI);
-        constants.put("pi", pi);
-        constants.put("\u03c0", pi);
+        initConstant("pi", pi);
+        initConstant("\u03c0", pi);
         
-        constants.put("false", BooleanNode.FALSE);
-        constants.put("true", BooleanNode.TRUE);
+        initConstant("false", BooleanNode.FALSE);
+        initConstant("true", BooleanNode.TRUE);
+    }
+    
+    private void initConstant(String name, Node value) {
+        final Variable constant = new Variable();
+        constant.name = name;
+        constant.value = value;
+        constant.isConstant = true;
+        final String key = name.toLowerCase();
+        variables.put(key, constant);
     }
     
     private void initBuiltInFunctions() {
@@ -157,10 +173,6 @@ public class Calculator {
         return result.toString();
     }
     
-    public Node getConstant(String name) {
-        return constants.get(name);
-    }
-    
     public CalculatorFunction getFunction(String name) {
         return functions.get(name);
     }
@@ -170,11 +182,21 @@ public class Calculator {
     }
     
     public Node getVariable(String name) {
-        return variables.get(name);
+        final Variable v = variables.get(name.toLowerCase());
+        return (v != null) ? v.value : null;
     }
     
     public void setVariable(String name, Node newValue) {
-        variables.put(name, newValue);
+        final String key = name.toLowerCase();
+        Variable v = variables.get(key);
+        if (v == null) {
+            v = new Variable();
+            v.name = name;
+            variables.put(key, v);
+        } else  if (v.isConstant) {
+            throw new CalculatorError("can't assign a new value to the constant " + v.name);
+        }
+        v.value = newValue;
     }
     
     @Test private static void testArithmetic() {
@@ -296,6 +318,12 @@ public class Calculator {
         Assert.equals(Double.valueOf(new Calculator().evaluate("e")), Math.E, 0.000001);
         Assert.equals(Double.valueOf(new Calculator().evaluate("pi")), Math.PI, 0.000001);
         Assert.equals(new Calculator().evaluate("pi == \u03c0"), "true");
+        try {
+            new Calculator().evaluate("pi = 3");
+            Assert.failure("no exception was thrown when assigning to a constant!");
+        } catch (CalculatorError ex) {
+            Assert.equals(ex.getMessage(), "can't assign a new value to the constant pi");
+        }
     }
     
     @Test private static void testBigIntegers() {
@@ -443,6 +471,7 @@ public class Calculator {
         Assert.equals(calculator.evaluate("1+Ans"), "1");
         Assert.equals(calculator.evaluate("1+Ans"), "2");
         Assert.equals(calculator.evaluate("Ans*2"), "4");
+        Assert.equals(calculator.evaluate("ans*2"), "8"); // Tests case-insensitivity.
     }
     
     @Test private static void testVariables() {
