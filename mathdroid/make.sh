@@ -2,6 +2,7 @@
 
 ASDK_ROOT=~/Downloads/android-sdk-linux_x86-1.6_r1
 ASDK_PLATFORM_ROOT=${ASDK_ROOT}/platforms/android-1.6
+JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
 
 
@@ -12,9 +13,9 @@ APKBUILDER=${ASDK_ROOT}/tools/apkbuilder
 DX=${ASDK_PLATFORM_ROOT}/tools/dx
 ZIPALIGN=${ASDK_ROOT}/tools/zipalign
 
-# Various JDK tools. We take whatever you've got on your path.
-JAVAC=javac
-JARSIGNER=jarsigner
+# Various JDK tools.
+JAVAC=${JAVA_ROOT}/javac
+JARSIGNER=${JAVA_ROOT}/jarsigner
 
 # The Android class library.
 ANDROID_JAR=${ASDK_PLATFORM_ROOT}/android.jar
@@ -42,14 +43,21 @@ JAVAC_FLAGS="${JAVAC_FLAGS} -source 1.5"
 JAVAC_FLAGS="${JAVAC_FLAGS} -encoding UTF-8"
 
 
+function usage() {
+    echo "usage: $0 [clean|debug|release]" > /dev/stderr
+    exit 1
+}
+
 # What does the user want us to do?
 if [ $# -eq "0" ]; then
     target=debug
 elif [ $# -eq "1" ]; then
     target=$1
+    if [[ "$target" != "clean" && "$target" != "debug" && "$target" != "release" ]]; then
+        usage
+    fi
 else
-    echo "usage: $0 [clean|debug|release]" >2
-    exit 1
+    usage
 fi
 
 # "clean" is easy, and unrelated to "debug" and "release"...
