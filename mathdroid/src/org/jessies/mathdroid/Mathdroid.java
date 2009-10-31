@@ -10,14 +10,14 @@ import android.text.style.*;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
-import java.util.HashMap;
+import java.util.*;
 import org.jessies.calc.Calculator;
 import org.jessies.calc.CalculatorError;
 import org.jessies.calc.CalculatorPlotData;
 import org.jessies.calc.CalculatorPlotter;
 import org.jessies.calc.UnitsConverter;
 
-public class Mathdroid extends Activity implements CalculatorPlotter, TextView.OnEditorActionListener, View.OnClickListener {
+public class Mathdroid extends Activity implements AdapterView.OnItemClickListener, CalculatorPlotter, TextView.OnEditorActionListener, View.OnClickListener {
     private static final String TAG = "Mathdroid";
     
     // Constants identifying the options menu items.
@@ -25,7 +25,7 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
     private static final int OPTIONS_MENU_HELP  = 1;
     
     // Constants for the transcript context menu items.
-    private static final int CONTEXT_MENU_COPY_LAST = 0;
+    private static final int CONTEXT_MENU_COPY_SELECTED = 0;
     private static final int CONTEXT_MENU_COPY_ALL  = 1;
     
     // Constants identifying dialogs.
@@ -36,6 +36,8 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
     private CalculatorPlotData plotData;
     
     private final HashMap<Integer, String> buttonMap = new HashMap<Integer, String>();
+    
+    private HistoryAdapter history;
     
     // Called when the activity is first created or recreated.
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -48,20 +50,28 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         
         final EditText queryView = (EditText) findViewById(R.id.q);
         queryView.setOnEditorActionListener(this);
+        queryView.requestFocus();
         
         initButtonMap();
         
         initButtonClickListener(R.id.clear);
         initButtonClickListener(R.id.del);
         initButtonClickListener(R.id.exe);
+        initButtonClickListener(R.id.left);
         initButtonClickListener(R.id.less);
         initButtonClickListener(R.id.more);
+        initButtonClickListener(R.id.right);
         
         for (int id : buttonMap.keySet()) {
             initButtonClickListener(id);
         }
         
-        registerForContextMenu(transcriptView());
+        this.history = new HistoryAdapter(this);
+        
+        ListView transcriptView = transcriptView();
+        registerForContextMenu(transcriptView);
+        transcriptView.setAdapter(history);
+        transcriptView.setOnItemClickListener(this);
         
         try {
             loadState();
@@ -95,6 +105,7 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         buttonMap.put(R.id.ans,    "Ans");
         buttonMap.put(R.id.asin,   "asin()");
         buttonMap.put(R.id.atan,   "atan()");
+        buttonMap.put(R.id.ceil,   "ceil()");
         buttonMap.put(R.id.close,  ")");
         buttonMap.put(R.id.comma,  ",");
         buttonMap.put(R.id.cos,    "cos()");
@@ -112,15 +123,16 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         buttonMap.put(R.id.dot,    ".");
         buttonMap.put(R.id.e,      "e");
         buttonMap.put(R.id.eng,    "E");
+        buttonMap.put(R.id.floor,  "floor()");
         buttonMap.put(R.id.log10,  "Log10()");
         buttonMap.put(R.id.logE,   "LogE()");
-        buttonMap.put(R.id.log,    "Log()");
         buttonMap.put(R.id.minus,  "-");
         buttonMap.put(R.id.open,   "(");
         buttonMap.put(R.id.pi,     "\u03c0");
         buttonMap.put(R.id.pling,  "!");
         buttonMap.put(R.id.plus,   "+");
         buttonMap.put(R.id.pow,    "^");
+        buttonMap.put(R.id.rand,   "rand()");
         buttonMap.put(R.id.sin,    "sin()");
         buttonMap.put(R.id.sqrt,   "\u221a");
         buttonMap.put(R.id.tan,    "tan()");
@@ -180,60 +192,54 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         return dialog;
     }
     
+    private String selectedHistoryItemText(ContextMenu.ContextMenuInfo menuInfo) {
+        String text = null;
+        if (menuInfo instanceof AdapterView.AdapterContextMenuInfo) {
+            final int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
+            final HistoryItem historyItem = (HistoryItem) history.getItem(position);
+            text = historyItem.question + " = " + historyItem.answer;
+        }
+        return text;
+    }
+    
     @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (transcriptView().length() == 0) {
+        if (history.getCount() == 0) {
             // If there's no transcript, there's nothing to copy, so no reason to show a menu.
             return;
         }
         
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("History");
-        menu.add(0, CONTEXT_MENU_COPY_LAST, 0, "Copy last");
+        final String selectedItem = selectedHistoryItemText(menuInfo);
+        if (selectedItem != null) {
+            menu.add(0, CONTEXT_MENU_COPY_SELECTED, 0, "Copy '" + selectedItem + "'");
+        }
         menu.add(0, CONTEXT_MENU_COPY_ALL,  0, "Copy all");
     }
     
     public boolean onContextItemSelected(MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
-        case CONTEXT_MENU_COPY_LAST:
+        case CONTEXT_MENU_COPY_SELECTED:
+            return copyToClipboard(selectedHistoryItemText(item.getMenuInfo()));
         case CONTEXT_MENU_COPY_ALL:
-            return copyHistoryToClipboard(id);
+            return copyToClipboard(history.toString());
         default:
             return super.onContextItemSelected(item);
         }
     }
     
-    private boolean copyHistoryToClipboard(int id) {
+    private boolean copyToClipboard(String text) {
         final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        // We work directly on the text history.
-        // This would all be simpler if we kept some kind of structured history.
-        final Editable transcript = transcriptView().getEditableText();
-        int start = 0;
-        int end = transcript.length();
-        
-        if (end == 0) {
-            
-        }
-        
-        if (id == CONTEXT_MENU_COPY_LAST) {
-            // Output is of the form:
-            // "sin(pi/2)\n"
-            // " = 1" // No trailing newline until the next history entry appears!
-            // So we need to go back two newlines...
-            start = TextUtils.lastIndexOf(transcript, '\n', end);
-            if (start == -1) {
-                return true;
-            }
-            start = TextUtils.lastIndexOf(transcript, '\n', start - 1);
-            if (start == -1) {
-                start = 0; // This is the first entry, so there's no newline before it.
-            } else {
-                // We don't actually want to copy the newline.
-                ++start;
-            }
-        }
-        clipboard.setText(transcript.subSequence(start, end));
+        clipboard.setText(text);
         return true;
+    }
+    
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final EditText queryView = (EditText) findViewById(R.id.q);
+        final HistoryItem historyItem = (HistoryItem) history.getItem(position);
+        queryView.setText(historyItem.question);
+        queryView.setSelection(queryView.length());
     }
     
     @Override protected void onPause() {
@@ -245,8 +251,16 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         final EditText queryView = (EditText) findViewById(R.id.q);
         final int id = view.getId();
         switch (id) {
+        case R.id.transcript:
+            break;
         case R.id.clear:
             clear(queryView);
+            break;
+        case R.id.left:
+            moveCaret(queryView, -1);
+            break;
+        case R.id.right:
+            moveCaret(queryView, 1);
             break;
         case R.id.del:
             del(queryView);
@@ -294,7 +308,7 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
     
     private void clear(EditText queryView) {
         queryView.setText("");
-        transcriptView().setText("");
+        history.clear();
     }
     
     private void del(EditText queryView) {
@@ -315,43 +329,23 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         queryView.setSelection(startOffset, startOffset);
     }
     
+    private void moveCaret(EditText queryView, int delta) {
+        int offset = (delta > 0) ? queryView.getSelectionEnd() : queryView.getSelectionStart();
+        offset += delta;
+        offset = Math.max(Math.min(offset, queryView.length()), 0);
+        queryView.setSelection(offset);
+    }
+    
     private void exe(EditText queryView) {
         final String queryText = queryView.getText().toString().trim();
         if (queryText.length() == 0) {
-            // FIXME: report an error?
+            // Nothing to do. Finger flub.
             return;
         }
+        // Select the input to make it easy to replace while allowing the possibility of further editing.
         queryView.selectAll();
-        
-        final String answerText = computeAnswer(queryText);
-        final Editable transcript = transcriptView().getEditableText();
-        if (transcript.length() > 0) {
-            // We add the newline between question/answer pairs when we add the next pair, so we don't waste space on a blank line.
-            transcript.append("\n");
-        }
-        final int inputStart = transcript.length();
-        transcript.append(queryText);
-        final int inputEnd = transcript.length();
-        transcript.append("\n");
-        transcript.append(" = ");
-        transcript.append(answerText);
-        highlightInput(transcript, inputStart, inputEnd);
-        
-        scrollToBottomOfTranscript();
-    }
-    
-    private void highlightInput(Spannable text, int start, int end) {
-        text.setSpan(new ForegroundColorSpan(0xffcdaa7d), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        text.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-    }
-    
-    private void scrollToBottomOfTranscript() {
-        final TextView transcriptView = transcriptView();
-        final android.graphics.Rect bounds = new android.graphics.Rect();
-        final int y = transcriptView.getLineBounds(transcriptView.getLineCount() - 1, bounds);
-        
-        final ScrollView transcriptScrollView = (ScrollView) findViewById(R.id.transcript_scroll_view);
-        transcriptScrollView.smoothScrollTo(0, bounds.bottom);
+        // Adding to the history automatically updates the display.
+        history.add(new HistoryItem(queryText, computeAnswer(queryText)));
     }
     
     private String computeAnswer(String query) {
@@ -389,7 +383,7 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
     private void loadState() {
         final SharedPreferences state = getPreferences(MODE_PRIVATE);
         final int version = state.getInt("version", 0);
-        if (version != 2) {
+        if (version != 3) {
             // We've never been run before, or the last run was an incompatible version.
             return;
         }
@@ -398,26 +392,8 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
         final String oldQuery = state.getString("query", "");
         queryView.setText(oldQuery);
         
-        final TextView transcriptView = transcriptView();
-        final String oldTranscript = state.getString("transcript", "");
-        transcriptView.setText(oldTranscript);
-        
-        // We usually style the text as it's appended, but we don't store that information.
-        final Editable transcript = transcriptView().getEditableText();
-        int start = 0;
-        int end;
-        while (start != -1 && (end = TextUtils.indexOf(transcript, "\n =", start)) != -1) {
-            highlightInput(transcript, start, end);
-            start = TextUtils.indexOf(transcript, "\n", end + 1);
-        }
-        
-        // We can't scroll to the bottom of the transcript until the text has been laid out.
-        // This method runs *before* we're visible, so we need to wait.
-        transcriptView.post(new Runnable() {
-            public void run() {
-                scrollToBottomOfTranscript();
-            }
-        });
+        final String serializedHistory = state.getString("transcript", "");
+        history.fromString(serializedHistory);
         
         final String serializedPlotData = state.getString("plotData", "");
         if (serializedPlotData.length() > 0) {
@@ -426,18 +402,20 @@ public class Mathdroid extends Activity implements CalculatorPlotter, TextView.O
     }
     
     private void saveState() {
+        final String serializedHistory = history.toString();
+        
         final EditText queryView = (EditText) findViewById(R.id.q);
         
         final SharedPreferences.Editor state = getPreferences(MODE_PRIVATE).edit();
-        state.putInt("version", 2);
+        state.putInt("version", 3);
         state.putString("query", queryView.getText().toString());
-        state.putString("transcript", transcriptView().getText().toString());
+        state.putString("transcript", serializedHistory);
         state.putString("plotData", (plotData != null) ? plotData.toString() : "");
         state.commit();
     }
     
-    private TextView transcriptView() {
-        return (TextView) findViewById(R.id.transcript);
+    private ListView transcriptView() {
+        return (ListView) findViewById(R.id.transcript);
     }
     
     private void showHelp() {

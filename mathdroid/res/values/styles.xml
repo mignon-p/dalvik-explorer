@@ -41,4 +41,10 @@
     <style name="symbol_button_style" parent="text_button_style">
        <item name="android:textSize">24dp</item>
     </style>
+    
+    <style name="history_question_appearance" parent="@android:style/TextAppearance">
+        <item name="android:textColor">#cdaa7d</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>
