@@ -90,62 +90,62 @@ public class Calculator {
     
     private void initBuiltInFunctions() {
         // FIXME: acosh, asinh, atanh, chop, clip.
-        addFunction(new CalculatorFunctions.Abs(),            "Abs", "abs");
-        addFunction(new CalculatorFunctions.Acos(),           "Acos", "acos", "ArcCos", "arccos");
-        addFunction(new CalculatorFunctions.And(),            "And", "and");
-        addFunction(new CalculatorFunctions.Asin(),           "Asin", "asin", "ArcSin", "arcsin");
-        addFunction(new CalculatorFunctions.Atan2(),          "Atan2", "atan2");
-        addFunction(new CalculatorFunctions.Atan(),           "Atan", "atan", "ArcTan", "arctan");
-        addFunction(new CalculatorFunctions.BitAnd(),         "BitAnd", "bit_and");
-        addFunction(new CalculatorFunctions.BitNot(),         "BitNot", "bit_not");
-        addFunction(new CalculatorFunctions.BitOr(),          "BitOr", "bit_or");
-        addFunction(new CalculatorFunctions.BitShiftRight() , "BitShiftRight", "bit_shift_right");
-        addFunction(new CalculatorFunctions.BitShiftLeft(),   "BitShiftLeft", "bit_shift_left");
-        addFunction(new CalculatorFunctions.BitXor(),         "BitXor", "bit_xor");
-        addFunction(new CalculatorFunctions.Cbrt(),           "Cbrt", "cbrt");
-        addFunction(new CalculatorFunctions.Ceiling(),        "Ceiling", "Ceil", "ceiling", "ceil");
-        addFunction(new CalculatorFunctions.Cosh(),           "Cosh", "cosh");
-        addFunction(new CalculatorFunctions.Cos(),            "Cos", "cos");
-        addFunction(new CalculatorFunctions.Define(),         "Define", "define");
-        addFunction(new CalculatorFunctions.Divide(),         "Divide", "divide");
-        addFunction(new CalculatorFunctions.Equal(),          "Equal", "equal");
-        addFunction(new CalculatorFunctions.Exp(),            "Exp", "exp");
-        addFunction(new CalculatorFunctions.Factorial(),      "Factorial", "factorial");
-        addFunction(new CalculatorFunctions.Floor(),          "Floor", "floor");
-        addFunction(new CalculatorFunctions.FractionalPart(), "FractionalPart", "fractional_part");
-        addFunction(new CalculatorFunctions.GreaterEqual(),   "GreaterEqual", "greater_equal");
-        addFunction(new CalculatorFunctions.Greater(),        "Greater", "greater");
-        addFunction(new CalculatorFunctions.Hypot(),          "Hypot", "hypot");
-        addFunction(new CalculatorFunctions.IntegerLength(),  "IntegerLength", "integer_length");
-        addFunction(new CalculatorFunctions.IntegerPart(),    "IntegerPart", "integer_part");
-        addFunction(new CalculatorFunctions.IsPrime(),        "IsPrime", "is_prime");
-        addFunction(new CalculatorFunctions.LessEqual(),      "LessEqual", "less_equal");
-        addFunction(new CalculatorFunctions.Less(),           "Less", "less");
-        addFunction(new CalculatorFunctions.Log10(),          "Log10", "log10");
-        addFunction(new CalculatorFunctions.Log2(),           "Log2", "log2");
-        addFunction(new CalculatorFunctions.LogE(),           "LogE", "Ln", "ln");
-        addFunction(new CalculatorFunctions.Log(),            "Log", "log");
-        addFunction(new CalculatorFunctions.Max(),            "Max", "max");
-        addFunction(new CalculatorFunctions.Min(),            "Min", "min");
-        addFunction(new CalculatorFunctions.Mod(),            "Mod", "mod");
-        addFunction(new CalculatorFunctions.Not(),            "Not", "not");
-        addFunction(new CalculatorFunctions.Or(),             "Or", "or");
-        addFunction(new CalculatorFunctions.Plot(),           "Plot", "plot");
-        addFunction(new CalculatorFunctions.Plus(),           "Plus", "plus");
-        addFunction(new CalculatorFunctions.Power(),          "Power", "power");
-        addFunction(new CalculatorFunctions.Product(),        "Product", "product", /* Unicode Greek capital letter pi */ "\u03a0", /* Unicode product sign */ "\u220f");
-        addFunction(new CalculatorFunctions.Random(),         "Random", "random", "rand");
-        addFunction(new CalculatorFunctions.Round(),          "Round", "round");
-        addFunction(new CalculatorFunctions.Sign(),           "Sign", "sign");
-        addFunction(new CalculatorFunctions.Sinh(),           "Sinh", "sinh");
-        addFunction(new CalculatorFunctions.Sin(),            "Sin", "sin");
-        addFunction(new CalculatorFunctions.Sqrt(),           "Sqrt", "sqrt");
-        addFunction(new CalculatorFunctions.Sum(),            "Sum", "sum", /* Unicode Greek capital letter sigma */ "\u03a3", /* Unicode summation sign */ "\u2211");
-        addFunction(new CalculatorFunctions.Subtract(),       "Subtract", "subtract");
-        addFunction(new CalculatorFunctions.Tanh(),           "Tanh", "tanh");
-        addFunction(new CalculatorFunctions.Tan(),            "Tan", "tan");
-        addFunction(new CalculatorFunctions.Times(),          "Times", "times");
-        addFunction(new CalculatorFunctions.Unequal(),        "Unequal", "unequal");
+        addFunction(new CalculatorFunctions.Abs(),            "Abs");
+        addFunction(new CalculatorFunctions.Acos(),           "Acos", "ArcCos");
+        addFunction(new CalculatorFunctions.And(),            "And");
+        addFunction(new CalculatorFunctions.Asin(),           "Asin", "ArcSin");
+        addFunction(new CalculatorFunctions.Atan2(),          "Atan2");
+        addFunction(new CalculatorFunctions.Atan(),           "Atan", "ArcTan");
+        addFunction(new CalculatorFunctions.BitAnd(),         "BitAnd");
+        addFunction(new CalculatorFunctions.BitNot(),         "BitNot");
+        addFunction(new CalculatorFunctions.BitOr(),          "BitOr");
+        addFunction(new CalculatorFunctions.BitShiftRight() , "BitShiftRight");
+        addFunction(new CalculatorFunctions.BitShiftLeft(),   "BitShiftLeft");
+        addFunction(new CalculatorFunctions.BitXor(),         "BitXor");
+        addFunction(new CalculatorFunctions.Cbrt(),           "Cbrt");
+        addFunction(new CalculatorFunctions.Ceiling(),        "Ceiling", "Ceil");
+        addFunction(new CalculatorFunctions.Cosh(),           "Cosh");
+        addFunction(new CalculatorFunctions.Cos(),            "Cos");
+        addFunction(new CalculatorFunctions.Define(),         "Define");
+        addFunction(new CalculatorFunctions.Divide(),         "Divide");
+        addFunction(new CalculatorFunctions.Equal(),          "Equal");
+        addFunction(new CalculatorFunctions.Exp(),            "Exp");
+        addFunction(new CalculatorFunctions.Factorial(),      "Factorial");
+        addFunction(new CalculatorFunctions.Floor(),          "Floor");
+        addFunction(new CalculatorFunctions.FractionalPart(), "FractionalPart");
+        addFunction(new CalculatorFunctions.GreaterEqual(),   "GreaterEqual");
+        addFunction(new CalculatorFunctions.Greater(),        "Greater");
+        addFunction(new CalculatorFunctions.Hypot(),          "Hypot");
+        addFunction(new CalculatorFunctions.IntegerLength(),  "IntegerLength");
+        addFunction(new CalculatorFunctions.IntegerPart(),    "IntegerPart");
+        addFunction(new CalculatorFunctions.IsPrime(),        "IsPrime");
+        addFunction(new CalculatorFunctions.LessEqual(),      "LessEqual");
+        addFunction(new CalculatorFunctions.Less(),           "Less");
+        addFunction(new CalculatorFunctions.Log10(),          "Log10");
+        addFunction(new CalculatorFunctions.Log2(),           "Log2");
+        addFunction(new CalculatorFunctions.LogE(),           "LogE", "Ln");
+        addFunction(new CalculatorFunctions.Log(),            "Log");
+        addFunction(new CalculatorFunctions.Max(),            "Max");
+        addFunction(new CalculatorFunctions.Min(),            "Min");
+        addFunction(new CalculatorFunctions.Mod(),            "Mod");
+        addFunction(new CalculatorFunctions.Not(),            "Not");
+        addFunction(new CalculatorFunctions.Or(),             "Or");
+        addFunction(new CalculatorFunctions.Plot(),           "Plot");
+        addFunction(new CalculatorFunctions.Plus(),           "Plus");
+        addFunction(new CalculatorFunctions.Power(),          "Power");
+        addFunction(new CalculatorFunctions.Product(),        "Product", /* Unicode Greek capital letter pi */ "\u03a0", /* Unicode product sign */ "\u220f");
+        addFunction(new CalculatorFunctions.Random(),         "Random", "rand");
+        addFunction(new CalculatorFunctions.Round(),          "Round");
+        addFunction(new CalculatorFunctions.Sign(),           "Sign");
+        addFunction(new CalculatorFunctions.Sinh(),           "Sinh");
+        addFunction(new CalculatorFunctions.Sin(),            "Sin");
+        addFunction(new CalculatorFunctions.Sqrt(),           "Sqrt");
+        addFunction(new CalculatorFunctions.Sum(),            "Sum", /* Unicode Greek capital letter sigma */ "\u03a3", /* Unicode summation sign */ "\u2211");
+        addFunction(new CalculatorFunctions.Subtract(),       "Subtract");
+        addFunction(new CalculatorFunctions.Tanh(),           "Tanh");
+        addFunction(new CalculatorFunctions.Tan(),            "Tan");
+        addFunction(new CalculatorFunctions.Times(),          "Times");
+        addFunction(new CalculatorFunctions.Unequal(),        "Unequal");
         
         operators.put(CalculatorToken.B_AND, functions.get("BitAnd"));
         operators.put(CalculatorToken.B_NOT, functions.get("BitNot"));
@@ -170,8 +170,25 @@ public class Calculator {
     
     private void addFunction(CalculatorFunction function, String... names) {
         for (String name : names) {
-            functions.put(name, function);
+            addUniqueFunction(function, name);
+            final String lowerCaseName = name.toLowerCase();
+            if (!lowerCaseName.equals(name)) {
+                addUniqueFunction(function, lowerCaseName);
+            }
+            final String cStyleName = name.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
+            if (!cStyleName.equals(lowerCaseName)) {
+                addUniqueFunction(function, cStyleName);
+            }
         }
+    }
+    
+    private void addUniqueFunction(CalculatorFunction function, String name) {
+        // The checks in addFunction ensure no duplication for a single function.
+        // This check is to avoid accidental duplication between functions.
+        if (functions.get(name) != null) {
+            throw new RuntimeException("function '" + name + "' already added");
+        }
+        functions.put(name, function);
     }
     
     public String evaluate(String stringExpression) throws CalculatorError {
