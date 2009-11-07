@@ -34,8 +34,8 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     private static final BigInteger BIG_INTEGER_TWO = BigInteger.valueOf(2);
     
     // If 'bignum' is null, this IntegerNode's value is 'fixnum'. Otherwise, it's 'bignum' and 'fixnum' is ignored.
-    private long fixnum;
-    private BigInteger bignum;
+    private final long fixnum;
+    private final BigInteger bignum;
     
     // Internally, we often need to distinguish fixnum IntegerNodes from bignum ones.
     boolean isBig() {
@@ -60,14 +60,24 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public IntegerNode(String digits, int base) {
+        boolean small = false;
+        long smallValue = 0;
         try {
-            this.fixnum = Long.parseLong(digits, base);
+            smallValue = Long.parseLong(digits, base);
+            small = true;
         } catch (NumberFormatException ex) {
+        }
+        if (small) {
+            this.bignum = null;
+            this.fixnum = smallValue;
+        } else {
             this.bignum = new BigInteger(digits, base);
+            this.fixnum = 0;
         }
     }
     
     private IntegerNode(long value) {
+        this.bignum = null;
         this.fixnum = value;
     }
     
@@ -75,8 +85,10 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         // Collapse to a fixnum if possible.
         if ((value.bitLength() + 1) <= 64) {
             this.fixnum = value.longValue();
+            this.bignum = null;
         } else {
             this.bignum = value;
+            this.fixnum = 0;
         }
     }
     
