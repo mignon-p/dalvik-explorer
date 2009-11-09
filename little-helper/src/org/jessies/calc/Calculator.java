@@ -191,10 +191,23 @@ public class Calculator {
         functions.put(name, function);
     }
     
-    public String evaluate(String stringExpression) throws CalculatorError {
+    private Node parse(String stringExpression) throws CalculatorError {
         final CalculatorParser parser = new CalculatorParser(this, stringExpression);
-        final Node expression = parser.parse();
-        //System.err.println(tree);
+        return parser.parse();
+    }
+    
+    private Node simplify(Node expression) {
+        return expression.simplify(this);
+    }
+    
+    public String evaluate(String stringExpression) throws CalculatorError {
+        final Node expression = parse(stringExpression);
+        final Node simplifiedExpression = simplify(expression);
+        if (false) {
+            final String expressionString = expression.toInputString();
+            final String simplifiedString = simplifiedExpression.toInputString();
+            System.err.println(expressionString + (expressionString.equals(simplifiedString) ? "" : (" --- " + simplifiedString)));
+        }
         final Node result = expression.evaluate(this);
         ans.value = result;
         return result.toString();
@@ -516,5 +529,91 @@ public class Calculator {
         Assert.equals(calculator.evaluate("a = 2"), "2");
         Assert.equals(calculator.evaluate("a"), "2");
         Assert.equals(calculator.evaluate("2*a"), "4");
+    }
+    
+    @Test private static void testSimplifier() {
+        final Calculator calculator = new Calculator();
+        final Node zero = IntegerNode.valueOf(0);
+        final Node one = IntegerNode.valueOf(1);
+        final Node x = new CalculatorVariableNode("x");
+        
+        // +0
+        Assert.equals(calculator.simplify(calculator.parse("0+0")), zero);
+        Assert.equals(calculator.simplify(calculator.parse("x+0")), x);
+        Assert.equals(calculator.simplify(calculator.parse("0+x")), x);
+        
+        // *1
+        Assert.equals(calculator.simplify(calculator.parse("1*1")), one);
+        Assert.equals(calculator.simplify(calculator.parse("x*1")), x);
+        Assert.equals(calculator.simplify(calculator.parse("1*x")), x);
+        Assert.equals(calculator.simplify(calculator.parse("(0+1)*x")), x);
+        
+        // *0
+        Assert.equals(calculator.simplify(calculator.parse("0*0")), zero);
+        Assert.equals(calculator.simplify(calculator.parse("0*1")), zero);
+        Assert.equals(calculator.simplify(calculator.parse("x*0")), zero);
+        Assert.equals(calculator.simplify(calculator.parse("0*x")), zero);
+        
+        // --
+        Assert.equals(calculator.simplify(calculator.parse("1")), one);
+        Assert.equals(calculator.simplify(calculator.parse("-1")), IntegerNode.valueOf(-1));
+        Assert.equals(calculator.simplify(calculator.parse("--1")), one);
+        Assert.equals(calculator.simplify(calculator.parse("---1")), IntegerNode.valueOf(-1));
+        
+        // From "Paradigms of Artificial Intelligence Programming", section 8.2.
+        Assert.equals(calculator.simplify(calculator.parse("2+2")), IntegerNode.valueOf(4));
+        Assert.equals(calculator.simplify(calculator.parse("5*20+30+7")), IntegerNode.valueOf(137));
+        // 5*x-(4+1)*x == 0
+        // (y/z*(5*x-(4+1)*x)) == 0
+        // ((4-3)*x+(y/y-1)*z) == x
+        // 1*f(x)+0 == f(x)
+        Assert.equals(calculator.simplify(calculator.parse("3*2*x")), new CalculatorFunctions.Times(IntegerNode.valueOf(6), x));
+        
+        // From "Paradigms of Artificial Intelligence Programming", section 8.3.
+        Assert.equals(calculator.simplify(calculator.parse("3*2*x")), new CalculatorFunctions.Times(IntegerNode.valueOf(6), x));
+        // 2*x*x*3 == 6*x^2
+        // 2*x*3*y*4*z*5*6 == 720*x*y*z
+        // 3+x+4+x == 2*x+7
+        // 2*x*3*x*4*(1/x)*5*6 == 720*x
+        // 3+x+4-x == 7
+        // x+y+y+x == 2*x+2*y
+        // 3*x+4*x == 7*x
+        
+        // 0-0 == 0
+        // x-0 == x
+        // 0-x == -x
+        // x-x == 0
+        // x+(-x) == 0
+        // (-x)+x == 0
+        
+        // 2^sin(x/2) - 2^sin(x/2) == 0
+        // 2^sin(x/2) / 2^sin(x/2) == 1
+        
+        // x+x == 2*x
+        // 3*x+4*x == 7*x
+        
+        // x*x == x^2
+        // x*x*x == x^3
+        // 2*x*3*x == 6*x^2
+        
+        // 0/0 == indeterminate
+        // 0/x (where x!=0) == 0
+        // x/1 == x
+        // 0*infinity == indeterminate
+        // infinity/infinity == indeterminate
+        // infinity-infinity == indeterminate
+        // 0^0 == indeterminate
+        // infinity^0 == indeterminate
+        // x^0 (where x!=0 && x!=infinity) == 1
+        // 0^x == 0
+        // 1^infinity == indeterminate
+        // 1^x (where x!=infinity) == 1
+        // x^1 == x
+        // 1/infinity == 0
+        // x^-1 == 1/x (is this useful?)
+        
+        // x+y-x == y
+        // x*(y/x) == y
+        // (x*y)/x == y
     }
 }

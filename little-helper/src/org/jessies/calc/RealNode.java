@@ -91,6 +91,22 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         return new RealNode(value/ ((RealNode) rhs).value);
     }
     
+    @Override public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof RealNode)) {
+            return false;
+        }
+        RealNode rhs = (RealNode) other;
+        return (Double.compare(value, rhs.value) == 0);
+    }
+    
+    @Override public int hashCode() {
+        final long bits = Double.doubleToLongBits(value);
+        return (int) (bits ^ (bits >>> 32));
+    }
+    
     public RealNode exp() {
         return new RealNode(Math.exp(value));
     }
@@ -161,6 +177,10 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         return IntegerNode.valueOf((long) Math.signum(value));
     }
     
+    public Node simplify(Calculator environment) {
+        return this;
+    }
+    
     public RealNode sin() {
         return new RealNode(Math.sin(value));
     }
@@ -201,6 +221,10 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     
     public RealNode toReal() {
         return this;
+    }
+    
+    public String toInputString() {
+        return toString();
     }
     
     @Override public String toString() {

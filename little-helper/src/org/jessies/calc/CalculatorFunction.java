@@ -38,7 +38,15 @@ public abstract class CalculatorFunction implements Cloneable, Node {
     
     public CalculatorFunction bind(List<Node> args) {
         if (arity != args.size()) {
-            throw new CalculatorError("wrong number of arguments to function \"" + name + "\"; need " + arity + " but got " + args.size());
+            String message = "wrong number of arguments to function \"" + name + "\"";
+            message += "; need " + arity + " but got " + args.size();
+            if (args.size() > 0) {
+                message += ": ";
+                for (Node arg : args) {
+                    message += arg.toInputString();
+                }
+            }
+            throw new CalculatorError(message);
         }
         
         try {
@@ -54,9 +62,42 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         return apply(environment);
     }
     
+    public Node simplify(Calculator environment) {
+        return bind(simplifyArgs(environment));
+    }
+    
+    protected ArrayList<Node> simplifyArgs(Calculator environment) {
+        ArrayList<Node> simplifiedArgs = new ArrayList<Node>();
+        for (int i = 0; i < args.size(); ++i) {
+            simplifiedArgs.add(args.get(i).simplify(environment));
+        }
+        return simplifiedArgs;
+    }
+    
     public abstract Node apply(Calculator environment);
     
-    @Override public String toString() {
+    public String name() {
         return name;
+    }
+    
+    @Override public String toInputString() {
+        StringBuilder result = new StringBuilder();
+        result.append(name);
+        if (arity > 0) {
+            result.append("(");
+            for (int i = 0; i < args.size(); ++i) {
+                Node arg = args.get(i);
+                if (i > 0) {
+                    result.append(", ");
+                }
+                result.append(arg.toInputString());
+            }
+            result.append(")");
+        }
+        return result.toString();
+    }
+    
+    @Override public String toString() {
+        return toInputString();
     }
 }

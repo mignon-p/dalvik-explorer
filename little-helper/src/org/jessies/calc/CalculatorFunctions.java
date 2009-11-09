@@ -24,6 +24,18 @@ import java.util.*;
 public class CalculatorFunctions {
     private CalculatorFunctions() {}
     
+    private static boolean isNumber(Node n) {
+        return (n instanceof NumberNode);
+    }
+    
+    private static boolean isZero(Node n) {
+        return (n instanceof IntegerNode) && (((IntegerNode) n).compareTo(IntegerNode.valueOf(0)) == 0);
+    }
+    
+    private static boolean isOne(Node n) {
+        return (n instanceof IntegerNode) && (((IntegerNode) n).compareTo(IntegerNode.valueOf(1)) == 0);
+    }
+    
     private static BooleanNode toBoolean(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof BooleanNode) {
@@ -588,6 +600,27 @@ public class CalculatorFunctions {
             final NumberNode rhs = toNumber("Plus", environment, args.get(1));
             return lhs.plus(rhs);
         }
+        
+        @Override public Node simplify(Calculator environment) {
+            final ArrayList<Node> args = simplifyArgs(environment);
+            NumberNode total = IntegerNode.valueOf(0);
+            for (int i = args.size() - 1; i >= 0; --i) {
+                final Node arg = args.get(i);
+                if (isNumber(arg)) {
+                    if (!isZero(arg)) {
+                        total = total.plus((NumberNode) arg);
+                    }
+                    args.remove(i);
+                }
+            }
+            if (args.size() == 0 || !isZero(total)) {
+                args.add(total);
+            }
+            if (args.size() == 1) {
+                return args.get(0);
+            }
+            return bind(args);
+        }
     }
     
     public static class Power extends CalculatorFunction {
@@ -760,6 +793,30 @@ public class CalculatorFunctions {
             final NumberNode lhs = toNumber("Times", environment, args.get(0));
             final NumberNode rhs = toNumber("Times", environment, args.get(1));
             return lhs.times(rhs);
+        }
+        
+        @Override public Node simplify(Calculator environment) {
+            final ArrayList<Node> args = simplifyArgs(environment);
+            NumberNode total = IntegerNode.valueOf(1);
+            for (int i = args.size() - 1; i >= 0; --i) {
+                final Node arg = args.get(i);
+                if (isNumber(arg)) {
+                    if (!isOne(arg)) {
+                        total = total.times((NumberNode) arg);
+                    }
+                    args.remove(i);
+                }
+            }
+            if (isZero(total)) {
+                return total;
+            }
+            if (args.size() == 0 || !isOne(total)) {
+                args.add(total);
+            }
+            if (args.size() == 1) {
+                return args.get(0);
+            }
+            return bind(args);
         }
     }
     

@@ -18,6 +18,9 @@ package org.jessies.calc;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * There are three kinds of number: integer (IntegerNode), rational (RationalNode), and machine-precision real (RealNode).
+ */
 public interface NumberNode extends Node {
     public NumberNode abs();
     public NumberNode divide(NumberNode rhs);

@@ -38,4 +38,34 @@ public class CalculatorVariableNode implements Node {
         }
         return value;
     }
+    
+    public Node simplify(Calculator environment) {
+        // If we have a value, use it.
+        // FIXME: we should implement "e" and "pi" (and all constants?) differently first.
+        final Node value = null; // environment.getVariable(name);
+        return (value != null ? value : this);
+    }
+    
+    public String toInputString() {
+        return name;
+    }
+    
+    @Override public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof CalculatorVariableNode)) {
+            return false;
+        }
+        CalculatorVariableNode rhs = (CalculatorVariableNode) other;
+        return name.equals(rhs.name);
+    }
+    
+    @Override public int hashCode() {
+        return name.hashCode();
+    }
+    
+    @Override public String toString() {
+        return toInputString();
+    }
 }

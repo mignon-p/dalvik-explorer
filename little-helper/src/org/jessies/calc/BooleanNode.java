@@ -36,6 +36,10 @@ public final class BooleanNode implements Node {
         return this;
     }
     
+    public Node simplify(Calculator environment) {
+        return this;
+    }
+    
     public BooleanNode or(BooleanNode rhs) {
         return valueOf(value || rhs.value);
     }
@@ -46,6 +50,10 @@ public final class BooleanNode implements Node {
     
     public static BooleanNode valueOf(boolean value) {
         return value ? TRUE : FALSE;
+    }
+    
+    public String toInputString() {
+        return toString();
     }
     
     @Override public String toString() {

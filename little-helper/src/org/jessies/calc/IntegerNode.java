@@ -43,11 +43,18 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     // Internally, we often want to treat an IntegerNode as if it was a bignum, whether it is or not.
-    private BigInteger big() {
+    BigInteger big() {
         return (bignum != null) ? bignum : BigInteger.valueOf(fixnum);
     }
     
-    // Internally, we often want to treat an IntegerNode as if it was a fixnum, whether it is or not.
+    long fix() {
+        if (isBig()) {
+            throw new RuntimeException("Internal error: trying to use bignum as fixnum");
+        }
+        return fixnum;
+    }
+    
+    // Internally, we often want to treat an IntegerNode as if it was a int, whether it is or not.
     private int intValue() {
         return isBig() ? big().intValue() : (int) fixnum;
     }
@@ -92,8 +99,29 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
     }
     
-    private static IntegerNode valueOf(BigInteger value) {
+    static IntegerNode valueOf(BigInteger value) {
         return new IntegerNode(value);
+    }
+    
+    @Override public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof IntegerNode)) {
+            return false;
+        }
+        IntegerNode rhs = (IntegerNode) other;
+        if (fixnum != rhs.fixnum) {
+            return false;
+        }
+        return (bignum == null ? rhs.bignum == null : bignum.equals(rhs.bignum));
+    }
+    
+    @Override public int hashCode() {
+        int result = 17;
+        result = 31 * result + (int) (fixnum ^ (fixnum >>> 32));
+        result = 31 * result + (bignum == null ? 0 : bignum.hashCode());
+        return result;
     }
     
     public Node evaluate(Calculator environment) {
@@ -317,6 +345,10 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
     }
     
+    public Node simplify(Calculator environment) {
+        return this;
+    }
+    
     public NumberNode subtract(NumberNode rhs) {
         if (rhs instanceof RealNode) {
             return toReal().subtract(rhs);
@@ -369,6 +401,10 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
             throw new RuntimeException("Integer value too large");
         }
         return new RealNode(result);
+    }
+    
+    public String toInputString() {
+        return toString();
     }
     
     @Override public String toString() {

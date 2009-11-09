@@ -22,4 +22,6 @@ import java.math.*;
 
 public interface Node {
     public Node evaluate(Calculator environment);
+    public Node simplify(Calculator environment);
+    public String toInputString();
 }
