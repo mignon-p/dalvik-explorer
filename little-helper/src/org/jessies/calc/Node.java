@@ -21,7 +21,22 @@ package org.jessies.calc;
 import java.math.*;
 
 public interface Node {
+    /**
+     * Returns a Node representing the most-evaluated form of this Node in the given environment.
+     * The result may be the same as the original Node (for example, given a Node that's a free variable).
+     */
     public Node evaluate(Calculator environment);
+    
+    /**
+     * Returns a Node, the evaluation of which would produce the same result as evaluating this Node, but which is "simpler".
+     * This is not intended to factor or expand expressions because that would assume a specific user intent.
+     * Rearranging and combining terms is acceptable, as is propagation of constants.
+     * Application of identities should only take place for "trivial" ones (involving 0 and 1, for example).
+     */
     public Node simplify(Calculator environment);
+    
+    /**
+     * Returns a string that can be parsed to produce an expression equivalent to this Node.
+     */
     public String toInputString();
 }
