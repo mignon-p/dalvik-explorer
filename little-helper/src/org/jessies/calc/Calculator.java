@@ -567,10 +567,12 @@ public class Calculator {
         // (y/z*(5*x-(4+1)*x)) == 0
         // ((4-3)*x+(y/y-1)*z) == x
         // 1*f(x)+0 == f(x)
-        Assert.equals(calculator.simplify(calculator.parse("3*2*x")), new CalculatorFunctions.Times(IntegerNode.valueOf(6), x));
+        Assert.equals(calculator.simplify(calculator.parse("3*2*x")), new CalculatorFunctions.Times().bind(Arrays.asList(IntegerNode.valueOf(6), x)));
+        Assert.equals(calculator.simplify(calculator.parse("3*x*2")), new CalculatorFunctions.Times().bind(Arrays.asList(IntegerNode.valueOf(6), x)));
+        Assert.equals(calculator.simplify(calculator.parse("x*3*2")), new CalculatorFunctions.Times().bind(Arrays.asList(IntegerNode.valueOf(6), x)));
         
         // From "Paradigms of Artificial Intelligence Programming", section 8.3.
-        Assert.equals(calculator.simplify(calculator.parse("3*2*x")), new CalculatorFunctions.Times(IntegerNode.valueOf(6), x));
+        Assert.equals(calculator.simplify(calculator.parse("3*2*x")), new CalculatorFunctions.Times().bind(Arrays.asList(IntegerNode.valueOf(6), x)));
         // 2*x*x*3 == 6*x^2
         // 2*x*3*y*4*z*5*6 == 720*x*y*z
         // 3+x+4+x == 2*x+7

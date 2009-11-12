@@ -100,4 +100,22 @@ public abstract class CalculatorFunction implements Cloneable, Node {
     @Override public String toString() {
         return toInputString();
     }
+    
+    @Override public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof CalculatorFunction)) {
+            return false;
+        }
+        CalculatorFunction rhs = (CalculatorFunction) other;
+        if (!name.equals(rhs.name)) {
+            return false;
+        }
+        return (args != null) ? args.equals(rhs.args) : rhs.args == null;
+    }
+    
+    @Override public int hashCode() {
+        throw new UnsupportedOperationException("hashing functions/function applications not yet supported");
+    }
 }

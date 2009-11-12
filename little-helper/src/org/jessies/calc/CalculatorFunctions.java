@@ -614,6 +614,7 @@ public class CalculatorFunctions {
                 }
             }
             if (args.size() == 0 || !isZero(total)) {
+                // Sort numeric terms last in sums (preferring "x + 1" rather than "1 + x").
                 args.add(total);
             }
             if (args.size() == 1) {
@@ -811,7 +812,8 @@ public class CalculatorFunctions {
                 return total;
             }
             if (args.size() == 0 || !isOne(total)) {
-                args.add(total);
+                // Sort numeric factors first in products (preferring "2*x" rather than "x*2")..
+                args.add(0, total);
             }
             if (args.size() == 1) {
                 return args.get(0);
