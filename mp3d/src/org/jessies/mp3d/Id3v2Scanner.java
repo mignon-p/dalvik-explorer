@@ -50,27 +50,27 @@ public class Id3v2Scanner {
             in = new BufferedInputStream(new FileInputStream(file));
             
             if (readByte() != 'I' || readByte() != 'D' || readByte() != '3') {
-                System.err.println("warning: " + file + " doesn't start with ID3 tag");
+                System.err.println(file + ": warning: doesn't start with ID3 tag");
                 return null;
             }
             
             final int majorVersion = readByte();
             final int revision = readByte();
             if (majorVersion < 2 || majorVersion > 4) {
-                System.err.println("warning: " + file + " has ID3v2." + majorVersion + "." + revision + " tags");
+                System.err.println(file + ": warning: has ID3v2." + majorVersion + "." + revision + " tags");
                 return null;
             }
             final boolean isNewFormat = (majorVersion == 3 || majorVersion == 4);
             
             final int flags = readByte();
             if (flags != 0) {
-                System.err.println("warning: " + file + " has non-zero flags " + Integer.toBinaryString(flags));
+                System.err.println(file + ": warning: has non-zero flags " + Integer.toBinaryString(flags));
                 return null;
             }
             
             final int tagSize = readSynchSafeInteger(4);
             
-            // FIXME: there might be an extended header to skip before we get to the frames.
+            // FIXME: there might be an extended header to skip before we get to the frames (but not while we have the non-zero flags test above).
             
             String title = null;
             String artist = null;
@@ -88,7 +88,7 @@ public class Id3v2Scanner {
                         break;
                     }
                     // Skip flag bytes.
-                    skipBytes(2);
+                    final int frameFlags = (readByte() << 8) | readByte();
                     if (code.equals("TALB")) {
                         album = readEncodedString(size);
                     } else if (code.equals("TIT2")) {
@@ -128,7 +128,7 @@ public class Id3v2Scanner {
             // We can guess a usable title...
             if (title == null) {
                 title = file.getName();
-                System.err.println(file);
+                System.err.println(file + ": warning: no title found in tags");
             }
             // ...but we're a bit hard-pressed to guess album and artist.
             if (album == null) {
@@ -142,6 +142,7 @@ public class Id3v2Scanner {
             return result;
         } catch (Exception ex) {
             // FIXME: anything cleverer?
+            System.err.print(file + ": warning: caught exception: ");
             ex.printStackTrace();
             return null;
         } finally {
@@ -163,7 +164,11 @@ public class Id3v2Scanner {
     }
     
     private void skipBytes(int byteCount) throws IOException {
-        in.skip(byteCount);
+        int stillToSkip = byteCount;
+        while (stillToSkip > 0) {
+            long skipped = in.skip(stillToSkip);
+            stillToSkip -= skipped;
+        }
         bytesRead += byteCount;
     }
     
