@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dalvik Explorer</string>
+    
+    <string name="charsets_activity_title">Charsets</string>
+    <string name="environment_variables_activity_title">Environment Variables</string>
+    <string name="locales_activity_title">Locales</string>
+    <string name="system_properties_activity_title">System Properties</string>
+    <string name="time_zones_activity_title">Time Zones</string>
 </resources>
