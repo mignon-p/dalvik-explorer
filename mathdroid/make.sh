@@ -85,7 +85,11 @@ ${DX} --dex --output=${dex_out} .generated/classes || exit 1
 
 echo "-- Packaging resources..."
 aapt_out=.generated/${APP_NAME}.ap_
-${AAPT} package -f -M AndroidManifest.xml -A assets -S res -I ${ANDROID_JAR} -F ${aapt_out} || exit 1
+assets="" # An assets directory is optional.
+if [ -d assets ]; then
+  assets="-A assets"
+fi
+${AAPT} package -f -M AndroidManifest.xml ${assets} -S res -I ${ANDROID_JAR} -F ${aapt_out} || exit 1
 
 echo "-- Creating ${target} apk..."
 if [ "$target" == "release" ]; then
