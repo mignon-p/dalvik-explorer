@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-ASDK_ROOT=~/Downloads/android-sdk-linux_x86-1.6_r1
+ASDK_ROOT=~/Downloads/android-sdk-linux
 ASDK_PLATFORM_ROOT=${ASDK_ROOT}/platforms/android-1.6
 JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
@@ -21,7 +21,7 @@ JARSIGNER=${JAVA_ROOT}/jarsigner
 ANDROID_JAR=${ASDK_PLATFORM_ROOT}/android.jar
 
 # Find out what we're building from the manifest.
-APP_NAME=`sed -n 's/.*name="app_name">\(.*\)<.*/\1/ p' res/values/strings.xml`
+APP_NAME=`sed -n 's/.*name="app_name">\(.*\)<.*/\1/ p' res/values/strings.xml | sed 's/[ ]//'`
 APP_VERSION=`sed -n 's/.*android:versionName="\(.*\)".*/\1/ p' AndroidManifest.xml`
 
 # javac options.
