@@ -3,8 +3,11 @@
     <string name="app_name">Dalvik Explorer</string>
     
     <string name="charsets_activity_title">Charsets</string>
+    <string name="charset_activity_title">Charset</string>
     <string name="environment_variables_activity_title">Environment Variables</string>
     <string name="locales_activity_title">Locales</string>
+    <string name="locale_activity_title">Locale</string>
     <string name="system_properties_activity_title">System Properties</string>
     <string name="time_zones_activity_title">Time Zones</string>
+    <string name="time_zone_activity_title">Time Zone</string>
 </resources>

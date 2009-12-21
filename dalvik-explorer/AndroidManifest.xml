@@ -15,6 +15,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".CharsetActivity" android:label="@string/charset_activity_title">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".EnvironmentVariablesActivity" android:label="@string/environment_variables_activity_title">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
