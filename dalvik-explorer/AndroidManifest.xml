@@ -33,6 +33,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".LocaleActivity" android:label="@string/locale_activity_title">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".SystemPropertiesActivity" android:label="@string/system_properties_activity_title">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
