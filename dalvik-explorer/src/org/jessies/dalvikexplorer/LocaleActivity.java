@@ -58,14 +58,12 @@ public class LocaleActivity extends Activity {
             result.append('\n');
         }
         if (locale.getCountry().length() > 0) {
-            //result.append("Country: " + locale.getDisplayCountry() + " (" + locale.getCountry() + "/" + locale.getISO3Country() + ")\n");
             result.append("Display Country: " + locale.getDisplayCountry() + "\n");
             result.append("2-Letter Country Code: " + locale.getCountry() + "\n");
             result.append("3-Letter Country Code: " + locale.getISO3Country() + "\n");
             result.append('\n');
         }
         if (locale.getVariant().length() > 0) {
-            //result.append("Display Variant: " + locale.getDisplayVariant() + " (" + locale.getVariant() + ")\n");
             result.append("Display Variant: " + locale.getDisplayVariant() + "\n");
             result.append("Variant Code: " + locale.getVariant() + "\n");
         }
