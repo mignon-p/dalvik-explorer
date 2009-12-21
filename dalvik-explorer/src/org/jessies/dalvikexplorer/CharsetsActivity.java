@@ -9,9 +9,9 @@ import java.nio.charset.*;
 import java.util.*;
 
 public class CharsetsActivity extends ListActivity {
-    private static class CharsetInfo {
+    private static class CharsetListItem {
         private final Charset charset;
-        private CharsetInfo(Charset charset) {
+        private CharsetListItem(Charset charset) {
             this.charset = charset;
         }
         @Override public String toString() {
@@ -22,11 +22,11 @@ public class CharsetsActivity extends ListActivity {
             return result;
         }
     }
-    private static final List<CharsetInfo> CHARSETS = gatherCharsets();
+    private static final List<CharsetListItem> CHARSETS = gatherCharsets();
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new ArrayAdapter<CharsetInfo>(this, android.R.layout.simple_list_item_1, CHARSETS));
+        setListAdapter(new ArrayAdapter<CharsetListItem>(this, android.R.layout.simple_list_item_1, CHARSETS));
         setTitle("Charsets (" + CHARSETS.size() + ")");
     }
     
@@ -36,17 +36,17 @@ public class CharsetsActivity extends ListActivity {
         startActivity(intent);
     }
     
-    private static List<CharsetInfo> gatherCharsets() {
+    private static List<CharsetListItem> gatherCharsets() {
         final SortedMap<String,Charset> charsets = Charset.availableCharsets();
         final Charset defaultCharset = Charset.defaultCharset();
         // Put the default charset at the top of the list...
-        final List<CharsetInfo> result = new ArrayList<CharsetInfo>(charsets.size());
-        result.add(new CharsetInfo(defaultCharset));
+        final List<CharsetListItem> result = new ArrayList<CharsetListItem>(charsets.size());
+        result.add(new CharsetListItem(defaultCharset));
         // ...followed by all the others.
         for (String name : charsets.keySet()) {
             final Charset charset = charsets.get(name);
             if (!charset.equals(defaultCharset)) {
-                result.add(new CharsetInfo(charset));
+                result.add(new CharsetListItem(charset));
             }
         }
         return result;
