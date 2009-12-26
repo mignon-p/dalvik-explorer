@@ -70,8 +70,22 @@ public class LocaleActivity extends Activity {
         }
         result.append('\n');
         
+        result.append("Number Formatting\n\n");
+        describeNumberFormat(result, "Decimal", NumberFormat.getInstance(locale), 1234.5, -1234.5);
+        describeNumberFormat(result, "Integer", NumberFormat.getIntegerInstance(locale), 1234, -1234);
+        describeNumberFormat(result, "Currency", NumberFormat.getCurrencyInstance(locale), 1234.5, -1234.5);
+        describeNumberFormat(result, "Percent", NumberFormat.getPercentInstance(locale), 12.3);
+        result.append('\n');
+        result.append('\n');
+        
+        result.append("Decimal Format Symbols\n\n");
+        NumberFormat nf = NumberFormat.getInstance(locale);
+        if (nf instanceof DecimalFormat) {
+            describeDecimalFormatSymbols(result, ((DecimalFormat) nf).getDecimalFormatSymbols());
+        }
+        
         Date now = new Date(); // FIXME: it might be more useful to always show a time in the afternoon, to make 24-hour patterns more obvious.
-        result.append("Date/Time Patterns\n\n");
+        result.append("Date/Time Formatting\n\n");
         describeDateFormat(result, "Full Date", DateFormat.getDateInstance(DateFormat.FULL, locale), now);
         describeDateFormat(result, "Medium Date", DateFormat.getDateInstance(DateFormat.MEDIUM, locale), now);
         describeDateFormat(result, "Short Date", DateFormat.getDateInstance(DateFormat.SHORT, locale), now);
@@ -102,11 +116,50 @@ public class LocaleActivity extends Activity {
         return result.toString();
     }
     
+    private static void describeDecimalFormatSymbols(StringBuilder result, DecimalFormatSymbols dfs) {
+        result.append("Currency Symbol: " + dfs.getCurrencySymbol() + "\n");
+        result.append("International Currency Symbol: " + dfs.getInternationalCurrencySymbol() + "\n");
+        result.append('\n');
+        
+        result.append("Digit: " + dfs.getDigit() + "\n");
+        result.append("Pattern Separator: " + dfs.getPatternSeparator() + "\n");
+        result.append('\n');
+        
+        result.append("Decimal Separator: " + dfs.getDecimalSeparator() + "\n");
+        result.append("Monetary Decimal Separator: " + dfs.getMonetaryDecimalSeparator() + "\n");
+        // 1.6: result.append("Exponent Separator: " + dfs.getExponentSeparator() + "\n");
+        result.append("Grouping Separator: " + dfs.getGroupingSeparator() + "\n");
+        
+        result.append("Infinity: " + dfs.getInfinity() + "\n");
+        result.append("Minus Sign: " + dfs.getMinusSign() + "\n");
+        result.append("NaN: " + dfs.getNaN() + "\n");
+        result.append("Percent: " + dfs.getPercent() + "\n");
+        result.append("Per Mille: " + dfs.getPerMill() + "\n");
+        result.append("Zero Digit: " + dfs.getZeroDigit() + "\n");
+        StringBuilder digits = new StringBuilder();
+        for (int i = 0; i <= 9; ++i) {
+            digits.append((char) (dfs.getZeroDigit() + i));
+        }
+        result.append("Digits: " + digits.toString() + "\n");
+        result.append('\n');
+        result.append('\n');
+    }
+    
     private static void describeDateFormat(StringBuilder result, String description, DateFormat dateFormat, Date when) {
         if (dateFormat instanceof SimpleDateFormat) {
             SimpleDateFormat sdf = (SimpleDateFormat) dateFormat;
             result.append(description + ": " + sdf.toLocalizedPattern() + "\n");
             result.append("    " + sdf.format(when) + "\n");
+        }
+    }
+    
+    private static void describeNumberFormat(StringBuilder result, String description, NumberFormat numberFormat, Number... values) {
+        if (numberFormat instanceof DecimalFormat) {
+            DecimalFormat df = (DecimalFormat) numberFormat;
+            result.append(description + ": " + df.toLocalizedPattern() + "\n");
+            for (Number value : values) {
+                result.append("    " + df.format(value) + "\n");
+            }
         }
     }
 }
