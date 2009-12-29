@@ -27,6 +27,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".FileSystemActivity" android:label="@string/file_system_activity_title">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".FileViewerActivity" android:label="@string/file_viewer_activity_title">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".LocalesActivity" android:label="@string/locales_activity_title">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

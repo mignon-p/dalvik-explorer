@@ -5,6 +5,8 @@
     <string name="charsets_activity_title">Charsets</string>
     <string name="charset_activity_title">Charset</string>
     <string name="environment_variables_activity_title">Environment Variables</string>
+    <string name="file_system_activity_title">File System</string>
+    <string name="file_viewer_activity_title">File Viewer</string>
     <string name="locales_activity_title">Locales</string>
     <string name="locale_activity_title">Locale</string>
     <string name="system_properties_activity_title">System Properties</string>

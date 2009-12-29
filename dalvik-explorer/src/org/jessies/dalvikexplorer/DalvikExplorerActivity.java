@@ -23,6 +23,7 @@ public class DalvikExplorerActivity extends ListActivity {
     private static final NamedActivity[] ACTIVITIES = new NamedActivity[] {
         new NamedActivity("Charsets", CharsetsActivity.class),
         new NamedActivity("Environment Variables", EnvironmentVariablesActivity.class),
+        new NamedActivity("File System", FileSystemActivity.class),
         new NamedActivity("Locales", LocalesActivity.class),
         new NamedActivity("System Properties", SystemPropertiesActivity.class),
         new NamedActivity("Time Zones", TimeZonesActivity.class)
