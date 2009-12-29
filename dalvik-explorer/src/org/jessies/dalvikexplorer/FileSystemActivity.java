@@ -37,11 +37,10 @@ public class FileSystemActivity extends ListActivity {
         }
         
         setListAdapter(new ArrayAdapter<FileListItem>(this, android.R.layout.simple_list_item_1, directoryItems(path)));
+        setTitle(path + " (" + getListAdapter().getCount() + ")");
     }
     
     private List<FileListItem> directoryItems(String path) {
-        setTitle(path);
-        
         File[] files = new File(path).listFiles();
         if (files == null) {
             // Returning null is how the retarded java.io.File API reports failure.

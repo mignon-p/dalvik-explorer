@@ -12,6 +12,7 @@ public class SystemPropertiesActivity extends Activity {
         
         TextView textView = (TextView) findViewById(R.id.output);
         textView.setText(getSystemPropertiesAsString());
+        setTitle("System Properties (" + System.getProperties().size() + ")");
     }
     
     // Original in salma-hayek "DebugMenu.java".

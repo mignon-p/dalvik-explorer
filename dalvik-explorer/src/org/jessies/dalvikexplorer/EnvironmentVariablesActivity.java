@@ -12,6 +12,7 @@ public class EnvironmentVariablesActivity extends Activity {
         
         TextView textView = (TextView) findViewById(R.id.output);
         textView.setText(getEnvironmentAsString());
+        setTitle("Environment Variables (" + System.getenv().size() + ")");
     }
     
     // Original in salma-hayek "DebugMenu.java".
