@@ -318,12 +318,16 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         if (existingText.length() == 0) {
             return;
         }
-        if (startOffset == endOffset) {
-            // Remove the character before the caret.
-            --startOffset;
+        if (startOffset != endOffset) {
+            // Remove the selection.
             queryView.setText(existingText.substring(0, startOffset) + existingText.substring(endOffset));
         } else {
-            // Remove the selection.
+            // Remove the character before the caret.
+            if (startOffset == 0) {
+                // There is no character before the caret.
+                return;
+            }
+            --startOffset;
             queryView.setText(existingText.substring(0, startOffset) + existingText.substring(endOffset));
         }
         queryView.setSelection(startOffset, startOffset);
