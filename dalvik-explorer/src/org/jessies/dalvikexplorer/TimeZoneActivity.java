@@ -19,7 +19,7 @@ public class TimeZoneActivity extends Activity {
         textView.setText(describeTimeZone(timeZoneId));
     }
     
-    private static String describeTimeZone(String id) {
+    static String describeTimeZone(String id) {
         final StringBuilder result = new StringBuilder();
         
         final TimeZone timeZone = TimeZone.getTimeZone(id);

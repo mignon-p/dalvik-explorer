@@ -37,7 +37,7 @@ public class CharsetsActivity extends ListActivity {
     }
     
     private static List<CharsetListItem> gatherCharsets() {
-        final SortedMap<String,Charset> charsets = Charset.availableCharsets();
+        final SortedMap<String, Charset> charsets = Charset.availableCharsets();
         final Charset defaultCharset = Charset.defaultCharset();
         // Put the default charset at the top of the list...
         final List<CharsetListItem> result = new ArrayList<CharsetListItem>(charsets.size());
@@ -50,5 +50,15 @@ public class CharsetsActivity extends ListActivity {
             }
         }
         return result;
+    }
+    
+    static String describeCharsets() {
+        StringBuilder result = new StringBuilder();
+        for (CharsetListItem item : gatherCharsets()) {
+            if (Thread.currentThread().isInterrupted()) return null;
+            result.append(CharsetActivity.describeCharset(item.charset.name()));
+            result.append('\n');
+        }
+        return result.toString();
     }
 }

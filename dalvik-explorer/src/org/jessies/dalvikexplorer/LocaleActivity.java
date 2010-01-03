@@ -44,7 +44,7 @@ public class LocaleActivity extends Activity {
         return new Locale(language, country, variant);
     }
     
-    private static String describeLocale(String name) {
+    static String describeLocale(String name) {
         final StringBuilder result = new StringBuilder();
         
         final Locale locale = localeByName(name);

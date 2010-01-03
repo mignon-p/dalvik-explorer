@@ -20,7 +20,7 @@ public class CharsetActivity extends Activity {
         textView.setText(describeCharset(charsetName));
     }
     
-    private String describeCharset(String name) {
+    static String describeCharset(String name) {
         final StringBuilder result = new StringBuilder();
         final Charset charset = Charset.forName(name);
         result.append("Canonical Name: " + charset.name() + "\n");

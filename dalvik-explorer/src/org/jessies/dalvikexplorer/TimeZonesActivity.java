@@ -43,11 +43,22 @@ public class TimeZonesActivity extends ListActivity {
         result.add(new TimeZoneListItem(defaultTimeZone));
         // ...followed by all the others.
         for (String id : availableIds) {
+            if (Thread.currentThread().isInterrupted()) return null;
             final TimeZone timeZone = TimeZone.getTimeZone(id);
             if (!timeZone.equals(defaultTimeZone)) {
                 result.add(new TimeZoneListItem(timeZone));
             }
         }
         return result;
+    }
+    
+    static String describeTimeZones() {
+        StringBuilder result = new StringBuilder();
+        for (TimeZoneListItem item : gatherTimeZones()) {
+            if (Thread.currentThread().isInterrupted()) return null;
+            result.append(TimeZoneActivity.describeTimeZone(item.timeZone.getID()));
+            result.append('\n');
+        }
+        return result.toString();
     }
 }

@@ -16,7 +16,7 @@ public class EnvironmentVariablesActivity extends Activity {
     }
     
     // Original in salma-hayek "DebugMenu.java".
-    private String getEnvironmentAsString() {
+    static String getEnvironmentAsString() {
         return Utils.sortedStringOfMap(System.getenv());
     }
 }

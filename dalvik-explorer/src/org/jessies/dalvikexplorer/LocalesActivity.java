@@ -49,4 +49,14 @@ public class LocalesActivity extends ListActivity {
         }
         return result;
     }
+    
+    static String describeLocales() {
+        StringBuilder result = new StringBuilder();
+        for (LocaleListItem item : gatherLocales()) {
+            if (Thread.currentThread().isInterrupted()) return null;
+            result.append(LocaleActivity.describeLocale(item.locale.toString()));
+            result.append('\n');
+        }
+        return result.toString();
+    }
 }

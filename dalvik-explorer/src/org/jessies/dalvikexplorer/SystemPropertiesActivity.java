@@ -16,12 +16,12 @@ public class SystemPropertiesActivity extends Activity {
     }
     
     // Original in salma-hayek "DebugMenu.java".
-    private String getSystemPropertiesAsString() {
+    static String getSystemPropertiesAsString() {
         return Utils.sortedStringOfMap(getSystemProperties());
     }
     
     // Original in salma-hayek "DebugMenu.java".
-    private Map<String, String> getSystemProperties() {
+    private static Map<String, String> getSystemProperties() {
         HashMap<String, String> result = new HashMap<String, String>();
         Properties properties = System.getProperties();
         Enumeration<?> propertyNames = properties.propertyNames();

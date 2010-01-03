@@ -9,6 +9,12 @@
             </intent-filter>
         </activity>
         
+        <activity android:name=".BuildActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".CharsetsActivity" android:label="@string/charsets_activity_title">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
