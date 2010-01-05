@@ -38,6 +38,7 @@ public class FileSystemActivity extends ListActivity {
         
         setListAdapter(new ArrayAdapter<FileListItem>(this, android.R.layout.simple_list_item_1, directoryItems(path)));
         setTitle(path + " (" + getListAdapter().getCount() + ")");
+        getListView().setTextFilterEnabled(true);
     }
     
     private List<FileListItem> directoryItems(String path) {

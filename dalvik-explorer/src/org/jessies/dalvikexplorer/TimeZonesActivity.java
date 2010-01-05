@@ -27,6 +27,7 @@ public class TimeZonesActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setListAdapter(new ArrayAdapter<TimeZoneListItem>(this, android.R.layout.simple_list_item_1, TIME_ZONES));
         setTitle("Time Zones (" + TIME_ZONES.size() + ")");
+        getListView().setTextFilterEnabled(true);
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {

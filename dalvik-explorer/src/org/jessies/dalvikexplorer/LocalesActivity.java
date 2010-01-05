@@ -27,6 +27,7 @@ public class LocalesActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setListAdapter(new ArrayAdapter<LocaleListItem>(this, android.R.layout.simple_list_item_1, LOCALES));
         setTitle("Locales (" + LOCALES.size() + ")");
+        getListView().setTextFilterEnabled(true);
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
