@@ -148,7 +148,7 @@ public class LocaleActivity extends Activity {
     private static void describeDateFormat(StringBuilder result, String description, DateFormat dateFormat, Date when) {
         if (dateFormat instanceof SimpleDateFormat) {
             SimpleDateFormat sdf = (SimpleDateFormat) dateFormat;
-            result.append(description + ": " + sdf.toLocalizedPattern() + "\n");
+            result.append(description + ": " + sdf.toPattern() + "\n");
             result.append("    " + sdf.format(when) + "\n");
         }
     }
@@ -156,7 +156,7 @@ public class LocaleActivity extends Activity {
     private static void describeNumberFormat(StringBuilder result, String description, NumberFormat numberFormat, Number... values) {
         if (numberFormat instanceof DecimalFormat) {
             DecimalFormat df = (DecimalFormat) numberFormat;
-            result.append(description + ": " + df.toLocalizedPattern() + "\n");
+            result.append(description + ": " + df.toPattern() + "\n");
             for (Number value : values) {
                 result.append("    " + df.format(value) + "\n");
             }
