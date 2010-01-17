@@ -32,7 +32,8 @@ public class LocalesActivity extends ListActivity {
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
         final Intent intent = new Intent(this, LocaleActivity.class);
-        intent.putExtra("org.jessies.dalvikexplorer.Locale", LOCALES.get(position).locale.toString());
+        final LocaleListItem item = (LocaleListItem) l.getAdapter().getItem(position);
+        intent.putExtra("org.jessies.dalvikexplorer.Locale", item.locale.toString());
         startActivity(intent);
     }
     

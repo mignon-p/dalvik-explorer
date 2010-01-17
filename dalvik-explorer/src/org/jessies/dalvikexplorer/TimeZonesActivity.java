@@ -32,7 +32,8 @@ public class TimeZonesActivity extends ListActivity {
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
         final Intent intent = new Intent(this, TimeZoneActivity.class);
-        intent.putExtra("org.jessies.dalvikexplorer.TimeZone", TIME_ZONES.get(position).timeZone.getID());
+        final TimeZoneListItem item = (TimeZoneListItem) l.getAdapter().getItem(position);
+        intent.putExtra("org.jessies.dalvikexplorer.TimeZone", item.timeZone.getID());
         startActivity(intent);
     }
     

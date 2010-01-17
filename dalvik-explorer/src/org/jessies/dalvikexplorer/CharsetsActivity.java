@@ -33,7 +33,8 @@ public class CharsetsActivity extends ListActivity {
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
         final Intent intent = new Intent(this, CharsetActivity.class);
-        intent.putExtra("org.jessies.dalvikexplorer.Charset", CHARSETS.get(position).charset.name());
+        final CharsetListItem item = (CharsetListItem) l.getAdapter().getItem(position);
+        intent.putExtra("org.jessies.dalvikexplorer.Charset", item.charset.name());
         startActivity(intent);
     }
     

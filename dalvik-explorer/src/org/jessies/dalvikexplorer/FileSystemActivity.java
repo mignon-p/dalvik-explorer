@@ -60,8 +60,8 @@ public class FileSystemActivity extends ListActivity {
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
-        final Object item = getListAdapter().getItem(position);
-        final File child = ((FileListItem) item).file;
+        final FileListItem item = (FileListItem) l.getAdapter().getItem(position);
+        final File child = item.file;
         final Intent intent = new Intent(this, child.isDirectory() ? FileSystemActivity.class : FileViewerActivity.class);
         intent.putExtra("org.jessies.dalvikexplorer.Path", child.toString());
         startActivity(intent);
