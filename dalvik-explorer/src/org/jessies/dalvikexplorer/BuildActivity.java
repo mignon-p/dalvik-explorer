@@ -36,6 +36,9 @@ public class BuildActivity extends Activity {
         result.append("Device: " + build.DEVICE + "\n"); // "sholes"
         result.append('\n');
         result.append("Build Fingerprint: " + build.FINGERPRINT + "\n"); // "verizon/voles/sholes/sholes:2.1/ERD76/22321:userdebug/test-keys"
+        result.append('\n');
+        result.append("DalvikVM Heap Size: " + Runtime.getRuntime().maxMemory() / (1024*1024) + " MiB\n"); // "24 MiB"
+        
         return result.toString();
     }
     
