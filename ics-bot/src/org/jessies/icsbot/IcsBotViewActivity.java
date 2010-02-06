@@ -91,19 +91,30 @@ public class IcsBotViewActivity extends Activity {
             }
             return new String(baos.toByteArray(), "UTF-8");
         } catch (FileNotFoundException fnfe) {
-            Log.w(TAG, "Could not open data.", fnfe);
+            toastAndLog("Couldn't open data", fnfe);
         } catch (IOException ioe) {
-            Log.w(TAG, "Could not read data.", ioe);
+            toastAndLog("Couldn't read data", ioe);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException ioe) {
+                    // We don't care enough about this to annoy the user with it.
                     Log.w(TAG, "Could not close InputStream.", ioe);
                 }
             }
         }
         return null;
+    }
+    
+    private void toastAndLog(String message, Throwable th) {
+        Toast.makeText(this, message + ": " + th.getMessage(), Toast.LENGTH_SHORT).show();
+        Log.w(TAG, message, th);
+    }
+    
+    private void toastAndLog(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Log.w(TAG, message);
     }
     
     private TextView mTextView;
@@ -124,7 +135,7 @@ public class IcsBotViewActivity extends Activity {
         
         String data = getIntentDataAsString();
         if (data == null) {
-            Log.w(TAG, "No iCalendar data to parse.");
+            toastAndLog("No calendar data found");
             finish();
             return;
         }
@@ -138,7 +149,7 @@ public class IcsBotViewActivity extends Activity {
         try {
             mCalendar = ICalendar.parseCalendar(data);
         } catch (ICalendar.FormatException fe) {
-            Log.d(TAG, "Could not parse iCalendar.", fe);
+            toastAndLog("Couldn't parse calendar data", fe);
             finish();
             return;
         }
@@ -152,7 +163,7 @@ public class IcsBotViewActivity extends Activity {
             }
         }
         if (eventCount == 0) {
-            Log.d(TAG, "No events in iCalendar.");
+            toastAndLog("No events in calendar data");
             finish();
             return;
         }
@@ -213,8 +224,6 @@ public class IcsBotViewActivity extends Activity {
     }
     
     private void importCalendar(boolean actuallyInsert) {
-        Log.d(TAG, "importCalendar");
-        
         int numImported = 0;
         for (ICalendar.Component component : mCalendar.getComponents()) {
             if ("VEVENT".equals(component.getName())) {
@@ -241,9 +250,7 @@ public class IcsBotViewActivity extends Activity {
         // title
         String title = extractValue(event, "SUMMARY");
         if (TextUtils.isEmpty(title)) {
-            if (Config.LOGD) {
-                Log.d(TAG, "No SUMMARY provided for event. Cannot import.");
-            }
+            toastAndLog("Can't import an untitled event");
             return false;
         }
         values.put(TITLE, title);
@@ -287,9 +294,7 @@ public class IcsBotViewActivity extends Activity {
                 try {
                     time.parse(dtStart);
                 } catch (Exception e) {
-                    if (Config.LOGD) {
-                        Log.d(TAG, "Cannot parse dtStart " + dtStart, e);
-                    }
+                    toastAndLog("Can't parse DTSTART '" + dtStart + "'", e);
                     return false;
                 }
                 if (time.allDay) {
@@ -309,9 +314,7 @@ public class IcsBotViewActivity extends Activity {
                     try {
                         time.parse(dtEnd);
                     } catch (Exception e) {
-                        if (Config.LOGD) {
-                            Log.d(TAG, "Cannot parse dtEnd " + dtEnd, e);
-                        }
+                        toastAndLog("Can't parse DTEND '" + dtEnd + "'", e);
                         return false;
                     }
                     dtEndMillis = time.toMillis(false /* use isDst */);
@@ -330,9 +333,7 @@ public class IcsBotViewActivity extends Activity {
             }
         }
         if (TextUtils.isEmpty(dtStart) || (TextUtils.isEmpty(dtEnd) && TextUtils.isEmpty(duration))) {
-            if (Config.LOGD) {
-                Log.d(TAG, "No DTSTART or DTEND/DURATION defined.");
-            }
+            toastAndLog("Can't import events without a start or end");
             return false;
         }
         
