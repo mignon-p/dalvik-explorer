@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ics Bot</string>
+    
+    <string name="ics_bot_view_activity_title">Calendar Event Viewer</string>
+    <string name="calendar_spinner_label">Calendar:</string>
+    <string name="import_label">Import</string>
+</resources>
