@@ -29,24 +29,14 @@ import android.view.*;
 import android.widget.*;
 import java.io.*;
 import java.text.*;
-import java.text.DateFormat;
 import java.util.*;
 
 public class IcsBotViewActivity extends Activity {
     private static final String TAG = "IcsBot";
     
-    private final View.OnClickListener mImportListener = new View.OnClickListener() {
-        @Override public void onClick(View v) {
-            importCalendar(true);
-            finish();
-        }
-    };
+    private Spinner mCalendarsSpinner;
     
-    private final View.OnClickListener mCancelListener = new View.OnClickListener() {
-        @Override public void onClick(View v) {
-            finish();
-        }
-    };
+    private ICalendar.Component mCalendar;
     
     private static class CalendarInfo {
         public final long id;
@@ -75,6 +65,34 @@ public class IcsBotViewActivity extends Activity {
             return getUriDataAsString(content);
         }
         return null;
+    }
+    
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        // TODO: show a UI with the calendar-choice spinner if the user has more than one writable calendar?
+        
+        // This activity is only started when someone asks for an app to VIEW an ics file.
+        String data = getIntentDataAsString();
+        if (data == null) {
+            toastAndLog("No calendar data found");
+            finish();
+            return;
+        }
+        populateCalendarSpinner();
+        parseCalendar(data);
+        finish();
+    }
+    
+    private void toastAndLog(String message, Throwable th) {
+        Toast.makeText(this, message + ": " + th.getMessage(), Toast.LENGTH_SHORT).show();
+        Log.w(TAG, message, th);
+    }
+    
+    private void toastAndLog(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Log.w(TAG, message);
     }
     
     private String getUriDataAsString(Uri content) {
@@ -107,77 +125,35 @@ public class IcsBotViewActivity extends Activity {
         return null;
     }
     
-    private void toastAndLog(String message, Throwable th) {
-        Toast.makeText(this, message + ": " + th.getMessage(), Toast.LENGTH_SHORT).show();
-        Log.w(TAG, message, th);
-    }
-    
-    private void toastAndLog(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        Log.w(TAG, message);
-    }
-    
-    private TextView mTextView;
-    private Spinner mCalendarsSpinner;
-    
-    private ICalendar.Component mCalendar;
-    
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        mTextView = (TextView) findViewById(R.id.output);
-        
-        Button importButton = (Button) findViewById(R.id.import_button);
-        importButton.setOnClickListener(mImportListener);
-        Button cancelButton = (Button) findViewById(R.id.cancel_button);
-        cancelButton.setOnClickListener(mCancelListener);
-        
-        String data = getIntentDataAsString();
-        if (data == null) {
-            toastAndLog("No calendar data found");
-            finish();
-            return;
-        }
-        parseCalendar(data);
-        populateCalendarSpinner();
-        importCalendar(false);
-        mTextView.append(data);
-    }
-    
     private void parseCalendar(String data) {
         try {
             mCalendar = ICalendar.parseCalendar(data);
         } catch (ICalendar.FormatException fe) {
             toastAndLog("Couldn't parse calendar data", fe);
-            finish();
             return;
         }
+        
         int eventCount = 0;
+        int importedEventCount = 0;
         if (mCalendar.getComponents() != null) {
             for (ICalendar.Component component : mCalendar.getComponents()) {
                 if ("VEVENT".equals(component.getName())) {
-                    // TODO: display a list of the events (start time, title) in the UI?
                     ++eventCount;
+                    if (insertVEvent(component)) {
+                        ++importedEventCount;
+                    }
                 }
             }
         }
         if (eventCount == 0) {
             toastAndLog("No events in calendar data");
-            finish();
-            return;
         }
-        // TODO: special-case a single-event calendar.  switch to the
-        // EventActivity, once the EventActivity supports displaying data that
-        // is passed in via the extras.
-        // OR, we could flip things around, where the EventActivity handles ICS
-        // import by default, and delegates to the IcsImportActivity if it finds
-        // that there are more than one event in the iCalendar.  that would
-        // avoid an extra activity launch for the expected common case of
-        // importing a single event.
-        mTextView.append("Events: " + Integer.toString(eventCount));
+        if (importedEventCount != eventCount) {
+            toastAndLog("Not all events were added");
+        }
     }
     
+    // Secrets we shouldn't know about Calendar's database schema...
     private static final String DISPLAY_NAME_COLUMN = "displayName";
     private static final String _ID_COLUMN = "_id";
     private static final String SELECTED_COLUMN = "selected";
@@ -195,6 +171,9 @@ public class IcsBotViewActivity extends Activity {
     private static final String EVENT_TIMEZONE = "eventTimezone";
     private static final String STATUS = "eventStatus";
     private static final String TITLE = "title";
+    // Intent extra keys, from Calendar...
+    private static final String EVENT_BEGIN_TIME = "beginTime";
+    private static final String EVENT_END_TIME = "endTime";
     
     private void populateCalendarSpinner() {
         mCalendarsSpinner = (Spinner) findViewById(R.id.calendars);
@@ -216,24 +195,9 @@ public class IcsBotViewActivity extends Activity {
             c.deactivate();
         }
         
-        // TODO: hide the spinner completely if the user only has one appropriate calendar.
-        
         ArrayAdapter<CalendarInfo> adapter = new ArrayAdapter<CalendarInfo>(this, android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCalendarsSpinner.setAdapter(adapter);
-    }
-    
-    private void importCalendar(boolean actuallyInsert) {
-        int numImported = 0;
-        for (ICalendar.Component component : mCalendar.getComponents()) {
-            if ("VEVENT".equals(component.getName())) {
-                CalendarInfo calInfo = (CalendarInfo) mCalendarsSpinner.getSelectedItem();
-                if (insertVEvent(component, calInfo.id, STATUS_CONFIRMED, actuallyInsert)) {
-                    ++numImported;
-                }
-            }
-        }
-        // TODO: check for success/failure.
     }
     
     private static String extractValue(ICalendar.Component component, String propertyName) {
@@ -241,10 +205,7 @@ public class IcsBotViewActivity extends Activity {
         return (property != null) ? property.getValue() : null;
     }
     
-    private boolean insertVEvent(ICalendar.Component event, long calendarId, int status, boolean actuallyInsert) {
-        // TODO: define VEVENT component names as constants in some
-        // appropriate class (ICalendar.Component?).
-        
+    private boolean insertVEvent(ICalendar.Component event) {
         ContentValues values = new ContentValues();
         
         // title
@@ -256,7 +217,7 @@ public class IcsBotViewActivity extends Activity {
         values.put(TITLE, title);
         
         // status
-        values.put(STATUS, status);
+        values.put(STATUS, STATUS_CONFIRMED);
         
         // description
         String description = extractValue(event, "DESCRIPTION");
@@ -270,7 +231,9 @@ public class IcsBotViewActivity extends Activity {
             values.put(EVENT_LOCATION, where);
         }
         
-        // Calendar ID
+        // Which calendar should we insert into?
+        CalendarInfo calInfo = (CalendarInfo) mCalendarsSpinner.getSelectedItem();
+        long calendarId = calInfo.id;
         values.put(CALENDAR_ID, calendarId);
         
         // TODO: deal with VALARMs
@@ -309,8 +272,7 @@ public class IcsBotViewActivity extends Activity {
             if (dtEndProp != null) {
                 dtEnd = dtEndProp.getValue();
                 if (!TextUtils.isEmpty(dtEnd)) {
-                    // TODO: make sure the timezones are the same for
-                    // start, end.
+                    // TODO: make sure the timezones are the same for start, end.
                     try {
                         time.parse(dtEnd);
                     } catch (Exception e) {
@@ -337,19 +299,6 @@ public class IcsBotViewActivity extends Activity {
             return false;
         }
         
-        mTextView.append("title: " + title + "\n");
-        mTextView.append("description: " + description + "\n");
-        mTextView.append("where: " + where + "\n");
-        if (values.get(ALL_DAY) != null) {
-            mTextView.append("when: " + String.format("%tF", dtStartMillis) + "\n");
-            mTextView.append("when: " + DateFormat.getDateInstance().format(dtStartMillis) + "\n");
-            mTextView.append("when: " + DateUtils.formatDateTime(this, dtStartMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_UTC) + "\n");
-        } else {
-            mTextView.append("when: " + String.format("%tF %tR - %tF %tR", dtStartMillis, dtStartMillis, dtEndMillis, dtEndMillis) + "\n");
-            mTextView.append("when: " + DateFormat.getDateTimeInstance().format(dtStartMillis) + " - " + DateFormat.getDateTimeInstance().format(dtEndMillis) + "\n");
-            mTextView.append("when: " + DateUtils.formatDateRange(this, dtStartMillis, dtEndMillis, DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_UTC) + "\n");
-        }
-        
         // rrule
         /*
         if (!RecurrenceSet.populateContentValues(event, values)) {
@@ -357,10 +306,22 @@ public class IcsBotViewActivity extends Activity {
         }
         */
         
-        if (actuallyInsert) {
-            return getContentResolver().insert(Uri.parse("content://calendar/events"), values) != null;
+        // Insert the event...
+        Uri uri = getContentResolver().insert(Uri.parse("content://calendar/events"), values);
+        if (uri == null) {
+            toastAndLog("Couldn't import event '" + title + "'");
+            return false;
         }
+        
+        // ...and immediately ask Calendar to open up the event-editing UI.
+        // (Ideally, we'd be able to go to the new-event UI, but this is as close as we can get.)
+        Intent intent = new Intent(Intent.ACTION_EDIT);
+        intent.setData(uri);
+        // Is this a Calendar bug? It never looks at the begin/end times actually stored in the event!
+        // If we don't resupply them like this, they get overwritten with 0.
+        intent.putExtra(EVENT_BEGIN_TIME, dtStartMillis);
+        intent.putExtra(EVENT_END_TIME, dtEndMillis);
+        startActivity(intent);
         return true;
     }
-    
 }
