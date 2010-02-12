@@ -202,7 +202,27 @@ public class IcsBotViewActivity extends Activity {
     
     private static String extractValue(ICalendar.Component component, String propertyName) {
         ICalendar.Property property = component.getFirstProperty(propertyName);
-        return (property != null) ? property.getValue() : null;
+        return (property != null) ? unescape(property.getValue()) : null;
+    }
+    
+    private static String unescape(String s) {
+        if (s.indexOf('\\') == -1) {
+            return s;
+        }
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < s.length(); ++i) {
+            char ch = s.charAt(i);
+            if (ch == '\\' && i < s.length() - 1) {
+                char ch2 = s.charAt(++i);
+                if (ch2 == 'n') {
+                    ch2 = '\n';
+                }
+                result.append(ch2);
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
     }
     
     private boolean insertVEvent(ICalendar.Component event) {
