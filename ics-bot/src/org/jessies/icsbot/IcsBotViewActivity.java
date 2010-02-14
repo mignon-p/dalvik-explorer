@@ -135,18 +135,21 @@ public class IcsBotViewActivity extends Activity {
         
         int eventCount = 0;
         int importedEventCount = 0;
+        Map<String, TimeZone> timeZones = new HashMap<String, TimeZone>();
         if (mCalendar.getComponents() != null) {
             for (ICalendar.Component component : mCalendar.getComponents()) {
-                if ("VEVENT".equals(component.getName())) {
+                if (component.getName().equals(ICalendar.Component.VTIMEZONE)) {
+                    parseTimeZone(component, timeZones);
+                } else if (component.getName().equals(ICalendar.Component.VEVENT)) {
                     ++eventCount;
-                    if (insertVEvent(component)) {
+                    if (insertVEvent(component, timeZones)) {
                         ++importedEventCount;
                     }
                 }
             }
         }
         if (eventCount == 0) {
-            toastAndLog("No events in calendar data");
+            toastAndLog("No events found in calendar data");
         }
         if (importedEventCount != eventCount) {
             toastAndLog("Not all events were added");
@@ -225,7 +228,55 @@ public class IcsBotViewActivity extends Activity {
         return result.toString();
     }
     
-    private boolean insertVEvent(ICalendar.Component event) {
+    /**
+     * The VEVENT uses the TZID parameter of the DTSTART/DTEND properties to declare the time zone of the time they represent.
+     * (Though, if you're lucky, the generating code is sane and uses UTC and doesn't need a TZID.)
+     * We need to translate that to a UTC offset.
+     * Stupidly, the time zone ids aren't the well-known America/Los_Angeles style; they're arbitrary strings.
+     * We need to have parsed VTIMEZONE properties into our timeZones map, and now we need to pull them back out.
+     * 
+     * This is broken because we don't know whether we need the STANDARD or DAYLIGHT variant, and the TimeZone in the map is always equivalent to STANDARD.
+     */
+    private String timeZoneIdFromProperty(ICalendar.Property property, Map<String, TimeZone> timeZones) {
+        ICalendar.Parameter tzIdParam = property.getFirstParameter("TZID");
+        if (tzIdParam == null || tzIdParam.value == null) {
+            return "GMT";
+        }
+        // FIXME: shouldn't ICalendar automatically remove the quotes for us?
+        String bogusTzId = tzIdParam.value.replaceFirst("^\"(.*)\"$", "$1");
+        TimeZone tz = timeZones.get(bogusTzId);
+        if (tz == null) {
+            toastAndLog("Can't parse TZID '" + tzIdParam + "'");
+        }
+        System.err.println("TZID=" + bogusTzId + " " + tz);
+        return tz.getID();
+    }
+    
+    private boolean parseTime(String what, ICalendar.Property property, Time time, Map<String, TimeZone> timeZones) {
+        String tzId = timeZoneIdFromProperty(property, timeZones);
+        time.clear(tzId);
+        try {
+            String t = property.getValue();
+            if (t.endsWith("Z")) {
+                // UTC times are easy. Google Calendar wisely uses these, but nothing else seems to.
+                time.parse(t);
+            } else {
+                // Damn it! We need to take the time zone into account.
+                // The easiest way I found -- given that we don't have an appropriate TimeZone object anyway --
+                // is to rewrite the time string so it's an RFC 3339 timestamp including a UTC offset.
+                String tzSuffix = tzId.replaceAll("GMT(.*)", "$1");
+                // FIXME: the .000 works around a bug in the crappy android.text.format.Time code.
+                t = t.replaceAll("(....)(..)(..)T(..)(..)(..)", "$1-$2-$3T$4:$5:$6.000" + tzSuffix);
+                time.parse3339(t);
+            }
+            return true;
+        } catch (Exception e) {
+            toastAndLog("Can't parse " + what + " '" + property.getValue() + "'", e);
+            return false;
+        }
+    }
+    
+    private boolean insertVEvent(ICalendar.Component event, Map<String, TimeZone> timeZones) {
         ContentValues values = new ContentValues();
         
         // title
@@ -256,8 +307,6 @@ public class IcsBotViewActivity extends Activity {
         long calendarId = calInfo.id;
         values.put(CALENDAR_ID, calendarId);
         
-        // TODO: deal with VALARMs
-        
         // dtStart & dtEnd
         Time time = new Time(Time.TIMEZONE_UTC);
         long dtStartMillis = 0;
@@ -266,18 +315,10 @@ public class IcsBotViewActivity extends Activity {
         String dtEnd = null;
         String duration = null;
         ICalendar.Property dtStartProp = event.getFirstProperty("DTSTART");
-        // TODO: handle "floating" timezone (no timezone specified).
         if (dtStartProp != null) {
             dtStart = dtStartProp.getValue();
             if (!TextUtils.isEmpty(dtStart)) {
-                ICalendar.Parameter tzIdParam = dtStartProp.getFirstParameter("TZID");
-                if (tzIdParam != null && tzIdParam.value != null) {
-                    time.clear(tzIdParam.value);
-                }
-                try {
-                    time.parse(dtStart);
-                } catch (Exception e) {
-                    toastAndLog("Can't parse DTSTART '" + dtStart + "'", e);
+                if (!parseTime("start time", dtStartProp, time, timeZones)) {
                     return false;
                 }
                 if (time.allDay) {
@@ -292,11 +333,7 @@ public class IcsBotViewActivity extends Activity {
             if (dtEndProp != null) {
                 dtEnd = dtEndProp.getValue();
                 if (!TextUtils.isEmpty(dtEnd)) {
-                    // TODO: make sure the timezones are the same for start, end.
-                    try {
-                        time.parse(dtEnd);
-                    } catch (Exception e) {
-                        toastAndLog("Can't parse DTEND '" + dtEnd + "'", e);
+                    if (!parseTime("end time", dtEndProp, time, timeZones)) {
                         return false;
                     }
                     dtEndMillis = time.toMillis(false /* use isDst */);
@@ -314,8 +351,13 @@ public class IcsBotViewActivity extends Activity {
                 }
             }
         }
-        if (TextUtils.isEmpty(dtStart) || (TextUtils.isEmpty(dtEnd) && TextUtils.isEmpty(duration))) {
-            toastAndLog("Can't import events without a start or end");
+        
+        if (TextUtils.isEmpty(dtStart)) {
+            toastAndLog("Can't import events that don't have a start time");
+            return false;
+        }
+        if (TextUtils.isEmpty(dtEnd) && TextUtils.isEmpty(duration)) {
+            toastAndLog("Can't import events that have neither an end time nor a duration");
             return false;
         }
         
@@ -325,6 +367,8 @@ public class IcsBotViewActivity extends Activity {
             return null;
         }
         */
+        
+        // FIXME: use the VALARM data to set a reminder.
         
         // Insert the event...
         Uri uri = getContentResolver().insert(Uri.parse("content://calendar/events"), values);
@@ -343,5 +387,35 @@ public class IcsBotViewActivity extends Activity {
         intent.putExtra(EVENT_END_TIME, dtEndMillis);
         startActivity(intent);
         return true;
+    }
+    
+    /**
+     * Translates VTIMEZONE components into entries in the String to TimeZone map.
+     * The entry corresponds to the STANDARD variant, and we ignore the DAYLIGHT variant.
+     * This is obviously broken, but it's better than the previous behavior (which was to always assume UTC).
+     * 
+     * It's not obvious to me how to implement the right behavior.
+     * I don't think we can use SimpleTimeZone because I don't think it can represent the complicated rules like "2nd Sunday".
+     * 
+     * Google Calendar gets round this by taking the eminently sane attitude that all times should be UTC.
+     * It lets the sending and receiving users' settings determine how the event appears.
+     */
+    private void parseTimeZone(ICalendar.Component timeZone, Map<String, TimeZone> timeZones) {
+        String name = extractValue(timeZone, "TZID");
+        for (ICalendar.Component variant : timeZone.getComponents()) {
+            // FIXME: we need to support DAYLIGHT too, but just supporting STANDARD is better than nothing!
+            if (variant.getName().equals("STANDARD")) {
+                ICalendar.Property offset = variant.getFirstProperty("TZOFFSETTO");
+                if (offset != null && offset.getValue() != null) {
+                    TimeZone tz = TimeZone.getTimeZone("GMT" + offset.getValue());
+                    timeZones.put(name, tz);
+                    System.err.println("added '" + name + "' variant '" + variant.getName() + "' as " + tz);
+                } else {
+                    System.err.println("didn't understand '" + name + "' variant '" + variant.getName() + "'");
+                }
+            } else {
+                System.err.println("ignoring '" + name + "' variant '" + variant.getName() + "'");
+            }
+        }
     }
 }
