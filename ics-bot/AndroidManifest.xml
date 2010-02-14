@@ -19,6 +19,7 @@
                 <data android:scheme="http" />
                 <data android:mimeType="application/ics" />
                 <data android:mimeType="text/calendar" />
+                <data android:mimeType="application/octet-stream" android:pathPattern=".*\\.ics" />
             </intent-filter>
         </activity>
     </application>
