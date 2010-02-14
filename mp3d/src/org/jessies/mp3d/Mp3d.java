@@ -230,6 +230,7 @@ public class Mp3d {
         }
         
         // Index all the mp3s.
+        notifyUser("Scanning music library...");
         this.allMp3s = scanId3v2Tags(findMp3Files(musicDirectories));
         
         // Start the HTTP server.
@@ -259,21 +260,45 @@ public class Mp3d {
         return staticHandler;
     }
     
+    private void notifyUser(String message) {
+        notifyUser(message, null, true);
+    }
+    
+    private void notifyUser(String message, Throwable th) {
+        notifyUser(message, th, true);
+    }
+    
+    private void notifyUser(String message, Throwable th, boolean gui) {
+        System.err.println(TimeUtilities.currentIsoString() + " mp3d: " + message);
+        if (th != null) {
+            System.err.println("Associated exception:");
+            th.printStackTrace(System.err);
+        }
+        if (gui) {
+            ProcessUtilities.spawn(null, "/usr/bin/notify-send", "mp3d", message);
+        }
+    }
+    
+    private void notifyUser(Mp3Info mp3) {
+        notifyUser("Playing " + nowPlaying + "...", null, false);
+        ProcessUtilities.spawn(null, "/usr/bin/notify-send", mp3.title, mp3.album);
+    }
+    
     private class PlayQueueRunnable implements Runnable {
         public void run() {
             while (true) {
                 try {
-                    System.err.println("Waiting for something to play...");
+                    notifyUser("Waiting for something to play...", null, playQueue.size() == 0);
                     nowPlaying = playQueue.take();
                     
-                    System.err.println("Playing " + nowPlaying + "...");
+                    notifyUser(nowPlaying);
                     try {
                         AudioDevice audioDevice = FactoryRegistry.systemRegistry().createAudioDevice();
                         player = new Player(new FileInputStream(nowPlaying.filename), audioDevice);
                         player.play();
                         nowPlaying = null;
                     } catch (Exception ex) {
-                        Log.warn("Failed to play \"" + nowPlaying.filename + "\"", ex);
+                        notifyUser("Failed to play \"" + nowPlaying.filename + "\"", ex);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -299,7 +324,7 @@ public class Mp3d {
                             }
                         }
                     } catch (Exception ex) {
-                        System.err.println("Problem with " + mp3file);
+                        notifyUser("Problem with '" + mp3file + "'");
                         ex.printStackTrace();
                     }
                 }
@@ -313,7 +338,7 @@ public class Mp3d {
         }
         
         final long t1 = System.nanoTime();
-        System.err.println("Scanned " + mp3s.size() + " .mp3 files' ID3v2 tags in " + TimeUtilities.nsToString(t1 - t0) + " (" + threadCount + " threads)");
+        notifyUser("Scanned " + mp3s.size() + " .mp3 files' ID3v2 tags in " + TimeUtilities.nsToString(t1 - t0) + " (" + threadCount + " threads)");
         return mp3s;
     }
     
@@ -339,7 +364,7 @@ public class Mp3d {
         }
         
         final long t1 = System.nanoTime();
-        System.err.println("Found " + mp3files.size() + " .mp3 files in " + TimeUtilities.nsToString(t1 - t0));
+        notifyUser("Found " + mp3files.size() + " .mp3 files in " + TimeUtilities.nsToString(t1 - t0));
         return mp3files;
     }
     
