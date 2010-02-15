@@ -7,16 +7,17 @@ import android.view.*;
 import android.widget.*;
 import java.util.*;
 
-public class TimeZoneActivity extends Activity {
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        final String timeZoneId = getIntent().getStringExtra("org.jessies.dalvikexplorer.TimeZone");
-        setTitle("Time Zone \"" + timeZoneId + "\"");
-        
-        TextView textView = (TextView) findViewById(R.id.output);
-        textView.setText(describeTimeZone(timeZoneId));
+public class TimeZoneActivity extends TextViewActivity {
+    protected String extraName() {
+        return "org.jessies.dalvikexplorer.TimeZone";
+    }
+    
+    protected CharSequence title(String timeZoneId) {
+        return "Time Zone \"" + timeZoneId + "\"";
+    }
+    
+    protected CharSequence content(String timeZoneId) {
+        return describeTimeZone(timeZoneId);
     }
     
     static String describeTimeZone(String id) {

@@ -5,14 +5,13 @@ import android.os.*;
 import android.widget.*;
 import java.util.*;
 
-public class SystemPropertiesActivity extends Activity {
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        TextView textView = (TextView) findViewById(R.id.output);
-        textView.setText(getSystemPropertiesAsString());
-        setTitle("System Properties (" + System.getProperties().size() + ")");
+public class SystemPropertiesActivity extends TextViewActivity {
+    protected CharSequence title(String unused) {
+        return "System Properties (" + System.getProperties().size() + ")";
+    }
+    
+    protected CharSequence content(String unused) {
+        return getSystemPropertiesAsString();
     }
     
     // Original in salma-hayek "DebugMenu.java".

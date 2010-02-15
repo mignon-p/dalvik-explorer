@@ -6,15 +6,13 @@ import android.widget.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-public class BuildActivity extends Activity {
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        setTitle("Build/Device Details");
-        
-        TextView textView = (TextView) findViewById(R.id.output);
-        textView.setText(getBuildDetailsAsString());
+public class BuildActivity extends TextViewActivity {
+    protected CharSequence title(String unused) {
+        return "Build/Device Details";
+    }
+    
+    protected CharSequence content(String unused) {
+        return getBuildDetailsAsString();
     }
     
     static String getBuildDetailsAsString() {

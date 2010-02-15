@@ -4,20 +4,20 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
-import android.widget.*;
 import java.nio.charset.*;
 import java.util.*;
 
-public class CharsetActivity extends Activity {
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        final String charsetName = getIntent().getStringExtra("org.jessies.dalvikexplorer.Charset");
-        setTitle("Charset \"" + charsetName + "\"");
-        
-        TextView textView = (TextView) findViewById(R.id.output);
-        textView.setText(describeCharset(charsetName));
+public class CharsetActivity extends TextViewActivity {
+    protected String extraName() {
+        return "org.jessies.dalvikexplorer.Charset";
+    }
+    
+    protected CharSequence title(String charsetName) {
+        return "Charset \"" + charsetName + "\"";
+    }
+    
+    protected CharSequence content(String charsetName) {
+        return describeCharset(charsetName);
     }
     
     static String describeCharset(String name) {

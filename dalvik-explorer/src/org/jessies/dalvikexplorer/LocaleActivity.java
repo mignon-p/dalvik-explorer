@@ -8,16 +8,17 @@ import android.widget.*;
 import java.text.*;
 import java.util.*;
 
-public class LocaleActivity extends Activity {
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        final String localeName = getIntent().getStringExtra("org.jessies.dalvikexplorer.Locale");
-        setTitle("Locale \"" + localeName + "\"");
-        
-        TextView textView = (TextView) findViewById(R.id.output);
-        textView.setText(describeLocale(localeName));
+public class LocaleActivity extends TextViewActivity {
+    protected String extraName() {
+        return "org.jessies.dalvikexplorer.Locale";
+    }
+    
+    protected CharSequence title(String localeName) {
+        return "Locale \"" + localeName + "\"";
+    }
+    
+    protected CharSequence content(String localeName) {
+        return describeLocale(localeName);
     }
     
     private static Locale localeByName(String name) {

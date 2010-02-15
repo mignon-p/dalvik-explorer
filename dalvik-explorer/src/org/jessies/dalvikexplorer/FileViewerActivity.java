@@ -7,15 +7,17 @@ import android.view.*;
 import android.widget.*;
 import java.io.*;
 
-public class FileViewerActivity extends Activity {
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        final String path = getIntent().getStringExtra("org.jessies.dalvikexplorer.Path");
-        setTitle(path);
-        TextView textView = (TextView) findViewById(R.id.output);
-        textView.setText(readFile(path));
+public class FileViewerActivity extends TextViewActivity {
+    protected String extraName() {
+        return "org.jessies.dalvikexplorer.Path";
+    }
+    
+    protected CharSequence title(String path) {
+        return path;
+    }
+    
+    protected CharSequence content(String path) {
+        return readFile(path);
     }
     
     private CharSequence readFile(String path) {
