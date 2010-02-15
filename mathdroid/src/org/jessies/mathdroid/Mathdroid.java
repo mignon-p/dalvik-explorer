@@ -217,7 +217,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         menu.add(0, CONTEXT_MENU_COPY_ALL,  0, "Copy all");
     }
     
-    public boolean onContextItemSelected(MenuItem item) {
+    @Override public boolean onContextItemSelected(MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
         case CONTEXT_MENU_COPY_SELECTED:
