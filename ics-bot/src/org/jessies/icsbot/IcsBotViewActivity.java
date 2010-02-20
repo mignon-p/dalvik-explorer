@@ -102,16 +102,14 @@ public class IcsBotViewActivity extends Activity {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[4096];
             int bytesRead = -1;
-            int pos = 0;
             while ((bytesRead = is.read(buf)) != -1) {
-                baos.write(buf, pos, bytesRead);
-                pos += bytesRead;
+                baos.write(buf, 0, bytesRead);
             }
             return new String(baos.toByteArray(), "UTF-8");
         } catch (FileNotFoundException fnfe) {
             toastAndLog("Couldn't open data", fnfe);
-        } catch (IOException ioe) {
-            toastAndLog("Couldn't read data", ioe);
+        } catch (Exception ex) {
+            toastAndLog("Couldn't read data", ex);
         } finally {
             if (is != null) {
                 try {
