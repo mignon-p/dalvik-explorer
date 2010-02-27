@@ -16,9 +16,6 @@
 
 package org.jessies.icalendar; // was: package android.pim;
 
-import android.util.Log;
-import android.util.Config;
-
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -447,11 +444,10 @@ public class ICalendar {
                     component = current;
                 }
             } catch (FormatException fe) {
-                if (Config.LOGV) {
-                    Log.v(TAG, "Cannot parse " + line, fe);
-                }
                 // for now, we ignore the parse error.  Google Calendar seems
                 // to be emitting some misformatted iCalendar objects.
+                System.err.println("Cannot parse " + line);
+                fe.printStackTrace();
             }
             continue;
         }
