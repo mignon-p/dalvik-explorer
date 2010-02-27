@@ -176,11 +176,24 @@ public class IcsBotViewActivity extends Activity {
     private static final String EVENT_BEGIN_TIME = "beginTime";
     private static final String EVENT_END_TIME = "endTime";
     
+    private static final String[] AUTHORITIES = new String[] { "calendar", "com.android.calendar" };
+    private String mAuthority;
+    
     private void populateCalendarSpinner() {
         mCalendarsSpinner = (Spinner) findViewById(R.id.calendars);
         
         String[] columns = new String[] { _ID_COLUMN, DISPLAY_NAME_COLUMN, SELECTED_COLUMN, ACCESS_LEVEL_COLUMN };
-        Cursor c = getContentResolver().query(Uri.parse("content://calendar/calendars"), columns, SELECTED_COLUMN + "=1 AND " + ACCESS_LEVEL_COLUMN + ">=" + CONTRIBUTOR_ACCESS, null, null /* sort order */);
+        String query = SELECTED_COLUMN + "=1 AND " + ACCESS_LEVEL_COLUMN + ">=" + CONTRIBUTOR_ACCESS;
+        // When Calendar was unbundled for Froyo, the authority changed. To support old and new builds, we need to try both.
+        Cursor c = null;
+        for (String authority : AUTHORITIES) {
+            Uri uri = Uri.parse(String.format("content://%s/calendars", authority));
+            c = getContentResolver().query(uri, columns, query, null, null /* sort order */);
+            if (c != null) {
+                mAuthority = authority;
+                break;
+            }
+        }
         
         ArrayList<CalendarInfo> items = new ArrayList<CalendarInfo>();
         try {
@@ -369,7 +382,7 @@ public class IcsBotViewActivity extends Activity {
         // FIXME: use the VALARM data to set a reminder.
         
         // Insert the event...
-        Uri uri = getContentResolver().insert(Uri.parse("content://calendar/events"), values);
+        Uri uri = getContentResolver().insert(Uri.parse(String.format("content://%s/events", mAuthority)), values);
         if (uri == null) {
             toastAndLog("Couldn't import event '" + title + "'");
             return false;
