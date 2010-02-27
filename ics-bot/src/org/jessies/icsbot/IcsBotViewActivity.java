@@ -439,11 +439,11 @@ public class IcsBotViewActivity extends Activity {
                         throw new IllegalArgumentException(rule.getValue() + ": can't parse BYDAY!");
                     }
                     if (standard) {
-                        standardDay = Integer.parseInt(matcher.group(1));
-                        standardDayOfWeek = parseDayName(matcher.group(2));
+                        standardDay = Integer.parseInt(m.group(1));
+                        standardDayOfWeek = IcsUtils.parseDayName(m.group(2));
                     } else {
-                        daylightDay = Integer.parseInt(matcher.group(1));
-                        daylightDayOfWeek = parseDayName(matcher.group(2));
+                        daylightDay = Integer.parseInt(m.group(1));
+                        daylightDayOfWeek = IcsUtils.parseDayName(m.group(2));
                     }
                 } else if (key.equals("BYMONTH")) {
                     if (standard) {
@@ -458,7 +458,7 @@ public class IcsBotViewActivity extends Activity {
             
             ICalendar.Property offset = variant.getFirstProperty("TZOFFSETTO");
             if (offset != null && offset.getValue() != null) {
-                int rawOffset = parseUtcOffset(offset.getValue());
+                int rawOffset = IcsUtils.parseUtcOffset(offset.getValue());
                 if (standard) {
                     standardOffset = rawOffset;
                 } else {
@@ -471,49 +471,5 @@ public class IcsBotViewActivity extends Activity {
         SimpleTimeZone tz = new SimpleTimeZone(standardOffset, name, daylightMonth, daylightDay, daylightDayOfWeek, 7200000, standardMonth, standardDay, standardDayOfWeek, 7200000, Math.abs(daylightOffset - standardOffset));
         timeZones.put(name, tz);
         System.err.println("added '" + name + "' as " + tz);
-    }
-    
-    /**
-     * Parses an RFC 5545 UTC offset and returns milliseconds.
-     * 
-     * Grammar:
-     *        utc-offset = time-numzone
-     *        time-numzone = ("+" / "-") time-hour time-minute [time-second]
-     * 
-     * Examples:
-     * -0500
-     * +0100
-     */
-    private int parseUtcOffset(String value) {
-        final Pattern utcOffsetPattern = Pattern.compile("([-+])(\\d{2})(\\d{2})(?:\\d{2})?");
-        final Matcher matcher = utcOffsetPattern.matcher(value);
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException(value);
-        }
-        int sign = matcher.group(1).equals("+") ? 1 : -1;
-        int hours = Integer.parseInt(matcher.group(2));
-        int minutes = Integer.parseInt(matcher.group(3));
-        int offsetSeconds = sign * (hours*60 + minutes)*60;
-        return offsetSeconds * 1000;
-    }
-    
-    private int parseDayName(String twoLetterDayName) {
-        if (twoLetterDayName.equals("SU")) {
-            return Calendar.SUNDAY;
-        } else if (twoLetterDayName.equals("MO")) {
-            return Calendar.MONDAY;
-        } else if (twoLetterDayName.equals("TU")) {
-            return Calendar.TUESDAY;
-        } else if (twoLetterDayName.equals("WE")) {
-            return Calendar.WEDNESDAY;
-        } else if (twoLetterDayName.equals("TH")) {
-            return Calendar.THURSDAY;
-        } else if (twoLetterDayName.equals("FR")) {
-            return Calendar.FRIDAY;
-        } else if (twoLetterDayName.equals("SA")) {
-            return Calendar.SATURDAY;
-        } else {
-            throw new IllegalArgumentException(twoLetterDayName);
-        }
     }
 }
