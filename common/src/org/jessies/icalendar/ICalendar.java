@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jessies.icsbot; // was: package android.pim;
+package org.jessies.icalendar; // was: package android.pim;
 
 import android.util.Log;
 import android.util.Config;

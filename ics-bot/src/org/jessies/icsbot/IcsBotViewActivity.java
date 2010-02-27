@@ -31,6 +31,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import java.util.regex.*;
+import org.jessies.icalendar.*;
 
 public class IcsBotViewActivity extends Activity {
     private static final String TAG = "IcsBot";
