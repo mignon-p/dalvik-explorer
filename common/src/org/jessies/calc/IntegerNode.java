@@ -19,6 +19,7 @@ package org.jessies.calc;
  */
 
 import java.math.*;
+//import org.jessies.calc.bigint.*;
 
 public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     // Cache common values, equivalent to what the JLS mandates for boxed integers in Java.
@@ -245,6 +246,8 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         if (n.compareTo(m) <= 0) {
             return n;
         }
+        // shiftLeft(1) - 550145094 ns
+        // multiply()   - 535161265 ns
         final BigInteger twoM = BIG_INTEGER_TWO.multiply(m); // This seems consistently faster than m.shiftLeft(1)!
         return factorialHelper(n, twoM).multiply(factorialHelper(n.subtract(m), twoM));
     }

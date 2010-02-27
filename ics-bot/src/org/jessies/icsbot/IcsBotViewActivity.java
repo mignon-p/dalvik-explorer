@@ -30,6 +30,7 @@ import android.widget.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.regex.*;
 
 public class IcsBotViewActivity extends Activity {
     private static final String TAG = "IcsBot";
@@ -80,6 +81,7 @@ public class IcsBotViewActivity extends Activity {
             finish();
             return;
         }
+        System.err.println(data);
         populateCalendarSpinner();
         parseCalendar(data);
         finish();
@@ -413,20 +415,104 @@ public class IcsBotViewActivity extends Activity {
      */
     private void parseTimeZone(ICalendar.Component timeZone, Map<String, TimeZone> timeZones) {
         String name = extractValue(timeZone, "TZID");
+        int standardDay = 0, standardDayOfWeek = 0, standardMonth = 0, daylightDay = 0, daylightDayOfWeek = 0, daylightMonth = 0;
+        int standardOffset = 0, daylightOffset = 0;
         for (ICalendar.Component variant : timeZone.getComponents()) {
-            // FIXME: we need to support DAYLIGHT too, but just supporting STANDARD is better than nothing!
-            if (variant.getName().equals("STANDARD")) {
-                ICalendar.Property offset = variant.getFirstProperty("TZOFFSETTO");
-                if (offset != null && offset.getValue() != null) {
-                    TimeZone tz = TimeZone.getTimeZone("GMT" + offset.getValue());
-                    timeZones.put(name, tz);
-                    System.err.println("added '" + name + "' variant '" + variant.getName() + "' as " + tz);
+            // RRULE:FREQ=YEARLY;BYMINUTE=0;BYHOUR=2;BYDAY=1SU;BYMONTH=11
+            boolean standard = variant.getName().equals("STANDARD");
+            ICalendar.Property rule = variant.getFirstProperty("RRULE");
+            if (rule == null) {
+                throw new IllegalArgumentException(name + ", variant " + variant.getName() + " has no RRULE!");
+            }
+            for (String param : rule.getValue().split(";")) {
+                String[] keyValue = param.split("=");
+                String key = keyValue[0];
+                String value = keyValue[1];
+                if (key.equals("FREQ")) {
+                    if (!value.equals("YEARLY")) {
+                        throw new IllegalArgumentException(rule.getValue() + ": FREQ not YEARLY!");
+                    }
+                } else if (key.equals("BYDAY")) {
+                    Matcher m = Pattern.compile("(-?\\d+)(..)").matcher(value);
+                    if (!m.matches()) {
+                        throw new IllegalArgumentException(rule.getValue() + ": can't parse BYDAY!");
+                    }
+                    if (standard) {
+                        standardDay = Integer.parseInt(matcher.group(1));
+                        standardDayOfWeek = parseDayName(matcher.group(2));
+                    } else {
+                        daylightDay = Integer.parseInt(matcher.group(1));
+                        daylightDayOfWeek = parseDayName(matcher.group(2));
+                    }
+                } else if (key.equals("BYMONTH")) {
+                    if (standard) {
+                        standardMonth = Integer.parseInt(value);
+                    } else {
+                        daylightMonth = Integer.parseInt(value);
+                    }
                 } else {
-                    System.err.println("didn't understand '" + name + "' variant '" + variant.getName() + "'");
+                    System.err.println("warning: ignoring key " + key + " (value " + value + ") for " + name + ", variant " + variant.getName());
+                }
+            }
+            
+            ICalendar.Property offset = variant.getFirstProperty("TZOFFSETTO");
+            if (offset != null && offset.getValue() != null) {
+                int rawOffset = parseUtcOffset(offset.getValue());
+                if (standard) {
+                    standardOffset = rawOffset;
+                } else {
+                    daylightOffset = rawOffset;
                 }
             } else {
-                System.err.println("ignoring '" + name + "' variant '" + variant.getName() + "'");
+                System.err.println("didn't understand TZOFFSETTO in '" + name + "' variant '" + variant.getName() + "'");
             }
+        }
+        SimpleTimeZone tz = new SimpleTimeZone(standardOffset, name, daylightMonth, daylightDay, daylightDayOfWeek, 7200000, standardMonth, standardDay, standardDayOfWeek, 7200000, Math.abs(daylightOffset - standardOffset));
+        timeZones.put(name, tz);
+        System.err.println("added '" + name + "' as " + tz);
+    }
+    
+    /**
+     * Parses an RFC 5545 UTC offset and returns milliseconds.
+     * 
+     * Grammar:
+     *        utc-offset = time-numzone
+     *        time-numzone = ("+" / "-") time-hour time-minute [time-second]
+     * 
+     * Examples:
+     * -0500
+     * +0100
+     */
+    private int parseUtcOffset(String value) {
+        final Pattern utcOffsetPattern = Pattern.compile("([-+])(\\d{2})(\\d{2})(?:\\d{2})?");
+        final Matcher matcher = utcOffsetPattern.matcher(value);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException(value);
+        }
+        int sign = matcher.group(1).equals("+") ? 1 : -1;
+        int hours = Integer.parseInt(matcher.group(2));
+        int minutes = Integer.parseInt(matcher.group(3));
+        int offsetSeconds = sign * (hours*60 + minutes)*60;
+        return offsetSeconds * 1000;
+    }
+    
+    private int parseDayName(String twoLetterDayName) {
+        if (twoLetterDayName.equals("SU")) {
+            return Calendar.SUNDAY;
+        } else if (twoLetterDayName.equals("MO")) {
+            return Calendar.MONDAY;
+        } else if (twoLetterDayName.equals("TU")) {
+            return Calendar.TUESDAY;
+        } else if (twoLetterDayName.equals("WE")) {
+            return Calendar.WEDNESDAY;
+        } else if (twoLetterDayName.equals("TH")) {
+            return Calendar.THURSDAY;
+        } else if (twoLetterDayName.equals("FR")) {
+            return Calendar.FRIDAY;
+        } else if (twoLetterDayName.equals("SA")) {
+            return Calendar.SATURDAY;
+        } else {
+            throw new IllegalArgumentException(twoLetterDayName);
         }
     }
 }

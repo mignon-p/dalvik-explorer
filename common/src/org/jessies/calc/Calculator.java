@@ -208,7 +208,10 @@ public class Calculator {
             final String simplifiedString = simplifiedExpression.toInputString();
             System.err.println(expressionString + (expressionString.equals(simplifiedString) ? "" : (" --- " + simplifiedString)));
         }
+        final long t0 = System.nanoTime();
         final Node result = expression.evaluate(this);
+        final long t1 = System.nanoTime();
+        System.err.println((t1-t0) + " ns");
         ans.value = result;
         return result.toString();
     }
