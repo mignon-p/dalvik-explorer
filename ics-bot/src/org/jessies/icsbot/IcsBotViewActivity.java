@@ -73,8 +73,6 @@ public class IcsBotViewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        // TODO: show a UI with the calendar-choice spinner if the user has more than one writable calendar?
-        
         // This activity is only started when someone asks for an app to VIEW an ics file.
         String data = getIntentDataAsString();
         if (data == null) {
@@ -83,7 +81,10 @@ public class IcsBotViewActivity extends Activity {
             return;
         }
         System.err.println(data);
+        
+        // TODO: show a UI with the calendar-choice spinner if the user has more than one writable calendar?
         populateCalendarSpinner();
+        // TODO: summarize the events and offer "Add All", "Add & Edit", and "Cancel"?
         parseCalendar(data);
         finish();
     }
@@ -178,8 +179,10 @@ public class IcsBotViewActivity extends Activity {
     // Intent extra keys, from Calendar...
     private static final String EVENT_BEGIN_TIME = "beginTime";
     private static final String EVENT_END_TIME = "endTime";
-    
+    // "content:" uri authorities, from different versions of Calendar...
     private static final String[] AUTHORITIES = new String[] { "calendar", "com.android.calendar" };
+    
+    // The value from AUTHORITIES appropriate for the build we're running on.
     private String mAuthority;
     
     private void populateCalendarSpinner() {
@@ -215,31 +218,6 @@ public class IcsBotViewActivity extends Activity {
         ArrayAdapter<CalendarInfo> adapter = new ArrayAdapter<CalendarInfo>(this, android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCalendarsSpinner.setAdapter(adapter);
-    }
-    
-    private static String extractValue(ICalendar.Component component, String propertyName) {
-        ICalendar.Property property = component.getFirstProperty(propertyName);
-        return (property != null) ? unescape(property.getValue()) : null;
-    }
-    
-    private static String unescape(String s) {
-        if (s.indexOf('\\') == -1) {
-            return s;
-        }
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < s.length(); ++i) {
-            char ch = s.charAt(i);
-            if (ch == '\\' && i < s.length() - 1) {
-                char ch2 = s.charAt(++i);
-                if (ch2 == 'n') {
-                    ch2 = '\n';
-                }
-                result.append(ch2);
-            } else {
-                result.append(ch);
-            }
-        }
-        return result.toString();
     }
     
     /**
@@ -294,7 +272,7 @@ public class IcsBotViewActivity extends Activity {
         ContentValues values = new ContentValues();
         
         // title
-        String title = extractValue(event, "SUMMARY");
+        String title = IcsUtils.getFirstPropertyText(event, "SUMMARY");
         if (TextUtils.isEmpty(title)) {
             toastAndLog("Can't import an untitled event");
             return false;
@@ -305,13 +283,13 @@ public class IcsBotViewActivity extends Activity {
         values.put(STATUS, STATUS_CONFIRMED);
         
         // description
-        String description = extractValue(event, "DESCRIPTION");
+        String description = IcsUtils.getFirstPropertyText(event, "DESCRIPTION");
         if (!TextUtils.isEmpty(description)) {
             values.put(DESCRIPTION, description);
         }
         
         // where
-        String where = extractValue(event, "LOCATION");
+        String where = IcsUtils.getFirstPropertyText(event, "LOCATION");
         if (!TextUtils.isEmpty(where)) {
             values.put(EVENT_LOCATION, where);
         }
@@ -404,18 +382,10 @@ public class IcsBotViewActivity extends Activity {
     }
     
     /**
-     * Translates VTIMEZONE components into entries in the String to TimeZone map.
-     * The entry corresponds to the STANDARD variant, and we ignore the DAYLIGHT variant.
-     * This is obviously broken, but it's better than the previous behavior (which was to always assume UTC).
-     * 
-     * It's not obvious to me how to implement the right behavior.
-     * I don't think we can use SimpleTimeZone because I don't think it can represent the complicated rules like "2nd Sunday".
-     * 
-     * Google Calendar gets round this by taking the eminently sane attitude that all times should be UTC.
-     * It lets the sending and receiving users' settings determine how the event appears.
+     * Translates a VTIMEZONE component into an entry in the given String to TimeZone map.
      */
     private void parseTimeZone(ICalendar.Component timeZone, Map<String, TimeZone> timeZones) {
-        String name = extractValue(timeZone, "TZID");
+        String name = IcsUtils.getFirstPropertyText(timeZone, "TZID");
         int standardDay = 0, standardDayOfWeek = 0, standardMonth = 0, daylightDay = 0, daylightDayOfWeek = 0, daylightMonth = 0;
         int standardOffset = 0, daylightOffset = 0;
         for (ICalendar.Component variant : timeZone.getComponents()) {
