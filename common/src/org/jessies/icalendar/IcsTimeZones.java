@@ -67,9 +67,9 @@ public class IcsTimeZones {
                     }
                 } else if (key.equals("BYMONTH")) {
                     if (standard) {
-                        standardMonth = Integer.parseInt(value);
+                        standardMonth = Integer.parseInt(value) - 1;
                     } else {
-                        daylightMonth = Integer.parseInt(value);
+                        daylightMonth = Integer.parseInt(value) - 1;
                     }
                 } else {
                     System.err.println("warning: ignoring key " + key + " (value " + value + ") for " + name + ", variant " + variant.getName());
