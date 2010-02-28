@@ -80,7 +80,7 @@ public class IcsBotViewActivity extends Activity {
             finish();
             return;
         }
-        System.err.println(data);
+        //System.err.println(data);
         
         // TODO: show a UI with the calendar-choice spinner if the user has more than one writable calendar?
         populateCalendarSpinner();

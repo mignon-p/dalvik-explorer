@@ -77,15 +77,14 @@ public class IcsTimeZones {
             }
             
             ICalendar.Property offset = variant.getFirstProperty("TZOFFSETTO");
-            if (offset != null && offset.getValue() != null) {
-                int rawOffset = IcsUtils.parseUtcOffset(offset.getValue());
-                if (standard) {
-                    standardOffset = rawOffset;
-                } else {
-                    daylightOffset = rawOffset;
-                }
+            if (offset == null || offset.getValue() == null) {
+                throw new IllegalArgumentException("missing TZOFFSETTO in '" + name + "' variant '" + variant.getName() + "'");
+            }
+            int rawOffset = IcsUtils.parseUtcOffset(offset.getValue());
+            if (standard) {
+                standardOffset = rawOffset;
             } else {
-                System.err.println("didn't understand TZOFFSETTO in '" + name + "' variant '" + variant.getName() + "'");
+                daylightOffset = rawOffset;
             }
         }
         SimpleTimeZone tz = new SimpleTimeZone(standardOffset, name, daylightMonth, daylightDay, daylightDayOfWeek, 7200000, standardMonth, standardDay, standardDayOfWeek, 7200000, Math.abs(daylightOffset - standardOffset));
@@ -108,8 +107,6 @@ public class IcsTimeZones {
         // FIXME: shouldn't ICalendar automatically remove the quotes for us?
         final String tzId = (tzIdParam != null && tzIdParam.value != null) ? tzIdParam.value.replaceFirst("^\"(.*)\"$", "$1") : null;
         final TimeZone tz = (tzId != null) ? mTimeZones.get(tzId) : TimeZone.getTimeZone("GMT");
-        System.err.println("TZID=" + tzId);
-        System.err.println("TZ=" + tz);
         
         final Calendar calendar = Calendar.getInstance(tz);
         return parseDateTime(calendar, value);
