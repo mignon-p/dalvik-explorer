@@ -135,14 +135,13 @@ public class IcsBotViewActivity extends Activity {
             return;
         }
         
+        final IcsTimeZones timeZones = new IcsTimeZones(mCalendar);
+        
         int eventCount = 0;
         int importedEventCount = 0;
-        Map<String, TimeZone> timeZones = new HashMap<String, TimeZone>();
         if (mCalendar.getComponents() != null) {
             for (ICalendar.Component component : mCalendar.getComponents()) {
-                if (component.getName().equals(ICalendar.Component.VTIMEZONE)) {
-                    parseTimeZone(component, timeZones);
-                } else if (component.getName().equals(ICalendar.Component.VEVENT)) {
+                if (component.getName().equals(ICalendar.Component.VEVENT)) {
                     ++eventCount;
                     if (insertVEvent(component, timeZones)) {
                         ++importedEventCount;
@@ -220,55 +219,7 @@ public class IcsBotViewActivity extends Activity {
         mCalendarsSpinner.setAdapter(adapter);
     }
     
-    /**
-     * The VEVENT uses the TZID parameter of the DTSTART/DTEND properties to declare the time zone of the time they represent.
-     * (Though, if you're lucky, the generating code is sane and uses UTC and doesn't need a TZID.)
-     * We need to translate that to a UTC offset.
-     * Stupidly, the time zone ids aren't the well-known America/Los_Angeles style; they're arbitrary strings.
-     * We need to have parsed VTIMEZONE properties into our timeZones map, and now we need to pull them back out.
-     * 
-     * This is broken because we don't know whether we need the STANDARD or DAYLIGHT variant, and the TimeZone in the map is always equivalent to STANDARD.
-     */
-    private String timeZoneIdFromProperty(ICalendar.Property property, Map<String, TimeZone> timeZones) {
-        ICalendar.Parameter tzIdParam = property.getFirstParameter("TZID");
-        if (tzIdParam == null || tzIdParam.value == null) {
-            return "GMT";
-        }
-        // FIXME: shouldn't ICalendar automatically remove the quotes for us?
-        String bogusTzId = tzIdParam.value.replaceFirst("^\"(.*)\"$", "$1");
-        TimeZone tz = timeZones.get(bogusTzId);
-        if (tz == null) {
-            toastAndLog("Can't parse TZID '" + tzIdParam + "'");
-        }
-        System.err.println("TZID=" + bogusTzId + " " + tz);
-        return tz.getID();
-    }
-    
-    private boolean parseTime(String what, ICalendar.Property property, Time time, Map<String, TimeZone> timeZones) {
-        String tzId = timeZoneIdFromProperty(property, timeZones);
-        time.clear(tzId);
-        try {
-            String t = property.getValue();
-            if (t.endsWith("Z")) {
-                // UTC times are easy. Google Calendar wisely uses these, but nothing else seems to.
-                time.parse(t);
-            } else {
-                // Damn it! We need to take the time zone into account.
-                // The easiest way I found -- given that we don't have an appropriate TimeZone object anyway --
-                // is to rewrite the time string so it's an RFC 3339 timestamp including a UTC offset.
-                String tzSuffix = tzId.replaceAll("GMT(.*)", "$1");
-                // FIXME: the .000 works around a bug in the crappy android.text.format.Time code.
-                t = t.replaceAll("(....)(..)(..)T(..)(..)(..)", "$1-$2-$3T$4:$5:$6.000" + tzSuffix);
-                time.parse3339(t);
-            }
-            return true;
-        } catch (Exception e) {
-            toastAndLog("Can't parse " + what + " '" + property.getValue() + "'", e);
-            return false;
-        }
-    }
-    
-    private boolean insertVEvent(ICalendar.Component event, Map<String, TimeZone> timeZones) {
+    private boolean insertVEvent(ICalendar.Component event, IcsTimeZones timeZones) {
         ContentValues values = new ContentValues();
         
         // title
@@ -299,58 +250,33 @@ public class IcsBotViewActivity extends Activity {
         long calendarId = calInfo.id;
         values.put(CALENDAR_ID, calendarId);
         
-        // dtStart & dtEnd
-        Time time = new Time(Time.TIMEZONE_UTC);
-        long dtStartMillis = 0;
-        long dtEndMillis = 0;
-        String dtStart = null;
-        String dtEnd = null;
-        String duration = null;
-        ICalendar.Property dtStartProp = event.getFirstProperty("DTSTART");
-        if (dtStartProp != null) {
-            dtStart = dtStartProp.getValue();
-            if (!TextUtils.isEmpty(dtStart)) {
-                if (!parseTime("start time", dtStartProp, time, timeZones)) {
-                    return false;
-                }
-                if (time.allDay) {
-                    values.put(ALL_DAY, 1);
-                }
-                dtStartMillis = time.toMillis(false /* use isDst */);
-                values.put(DTSTART, dtStartMillis);
-                values.put(EVENT_TIMEZONE, time.timezone);
-            }
-            
-            ICalendar.Property dtEndProp = event.getFirstProperty("DTEND");
-            if (dtEndProp != null) {
-                dtEnd = dtEndProp.getValue();
-                if (!TextUtils.isEmpty(dtEnd)) {
-                    if (!parseTime("end time", dtEndProp, time, timeZones)) {
-                        return false;
-                    }
-                    dtEndMillis = time.toMillis(false /* use isDst */);
-                    values.put(DTEND, dtEndMillis);
-                }
-            } else {
-                // look for a duration
-                ICalendar.Property durationProp = event.getFirstProperty("DURATION");
-                if (durationProp != null) {
-                    duration = durationProp.getValue();
-                    if (!TextUtils.isEmpty(duration)) {
-                        // TODO: check that it is valid?
-                        values.put(DURATION, duration);
-                    }
-                }
-            }
-        }
-        
-        if (TextUtils.isEmpty(dtStart)) {
+        // The time span, defined by dtStart...
+        IcsTime dtStart = timeZones.parseTimeProperty(event, "DTSTART");
+        if (dtStart == null) {
             toastAndLog("Can't import events that don't have a start time");
             return false;
         }
-        if (TextUtils.isEmpty(dtEnd) && TextUtils.isEmpty(duration)) {
-            toastAndLog("Can't import events that have neither an end time nor a duration");
-            return false;
+        values.put(DTSTART, dtStart.utcMillis);
+        if (dtStart.allDay) {
+            values.put(ALL_DAY, 1);
+        }
+        
+        // ...and either dtEnd or duration.
+        IcsTime dtEnd = timeZones.parseTimeProperty(event, "DTEND");
+        if (dtEnd != null) {
+            values.put(DTEND, dtEnd.utcMillis);
+        } else {
+            // look for a duration
+            ICalendar.Property durationProp = event.getFirstProperty("DURATION");
+            if (durationProp != null) {
+                String duration = durationProp.getValue();
+                if (TextUtils.isEmpty(duration)) {
+                    toastAndLog("Can't import events that have neither an end time nor a duration");
+                    return false;
+                }
+                // TODO: check that it is valid?
+                values.put(DURATION, duration);
+            }
         }
         
         // rrule
@@ -375,71 +301,9 @@ public class IcsBotViewActivity extends Activity {
         intent.setData(uri);
         // Is this a Calendar bug? It never looks at the begin/end times actually stored in the event!
         // If we don't resupply them like this, they get overwritten with 0.
-        intent.putExtra(EVENT_BEGIN_TIME, dtStartMillis);
-        intent.putExtra(EVENT_END_TIME, dtEndMillis);
+        intent.putExtra(EVENT_BEGIN_TIME, dtStart.utcMillis);
+        intent.putExtra(EVENT_END_TIME, dtEnd.utcMillis);
         startActivity(intent);
         return true;
-    }
-    
-    /**
-     * Translates a VTIMEZONE component into an entry in the given String to TimeZone map.
-     */
-    private void parseTimeZone(ICalendar.Component timeZone, Map<String, TimeZone> timeZones) {
-        String name = IcsUtils.getFirstPropertyText(timeZone, "TZID");
-        int standardDay = 0, standardDayOfWeek = 0, standardMonth = 0, daylightDay = 0, daylightDayOfWeek = 0, daylightMonth = 0;
-        int standardOffset = 0, daylightOffset = 0;
-        for (ICalendar.Component variant : timeZone.getComponents()) {
-            // RRULE:FREQ=YEARLY;BYMINUTE=0;BYHOUR=2;BYDAY=1SU;BYMONTH=11
-            boolean standard = variant.getName().equals("STANDARD");
-            ICalendar.Property rule = variant.getFirstProperty("RRULE");
-            if (rule == null) {
-                throw new IllegalArgumentException(name + ", variant " + variant.getName() + " has no RRULE!");
-            }
-            for (String param : rule.getValue().split(";")) {
-                String[] keyValue = param.split("=");
-                String key = keyValue[0];
-                String value = keyValue[1];
-                if (key.equals("FREQ")) {
-                    if (!value.equals("YEARLY")) {
-                        throw new IllegalArgumentException(rule.getValue() + ": FREQ not YEARLY!");
-                    }
-                } else if (key.equals("BYDAY")) {
-                    Matcher m = Pattern.compile("(-?\\d+)(..)").matcher(value);
-                    if (!m.matches()) {
-                        throw new IllegalArgumentException(rule.getValue() + ": can't parse BYDAY!");
-                    }
-                    if (standard) {
-                        standardDay = Integer.parseInt(m.group(1));
-                        standardDayOfWeek = IcsUtils.parseDayName(m.group(2));
-                    } else {
-                        daylightDay = Integer.parseInt(m.group(1));
-                        daylightDayOfWeek = IcsUtils.parseDayName(m.group(2));
-                    }
-                } else if (key.equals("BYMONTH")) {
-                    if (standard) {
-                        standardMonth = Integer.parseInt(value);
-                    } else {
-                        daylightMonth = Integer.parseInt(value);
-                    }
-                } else {
-                    System.err.println("warning: ignoring key " + key + " (value " + value + ") for " + name + ", variant " + variant.getName());
-                }
-            }
-            
-            ICalendar.Property offset = variant.getFirstProperty("TZOFFSETTO");
-            if (offset != null && offset.getValue() != null) {
-                int rawOffset = IcsUtils.parseUtcOffset(offset.getValue());
-                if (standard) {
-                    standardOffset = rawOffset;
-                } else {
-                    daylightOffset = rawOffset;
-                }
-            } else {
-                System.err.println("didn't understand TZOFFSETTO in '" + name + "' variant '" + variant.getName() + "'");
-            }
-        }
-        SimpleTimeZone tz = new SimpleTimeZone(standardOffset, name, daylightMonth, daylightDay, daylightDayOfWeek, 7200000, standardMonth, standardDay, standardDayOfWeek, 7200000, Math.abs(daylightOffset - standardOffset));
-        timeZones.put(name, tz);
-        System.err.println("added '" + name + "' as " + tz);
     }
 }
