@@ -32,19 +32,31 @@ public class IcsTimeZones {
     }
     
     /**
-     * Translates the given VTIMEZONE component 'timeZone' into an entry in the TimeZone map.
+     * Describes one variant ("STANDARD" or "DAYLIGHT") of a VTIMEZONE.
      */
-    private void parseTimeZone(ICalendar.Component timeZone) {
-        String name = IcsUtils.getFirstPropertyText(timeZone, "TZID");
-        int standardDay = 0, standardDayOfWeek = 0, standardMonth = 0, daylightDay = 0, daylightDayOfWeek = 0, daylightMonth = 0;
-        int standardOffset = 0, daylightOffset = 0;
-        for (ICalendar.Component variant : timeZone.getComponents()) {
-            // RRULE:FREQ=YEARLY;BYMINUTE=0;BYHOUR=2;BYDAY=1SU;BYMONTH=11
-            boolean standard = variant.getName().equals("STANDARD");
-            ICalendar.Property rule = variant.getFirstProperty("RRULE");
-            if (rule == null) {
-                throw new IllegalArgumentException(name + ", variant " + variant.getName() + " has no RRULE!");
+    private static class TzInfo {
+        int offset;
+        int day;
+        int dayOfWeek;
+        int month;
+        
+        static TzInfo fromComponent(String name, ICalendar.Component c, boolean requiresRule) {
+            TzInfo result = new TzInfo();
+            ICalendar.Property offsetProperty = c.getFirstProperty("TZOFFSETTO");
+            if (offsetProperty == null || offsetProperty.getValue() == null) {
+                throw new IllegalArgumentException("missing TZOFFSETTO in '" + name + "' variant '" + c.getName() + "'");
             }
+            result.offset = IcsUtils.parseUtcOffset(offsetProperty.getValue());
+
+            ICalendar.Property rule = c.getFirstProperty("RRULE");
+            if (rule == null) {
+                if (requiresRule) {
+                    throw new IllegalArgumentException(name + ", variant " + c.getName() + " has no RRULE!");
+                } else {
+                    return result;
+                }
+            }
+            // RRULE:FREQ=YEARLY;BYMINUTE=0;BYHOUR=2;BYDAY=1SU;BYMONTH=11
             for (String param : rule.getValue().split(";")) {
                 String[] keyValue = param.split("=");
                 String key = keyValue[0];
@@ -58,38 +70,40 @@ public class IcsTimeZones {
                     if (!m.matches()) {
                         throw new IllegalArgumentException(rule.getValue() + ": can't parse BYDAY!");
                     }
-                    if (standard) {
-                        standardDay = Integer.parseInt(m.group(1));
-                        standardDayOfWeek = IcsUtils.parseDayName(m.group(2));
-                    } else {
-                        daylightDay = Integer.parseInt(m.group(1));
-                        daylightDayOfWeek = IcsUtils.parseDayName(m.group(2));
-                    }
+                    result.day = Integer.parseInt(m.group(1));
+                    result.dayOfWeek = IcsUtils.parseDayName(m.group(2));
                 } else if (key.equals("BYMONTH")) {
-                    if (standard) {
-                        standardMonth = Integer.parseInt(value) - 1;
-                    } else {
-                        daylightMonth = Integer.parseInt(value) - 1;
-                    }
+                    result.month = Integer.parseInt(value) - 1;
                 } else {
-                    System.err.println("warning: ignoring key " + key + " (value " + value + ") for " + name + ", variant " + variant.getName());
+                    System.err.println("warning: ignoring key " + key + " (value " + value + ") for " + name + ", variant " + c.getName());
                 }
             }
-            
-            ICalendar.Property offset = variant.getFirstProperty("TZOFFSETTO");
-            if (offset == null || offset.getValue() == null) {
-                throw new IllegalArgumentException("missing TZOFFSETTO in '" + name + "' variant '" + variant.getName() + "'");
-            }
-            int rawOffset = IcsUtils.parseUtcOffset(offset.getValue());
-            if (standard) {
-                standardOffset = rawOffset;
-            } else {
-                daylightOffset = rawOffset;
-            }
+            return result;
         }
-        SimpleTimeZone tz = new SimpleTimeZone(standardOffset, name, daylightMonth, daylightDay, daylightDayOfWeek, 7200000, standardMonth, standardDay, standardDayOfWeek, 7200000, Math.abs(daylightOffset - standardOffset));
-        mTimeZones.put(name, tz);
-        System.err.println("added '" + name + "' as " + tz);
+    }
+    
+    /**
+     * Translates the given VTIMEZONE component 'timeZone' into an entry in the TimeZone map.
+     */
+    private void parseTimeZone(ICalendar.Component timeZone) {
+        final String name = IcsUtils.getFirstPropertyText(timeZone, "TZID");
+        final List<ICalendar.Component> variants = timeZone.getComponents();
+        final TimeZone newTimeZone;
+        if (variants.size() == 2) {
+            // We have a daylight savings schedule.
+            final boolean standardFirst = variants.get(0).getName().equals("STANDARD");
+            final TzInfo standard = TzInfo.fromComponent(name, variants.get(standardFirst ? 0 : 1), true);
+            final TzInfo daylight = TzInfo.fromComponent(name, variants.get(standardFirst ? 1 : 0), true);
+            newTimeZone = new SimpleTimeZone(standard.offset, name, daylight.month, daylight.day, daylight.dayOfWeek, 7200000, standard.month, standard.day, standard.dayOfWeek, 7200000, Math.abs(daylight.offset - standard.offset));
+        } else if (variants.size() == 1) {
+            // No daylight savings.
+            TzInfo tzInfo = TzInfo.fromComponent(name, variants.get(0), false);
+            newTimeZone = new SimpleTimeZone(tzInfo.offset, name);
+        } else {
+            throw new IllegalArgumentException("time zone '" + name + "' has " + variants.size() + " variants: " + timeZone);
+        }
+        mTimeZones.put(name, newTimeZone);
+        System.err.println("added '" + name + "' as " + newTimeZone);
     }
     
     public IcsTime parseTimeProperty(ICalendar.Component event, String propertyName) {
