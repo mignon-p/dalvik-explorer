@@ -45,6 +45,14 @@ public class ListNode implements Node {
         return values.size();
     }
     
+    public ListNode reverse() {
+        final ListNode result = new ListNode();
+        for (int i = values.size() - 1; i >= 0; --i) {
+            result.add(values.get(i));
+        }
+        return result;
+    }
+    
     public Node evaluate(Calculator environment) {
         ListNode result = new ListNode();
         for (Node value : values) {

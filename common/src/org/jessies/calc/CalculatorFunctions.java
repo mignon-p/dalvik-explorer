@@ -44,6 +44,14 @@ public class CalculatorFunctions {
         throw new CalculatorError("'" + function + "' expected boolean argument");
     }
     
+    private static ListNode toList(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof ListNode) {
+            return (ListNode) node;
+        }
+        throw new CalculatorError("'" + function + "' expected list argument");
+    }
+    
     private static NumberNode toNumber(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof NumberNode) {
@@ -751,6 +759,16 @@ public class CalculatorFunctions {
                 }
             }
             return result;
+        }
+    }
+    
+    public static class Reverse extends CalculatorFunction {
+        public Reverse() {
+            super("Reverse", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            return toList("Reverse", environment, args.get(0)).reverse();
         }
     }
     

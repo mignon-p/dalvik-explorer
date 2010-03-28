@@ -139,6 +139,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Product(),        "Product", /* Unicode Greek capital letter pi */ "\u03a0", /* Unicode product sign */ "\u220f");
         addFunction(new CalculatorFunctions.Range(),          "Range");
         addFunction(new CalculatorFunctions.Random(),         "Random", "rand");
+        addFunction(new CalculatorFunctions.Reverse(),        "Reverse");
         addFunction(new CalculatorFunctions.Round(),          "Round");
         addFunction(new CalculatorFunctions.Sign(),           "Sign");
         addFunction(new CalculatorFunctions.Sinh(),           "Sinh");
@@ -571,6 +572,12 @@ public class Calculator {
         Assert.equals(calculator.evaluate("Range(1, 6, 2)"), "[1, 3, 5]");
         Assert.equals(calculator.evaluate("Range(4, 1, -1)"), "[4, 3, 2, 1]");
         Assert.equals(calculator.evaluate("Range(1.2, 2.1, 0.3)"), "[1.2, 1.5, 1.8, 2.1]");
+        
+        // Reverse.
+        Assert.equals(calculator.evaluate("Reverse([])"), "[]");
+        Assert.equals(calculator.evaluate("Reverse([7])"), "[7]");
+        Assert.equals(calculator.evaluate("Reverse([3, 4])"), "[4, 3]");
+        Assert.equals(calculator.evaluate("Reverse(Reverse([-1, 0, 1]))"), "[-1, 0, 1]");
     }
     
     @Test private static void testMatrices() {
