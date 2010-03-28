@@ -407,6 +407,21 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Length extends CalculatorFunction {
+        public Length() {
+            super("Length", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            Node node = args.get(0).evaluate(environment);
+            if (!(node instanceof ListNode)) {
+                return IntegerNode.valueOf(0);
+            }
+            ListNode list = (ListNode) node;
+            return IntegerNode.valueOf(list.size());
+        }
+    }
+    
     public static class Less extends CalculatorFunction {
         public Less() {
             super("Less", 2);
@@ -424,6 +439,21 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) <= 0);
+        }
+    }
+    
+    // We call this ListBuilder because reusing the name List in Java is just too confusing.
+    public static class ListBuilder extends CalculatorFunction {
+        public ListBuilder() {
+            super("List", 0, Integer.MAX_VALUE);
+        }
+        
+        public Node apply(Calculator environment) {
+            final ListNode result = new ListNode();
+            for (Node arg : args) {
+                result.add(arg.evaluate(environment));
+            }
+            return result;
         }
     }
     
@@ -653,6 +683,54 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment) {
             return new RealNode(Math.random());
+        }
+    }
+    
+    public static class Range extends CalculatorFunction {
+        public Range() {
+            super("Range", 1, 3);
+        }
+        
+        public Node apply(Calculator environment) {
+            final NumberNode start;
+            final NumberNode end;
+            final NumberNode step;
+            if (args.size() == 1) {
+                // given n: 1, 2, ..., n
+                start = IntegerNode.valueOf(1);
+                end = toNumber("range", environment, args.get(0));
+                step = IntegerNode.valueOf(1);
+            } else if (args.size() == 2) {
+                // given n, m: n, n+1, ..., m
+                start = toNumber("range", environment, args.get(0));
+                end = toNumber("range", environment, args.get(1));
+                step = IntegerNode.valueOf(1);
+            } else {
+                // given n, m, k: n, n+k, ..., m
+                start = toNumber("range", environment, args.get(0));
+                end = toNumber("range", environment, args.get(1));
+                step = toNumber("range", environment, args.get(2));
+            }
+            return makeRange(start, end, step);
+        }
+        
+        private static ListNode makeRange(NumberNode start, NumberNode end, NumberNode step) {
+            IntegerNode stepSign = step.sign();
+            if (stepSign.equals(IntegerNode.valueOf(0))) {
+                throw new CalculatorError("need a non-zero step size");
+            }
+            
+            final ListNode result = new ListNode();
+            if (cmp(stepSign, IntegerNode.valueOf(0)) > 0) {
+                for (NumberNode i = start; cmp(i, end) <= 0; i = i.plus(step)) {
+                    result.add(i);
+                }
+            } else {
+                for (NumberNode i = start; cmp(i, end) >= 0; i = i.plus(step)) {
+                    result.add(i);
+                }
+            }
+            return result;
         }
     }
     

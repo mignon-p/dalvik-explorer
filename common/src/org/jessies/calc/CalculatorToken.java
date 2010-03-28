@@ -65,6 +65,9 @@ public enum CalculatorToken {
     OPEN_PARENTHESIS("("),
     CLOSE_PARENTHESIS(")"),
     
+    OPEN_SQUARE("["),
+    CLOSE_SQUARE("]"),
+    
     COMMA(",")
     
     ;

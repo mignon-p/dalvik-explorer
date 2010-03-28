@@ -20,11 +20,17 @@
 
 <p>Usual operator precedence ("order of operations") is followed, and parentheses are supported.
 
-<p>Numbers can be given in decimal (123), binary (0b1011), octal (0o777), and hex (0xfffe).
+<p>Numbers can be given in decimal (<code>123</code>), binary (<code>0b1011</code>), octal (<code>0o777</code>), and hex (<code>0xfffe</code>).
 
-<p>The constants e (2.718...), pi (3.14...), true, and false are predefined.
+<p>The boolean type has two values: <code>true</code> and <code>false</code>.
 
-<p>The special variable Ans returns the result of the previous calculation.
+<p>The list type is an arbitrary sequence of values: <code>[1, 2, 3]</code>.
+Lists are used to represent vectors.
+Lists may include nested lists, allowing the construction of matrices and tensors: <code>[[1, 2], [3, 4]]</code>.
+
+<p>The constants <code>e</code> (2.718...) and <code>pi</code> (3.14...) are predefined.
+
+<p>The special variable <code>Ans</code> returns the result of the previous calculation.
 
 <h2>Built-in functions</h2>
 
@@ -40,47 +46,47 @@
 <li>GreaterEqual (&gt;=), Greater (&gt;).
 <li>Hypot.
 <li>IntegerLength, IntegerPart, IsPrime.
-<li>LessEqual (&lt;=), Less (&lt;), Log10, Log2, LogE (Ln), Log.
+<li>Length, LessEqual (&lt;=), Less (&lt;), Log10, Log2, LogE (Ln), Log.
 <li>Max, Min, Mod (%).
 <li>Not (!).
 <li>Or (||).
 <li>Plus (+), Power (^), Product.
-<li>Random (Rand), Round.
+<li>Random (Rand), Range, Round.
 <li>Sign, Sinh, Sin, Sqrt, Subtract, Sum.
 <li>Tanh, Tan, Times (*, &times;).
 <li>Unequal (!=).
 </ul>
 
 <p>Where a function has an operator form or alternate spelling, the alternatives are given in parentheses.
-For example, "BitShiftLeft(1, 32)" and "1 << 32" are equivalent, as are "Ceil(1.2)" and "Ceiling(1.2)".
+For example, <code>BitShiftLeft(1, 32)</code> and <code>1 << 32</code> are equivalent, as are <code>Ceil(1.2)</code> and <code>Ceiling(1.2)</code>.
 
-<p>Although the function names given above contain capital letters, "isprime" is equivalent to "IsPrime" to make it easier to type on phone keyboards.
-If you have a convenient underscore key and value readability, you can insert an underscore between words: so "is_prime" is equivalent to "IsPrime".
+<p>Although the function names given above contain capital letters, <code>isprime</code> is equivalent to <code>IsPrime</code> to make it easier to type on phone keyboards.
+If you have a convenient underscore key and value readability, you can insert an underscore between words: so <code>is_prime</code> is equivalent to <code>IsPrime</code>.
 
 <p>All trigonometric functions use radians.
 
 <h2>Constants and variables</h2>
 
 <p>All constant and variable names, whether built-in or user-defined, are case-insensitive.
-"Ans" and "ans" are equivalent, as are "pi" and "Pi" (and "PI" and "pI").
+<code>Ans</code> and <code>ans</code> are equivalent, as are <code>pi</code> and <code>Pi</code> (and <code>PI</code> and <code>pI</code>).
 
-<p>You can assign to a variable with an expression like "t = 4".
+<p>You can assign to a variable with an expression like <code>t = 4</code>.
 
-<p>It is not possible to assign a new value to a constant, nor the special variable "Ans".
+<p>It is not possible to assign a new value to a constant, nor the special variable <code>Ans</code>.
 
 <h2>Using the on-screen buttons</h2>
 
 <p>Most of the buttons should be familiar from pocket calculators you've used before.
 
-<p>The EXE button is used to actually perform a calculation.
+<p>The EXE ("execute") button is used to actually perform a calculation.
 
-<p>The EXP button is used to enter numbers in engineering notation, such as 1.2E6, which is the same as 1.2*10^6.
+<p>The EXP button is used to enter numbers in engineering notation, such as <code>1.2E6</code>, which is the same as <code>1.2*10^6</code>.
 The EXP button provides the "E".
 If you're using your phone's keyboard, you can just type E.
 
 <p>The Ans button is used to refer to the previous answer.
 It can be thought of as a variable whose value changes after each calculation.
-For example, executing "1" and then repeatedly executing "2*Ans" will result in 1, 2, 4, 8, 16, et cetera.
+For example, executing <code>1</code> and then repeatedly executing <code>2*Ans</code> will result in 1, 2, 4, 8, 16, et cetera.
 
 <p>The "2nd" button is used to switch the special function buttons (sin, cos, et cetera) to their second set of functions.
 Unlike pocket calculators, the "2nd" button is sticky; it changes to say "1st", and you have to press it again to go back.

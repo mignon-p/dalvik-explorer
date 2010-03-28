@@ -77,7 +77,9 @@ public class CalculatorLexer {
         case EOF: return CalculatorToken.END_OF_INPUT;
             
         case '(': return CalculatorToken.OPEN_PARENTHESIS;
+        case '[': return CalculatorToken.OPEN_SQUARE;
         case ',': return CalculatorToken.COMMA;
+        case ']': return CalculatorToken.CLOSE_SQUARE;
         case ')': return CalculatorToken.CLOSE_PARENTHESIS;
             
         case '=': return maybe('=', CalculatorToken.EQ, CalculatorToken.ASSIGN);

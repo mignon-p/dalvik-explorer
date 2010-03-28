@@ -191,6 +191,8 @@ public class CalculatorParser {
             Node result = parseExpr();
             expect(CalculatorToken.CLOSE_PARENTHESIS);
             return result;
+        } else if (lexer.token() == CalculatorToken.OPEN_SQUARE) {
+            return parseList();
         } else if (lexer.token() == CalculatorToken.NUMBER) {
             Node result = lexer.number();
             expect(CalculatorToken.NUMBER);
@@ -224,6 +226,21 @@ public class CalculatorParser {
             }
         }
         expect(CalculatorToken.CLOSE_PARENTHESIS);
+        return result;
+    }
+    
+    // '[' [ expr [ ',' expr ] ] ']'
+    private ListNode parseList() {
+        final ListNode result = new ListNode();
+        expect(CalculatorToken.OPEN_SQUARE);
+        while (lexer.token() != CalculatorToken.CLOSE_SQUARE) {
+            result.add(parseExpr());
+            if (lexer.token() == CalculatorToken.COMMA) {
+                expect(CalculatorToken.COMMA);
+                continue;
+            }
+        }
+        expect(CalculatorToken.CLOSE_SQUARE);
         return result;
     }
     

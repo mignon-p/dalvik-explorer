@@ -26,26 +26,35 @@ import java.util.*;
  */
 public abstract class CalculatorFunction implements Cloneable, Node {
     private final String name;
-    private final int arity;
+    private final int minArity;
+    private final int maxArity;
     
     // Only valid in a bound function.
     protected List<Node> args;
     
+    // A fixed-arity function.
     public CalculatorFunction(String name, int arity) {
+        this(name, arity, arity);
+    }
+    
+    // A variable-arity function.
+    public CalculatorFunction(String name, int minArity, int maxArity) {
         this.name = name;
-        this.arity = arity;
+        this.minArity = minArity;
+        this.maxArity = maxArity;
     }
     
     public CalculatorFunction bind(List<Node> args) {
-        if (arity != args.size()) {
-            String message = "wrong number of arguments to function \"" + name + "\"";
-            message += "; need " + arity + " but got " + args.size();
-            if (args.size() > 0) {
-                message += ": ";
-                for (Node arg : args) {
-                    message += arg.toInputString();
-                }
+        if (args.size() < minArity || args.size() > maxArity) {
+            String message = "wrong number of arguments to function \"" + name + "\"; need ";
+            if (minArity == maxArity) {
+                message += "exactly " + minArity;
+            } else if (args.size() < minArity) {
+                message += "at least " + minArity;
+            } else if (args.size() > maxArity) {
+                message += "at most " + maxArity;
             }
+            message += " but got " + args.size();
             throw new CalculatorError(message);
         }
         
@@ -83,7 +92,7 @@ public abstract class CalculatorFunction implements Cloneable, Node {
     @Override public String toInputString() {
         StringBuilder result = new StringBuilder();
         result.append(name);
-        if (arity > 0) {
+        if (args != null && args.size() > 0) {
             result.append("(");
             for (int i = 0; i < args.size(); ++i) {
                 Node arg = args.get(i);
