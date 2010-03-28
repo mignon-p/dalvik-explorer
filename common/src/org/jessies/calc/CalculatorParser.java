@@ -166,7 +166,7 @@ public class CalculatorParser {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (-1*f) for simplicity.
-            return getFunction(CalculatorToken.MUL).bind(Arrays.asList(IntegerNode.valueOf(-1), parseUnaryExpression()));
+            return getFunction(CalculatorToken.MUL).bind(Arrays.asList(IntegerNode.MINUS_ONE, parseUnaryExpression()));
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
             return getFunction(CalculatorToken.B_NOT).bind(Collections.singletonList(parseUnaryExpression()));

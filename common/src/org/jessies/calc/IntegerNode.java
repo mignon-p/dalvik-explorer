@@ -31,6 +31,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
     }
     
+    // Insanely popular values.
+    public static final IntegerNode MINUS_ONE = IntegerNode.valueOf(-1);
+    public static final IntegerNode ZERO = IntegerNode.valueOf(0);
+    public static final IntegerNode ONE = IntegerNode.valueOf(1);
+    
     // Used by factorial.
     private static final BigInteger BIG_INTEGER_TWO = BigInteger.valueOf(2);
     
@@ -236,7 +241,7 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         if (signum < 0) {
             throw new IllegalArgumentException("factorial requires a non-negative integer argument; got " + this + " instead");
         } else if (signum == 0) {
-            return IntegerNode.valueOf(1);
+            return IntegerNode.ONE;
         }
         // Based on fact6 from Richard J Fateman's "Comments on Factorial Programs".
         return IntegerNode.valueOf(factorialHelper(n, BigInteger.ONE));
@@ -323,7 +328,7 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public NumberNode power(NumberNode rhs) {
-        if (rhs instanceof RealNode || rhs.sign().compareTo(IntegerNode.valueOf(-1)) == 0) {
+        if (rhs instanceof RealNode || rhs.sign().compareTo(MINUS_ONE) == 0) {
             return toReal().power(rhs);
         }
         // FIXME: special-case small enough fixnums?
@@ -340,11 +345,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
             return IntegerNode.valueOf(bignum.signum());
         }
         if (fixnum < 0) {
-            return IntegerNode.valueOf(-1);
+            return IntegerNode.MINUS_ONE;
         } else if (fixnum > 0) {
-            return IntegerNode.valueOf(1);
+            return IntegerNode.ONE;
         } else {
-            return IntegerNode.valueOf(0);
+            return IntegerNode.ZERO;
         }
     }
     

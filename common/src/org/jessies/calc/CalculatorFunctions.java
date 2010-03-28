@@ -29,11 +29,11 @@ public class CalculatorFunctions {
     }
     
     private static boolean isZero(Node n) {
-        return (n instanceof IntegerNode) && (((IntegerNode) n).compareTo(IntegerNode.valueOf(0)) == 0);
+        return (n instanceof IntegerNode) && (((IntegerNode) n).compareTo(IntegerNode.ZERO) == 0);
     }
     
     private static boolean isOne(Node n) {
-        return (n instanceof IntegerNode) && (((IntegerNode) n).compareTo(IntegerNode.valueOf(1)) == 0);
+        return (n instanceof IntegerNode) && (((IntegerNode) n).compareTo(IntegerNode.ONE) == 0);
     }
     
     private static BooleanNode toBoolean(String function, Calculator environment, Node node) {
@@ -374,6 +374,25 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class IdentityMatrix extends CalculatorFunction {
+        public IdentityMatrix() {
+            super("IdentityMatrix", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode dimension = toInteger("IdentityMatrix", environment, args.get(0));
+            final ListNode result = new ListNode();
+            for (NumberNode i = IntegerNode.ONE; cmp(i, dimension) <= 0; i = i.increment()) {
+                final ListNode row = new ListNode();
+                for (NumberNode j = IntegerNode.ONE; cmp(j, dimension) <= 0; j = j.increment()) {
+                    row.add(cmp(j, i) == 0 ? IntegerNode.ONE : IntegerNode.ZERO);
+                }
+                result.add(row);
+            }
+            return result;
+        }
+    }
+    
     // Returns the number of decimal digits in the given integer.
     public static class IntegerLength extends CalculatorFunction {
         public IntegerLength() {
@@ -415,7 +434,7 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             Node node = args.get(0).evaluate(environment);
             if (!(node instanceof ListNode)) {
-                return IntegerNode.valueOf(0);
+                return IntegerNode.ZERO;
             }
             ListNode list = (ListNode) node;
             return IntegerNode.valueOf(list.size());
@@ -633,7 +652,7 @@ public class CalculatorFunctions {
         
         @Override public Node simplify(Calculator environment) {
             final ArrayList<Node> args = simplifyArgs(environment);
-            NumberNode total = IntegerNode.valueOf(0);
+            NumberNode total = IntegerNode.ZERO;
             for (int i = args.size() - 1; i >= 0; --i) {
                 final Node arg = args.get(i);
                 if (isNumber(arg)) {
@@ -672,7 +691,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            return series(environment, args, IntegerNode.valueOf(1), false);
+            return series(environment, args, IntegerNode.ONE, false);
         }
     }
     
@@ -697,14 +716,14 @@ public class CalculatorFunctions {
             final NumberNode step;
             if (args.size() == 1) {
                 // given n: 1, 2, ..., n
-                start = IntegerNode.valueOf(1);
+                start = IntegerNode.ONE;
                 end = toNumber("range", environment, args.get(0));
-                step = IntegerNode.valueOf(1);
+                step = IntegerNode.ONE;
             } else if (args.size() == 2) {
                 // given n, m: n, n+1, ..., m
                 start = toNumber("range", environment, args.get(0));
                 end = toNumber("range", environment, args.get(1));
-                step = IntegerNode.valueOf(1);
+                step = IntegerNode.ONE;
             } else {
                 // given n, m, k: n, n+k, ..., m
                 start = toNumber("range", environment, args.get(0));
@@ -715,13 +734,14 @@ public class CalculatorFunctions {
         }
         
         private static ListNode makeRange(NumberNode start, NumberNode end, NumberNode step) {
+            // TODO: factor out iteration (and collection of iteration parameters) so we can have consistent behavior between functions.
             IntegerNode stepSign = step.sign();
-            if (stepSign.equals(IntegerNode.valueOf(0))) {
+            if (stepSign.equals(IntegerNode.ZERO)) {
                 throw new CalculatorError("need a non-zero step size");
             }
             
             final ListNode result = new ListNode();
-            if (cmp(stepSign, IntegerNode.valueOf(0)) > 0) {
+            if (cmp(stepSign, IntegerNode.ZERO) > 0) {
                 for (NumberNode i = start; cmp(i, end) <= 0; i = i.plus(step)) {
                     result.add(i);
                 }
@@ -839,7 +859,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            return series(environment, args, IntegerNode.valueOf(0), true);
+            return series(environment, args, IntegerNode.ZERO, true);
         }
     }
     
@@ -876,7 +896,7 @@ public class CalculatorFunctions {
         
         @Override public Node simplify(Calculator environment) {
             final ArrayList<Node> args = simplifyArgs(environment);
-            NumberNode total = IntegerNode.valueOf(1);
+            NumberNode total = IntegerNode.ONE;
             for (int i = args.size() - 1; i >= 0; --i) {
                 final Node arg = args.get(i);
                 if (isNumber(arg)) {

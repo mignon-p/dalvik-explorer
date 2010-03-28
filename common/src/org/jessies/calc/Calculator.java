@@ -116,6 +116,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.GreaterEqual(),   "GreaterEqual");
         addFunction(new CalculatorFunctions.Greater(),        "Greater");
         addFunction(new CalculatorFunctions.Hypot(),          "Hypot");
+        addFunction(new CalculatorFunctions.IdentityMatrix(), "IdentityMatrix");
         addFunction(new CalculatorFunctions.IntegerLength(),  "IntegerLength");
         addFunction(new CalculatorFunctions.IntegerPart(),    "IntegerPart");
         addFunction(new CalculatorFunctions.IsPrime(),        "IsPrime");
@@ -572,34 +573,43 @@ public class Calculator {
         Assert.equals(calculator.evaluate("Range(1.2, 2.1, 0.3)"), "[1.2, 1.5, 1.8, 2.1]");
     }
     
+    @Test private static void testMatrices() {
+        final Calculator calculator = new Calculator();
+        
+        // IdentityMatrix.
+        Assert.equals(calculator.evaluate("IdentityMatrix(-1)"), "[]");
+        Assert.equals(calculator.evaluate("IdentityMatrix(0)"), "[]");
+        Assert.equals(calculator.evaluate("IdentityMatrix(1)"), "[[1]]");
+        Assert.equals(calculator.evaluate("IdentityMatrix(2)"), "[[1, 0], [0, 1]]");
+        Assert.equals(calculator.evaluate("IdentityMatrix(4)"), "[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]");
+    }
+    
     @Test private static void testSimplifier() {
         final Calculator calculator = new Calculator();
-        final Node zero = IntegerNode.valueOf(0);
-        final Node one = IntegerNode.valueOf(1);
         final Node x = new CalculatorVariableNode("x");
         
         // +0
-        Assert.equals(calculator.simplify(calculator.parse("0+0")), zero);
+        Assert.equals(calculator.simplify(calculator.parse("0+0")), IntegerNode.ZERO);
         Assert.equals(calculator.simplify(calculator.parse("x+0")), x);
         Assert.equals(calculator.simplify(calculator.parse("0+x")), x);
         
         // *1
-        Assert.equals(calculator.simplify(calculator.parse("1*1")), one);
+        Assert.equals(calculator.simplify(calculator.parse("1*1")), IntegerNode.ONE);
         Assert.equals(calculator.simplify(calculator.parse("x*1")), x);
         Assert.equals(calculator.simplify(calculator.parse("1*x")), x);
         Assert.equals(calculator.simplify(calculator.parse("(0+1)*x")), x);
         
         // *0
-        Assert.equals(calculator.simplify(calculator.parse("0*0")), zero);
-        Assert.equals(calculator.simplify(calculator.parse("0*1")), zero);
-        Assert.equals(calculator.simplify(calculator.parse("x*0")), zero);
-        Assert.equals(calculator.simplify(calculator.parse("0*x")), zero);
+        Assert.equals(calculator.simplify(calculator.parse("0*0")), IntegerNode.ZERO);
+        Assert.equals(calculator.simplify(calculator.parse("0*1")), IntegerNode.ZERO);
+        Assert.equals(calculator.simplify(calculator.parse("x*0")), IntegerNode.ZERO);
+        Assert.equals(calculator.simplify(calculator.parse("0*x")), IntegerNode.ZERO);
         
         // --
-        Assert.equals(calculator.simplify(calculator.parse("1")), one);
-        Assert.equals(calculator.simplify(calculator.parse("-1")), IntegerNode.valueOf(-1));
-        Assert.equals(calculator.simplify(calculator.parse("--1")), one);
-        Assert.equals(calculator.simplify(calculator.parse("---1")), IntegerNode.valueOf(-1));
+        Assert.equals(calculator.simplify(calculator.parse("1")), IntegerNode.ONE);
+        Assert.equals(calculator.simplify(calculator.parse("-1")), IntegerNode.MINUS_ONE);
+        Assert.equals(calculator.simplify(calculator.parse("--1")), IntegerNode.ONE);
+        Assert.equals(calculator.simplify(calculator.parse("---1")), IntegerNode.MINUS_ONE);
         
         // From "Paradigms of Artificial Intelligence Programming", section 8.2.
         Assert.equals(calculator.simplify(calculator.parse("2+2")), IntegerNode.valueOf(4));

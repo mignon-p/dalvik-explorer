@@ -27,7 +27,7 @@ public class RationalNode implements Comparable<RationalNode>, NumberNode {
     private final IntegerNode q;
     
     private RationalNode(IntegerNode p, IntegerNode q) {
-        if (q.compareTo(IntegerNode.valueOf(0)) < 0) {
+        if (q.compareTo(IntegerNode.ZERO) < 0) {
             // FIXME: we can cope with this if we fiddle the signs; but should we?
             throw new RuntimeException("Internal error: trying to create rational with negative denominator");
         }
@@ -47,7 +47,7 @@ public class RationalNode implements Comparable<RationalNode>, NumberNode {
     }
     
     static NumberNode valueOf(IntegerNode p, IntegerNode q) {
-        if (q.compareTo(IntegerNode.valueOf(1)) == 0) {
+        if (q.compareTo(IntegerNode.ONE) == 0) {
             return p;
         } else {
             return new RationalNode(p, q);
@@ -132,7 +132,7 @@ public class RationalNode implements Comparable<RationalNode>, NumberNode {
     }
     
     public NumberNode increment() {
-        return this.plus(IntegerNode.valueOf(1));
+        return this.plus(IntegerNode.ONE);
     }
     
     public IntegerNode integerPart() {
