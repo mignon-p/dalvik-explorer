@@ -61,7 +61,7 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     // Internally, we often want to treat an IntegerNode as if it was a int, whether it is or not.
-    private int intValue() {
+    int intValue() {
         return isBig() ? big().intValue() : (int) fixnum;
     }
     

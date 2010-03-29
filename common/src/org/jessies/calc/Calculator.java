@@ -152,6 +152,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Tanh(),           "Tanh");
         addFunction(new CalculatorFunctions.Tan(),            "Tan");
         addFunction(new CalculatorFunctions.Times(),          "Times");
+        addFunction(new CalculatorFunctions.Transpose(),      "Transpose");
         addFunction(new CalculatorFunctions.Unequal(),        "Unequal");
         
         operators.put(CalculatorToken.B_AND, functions.get("BitAnd"));
@@ -607,6 +608,23 @@ public class Calculator {
         Assert.equals(calculator.evaluate("Dimensions([[1, 1, 1], [2, 2, 2]])"), "[2, 3]");
         Assert.equals(calculator.evaluate("Dimensions([[1, 1], [2, 2], [3, 3]])"), "[3, 2]");
         Assert.equals(calculator.evaluate("Dimensions(IdentityMatrix(4))"), "[4, 4]");
+        
+        // Scalar multiplication.
+        Assert.equals(calculator.evaluate("2*[[1, 8, -3], [4, -2, 5]]"), "[[2, 16, -6], [8, -4, 10]]");
+        Assert.equals(calculator.evaluate("[[1, 8, -3], [4, -2, 5]]*2"), "[[2, 16, -6], [8, -4, 10]]");
+        
+        // Matrix multiplication.
+        Assert.equals(calculator.evaluate("IdentityMatrix(3)*IdentityMatrix(3)"), "[[1, 0, 0], [0, 1, 0], [0, 0, 1]]");
+        Assert.equals(calculator.evaluate("[[1,2],[3,4]]*[[0,1],[0,0]]"), "[[0, 1], [0, 3]]");
+        Assert.equals(calculator.evaluate("[[0,1],[0,0]]*[[1,2],[3,4]]"), "[[3, 4], [0, 0]]");
+        Assert.equals(calculator.evaluate("[[1,0,2],[-1,3,1]]*[[3,1],[2,1],[1,0]]"), "[[5, 1], [4, 2]]");
+        
+        // Transposition.
+        Assert.equals(calculator.evaluate("Transpose([])"), "[]");
+        Assert.equals(calculator.evaluate("Transpose([[1, 2]])"), "[[1], [2]]");
+        Assert.equals(calculator.evaluate("Transpose([[1], [2]])"), "[[1, 2]]");
+        Assert.equals(calculator.evaluate("Transpose([[1, 2], [3, 4]])"), "[[1, 3], [2, 4]]");
+        Assert.equals(calculator.evaluate("Transpose([[1, 2, 3], [0, -6, 0]])"), "[[1, 0], [2, -6], [3, 0]]");
     }
     
     @Test private static void testSimplifier() {

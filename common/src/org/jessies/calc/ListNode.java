@@ -28,6 +28,14 @@ public class ListNode implements Iterable<Node>, Node {
         return this;
     }
     
+    public Node get(IntegerNode index) {
+        return values.get(index.intValue());
+    }
+    
+    public Node get(int index) {
+        return values.get(index);
+    }
+    
     public Iterator<Node> iterator() {
         return values.iterator();
     }
