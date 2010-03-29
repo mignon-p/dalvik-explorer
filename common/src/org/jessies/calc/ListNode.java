@@ -20,11 +20,16 @@ package org.jessies.calc;
 
 import java.util.*;
 
-public class ListNode implements Node {
+public class ListNode implements Iterable<Node>, Node {
     private final List<Node> values = new ArrayList<Node>();
     
-    public void add(Node value) {
+    public ListNode add(Node value) {
         values.add(value);
+        return this;
+    }
+    
+    public Iterator<Node> iterator() {
+        return values.iterator();
     }
     
     @Override public boolean equals(Object other) {

@@ -107,6 +107,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Cosh(),           "Cosh");
         addFunction(new CalculatorFunctions.Cos(),            "Cos");
         addFunction(new CalculatorFunctions.Define(),         "Define");
+        addFunction(new CalculatorFunctions.Dimensions(),     "Dimensions");
         addFunction(new CalculatorFunctions.Divide(),         "Divide");
         addFunction(new CalculatorFunctions.Equal(),          "Equal");
         addFunction(new CalculatorFunctions.Exp(),            "Exp");
@@ -119,6 +120,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.IdentityMatrix(), "IdentityMatrix");
         addFunction(new CalculatorFunctions.IntegerLength(),  "IntegerLength");
         addFunction(new CalculatorFunctions.IntegerPart(),    "IntegerPart");
+        addFunction(new CalculatorFunctions.IsMatrix(),       "IsMatrix");
         addFunction(new CalculatorFunctions.IsPrime(),        "IsPrime");
         addFunction(new CalculatorFunctions.Length(),         "Length");
         addFunction(new CalculatorFunctions.LessEqual(),      "LessEqual");
@@ -589,6 +591,22 @@ public class Calculator {
         Assert.equals(calculator.evaluate("IdentityMatrix(1)"), "[[1]]");
         Assert.equals(calculator.evaluate("IdentityMatrix(2)"), "[[1, 0], [0, 1]]");
         Assert.equals(calculator.evaluate("IdentityMatrix(4)"), "[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]");
+        
+        // IsMatrix.
+        Assert.equals(calculator.evaluate("IsMatrix(1)"), "false");
+        Assert.equals(calculator.evaluate("IsMatrix([])"), "true");
+        Assert.equals(calculator.evaluate("IsMatrix([1])"), "false");
+        Assert.equals(calculator.evaluate("IsMatrix([[1]])"), "true");
+        Assert.equals(calculator.evaluate("IsMatrix([[1], [2]])"), "true");
+        Assert.equals(calculator.evaluate("IsMatrix([[1], [2], [3, 4]])"), "false");
+        Assert.equals(calculator.evaluate("IsMatrix([[1, 1], [2, 1], [3, 4]])"), "true");
+        Assert.equals(calculator.evaluate("IsMatrix([[1, 1], [2, 1], [3, [4]]])"), "false");
+        
+        // Dimensions.
+        Assert.equals(calculator.evaluate("Dimensions([])"), "[0, 0]");
+        Assert.equals(calculator.evaluate("Dimensions([[1, 1, 1], [2, 2, 2]])"), "[2, 3]");
+        Assert.equals(calculator.evaluate("Dimensions([[1, 1], [2, 2], [3, 3]])"), "[3, 2]");
+        Assert.equals(calculator.evaluate("Dimensions(IdentityMatrix(4))"), "[4, 4]");
     }
     
     @Test private static void testSimplifier() {

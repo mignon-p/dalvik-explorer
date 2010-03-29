@@ -41,7 +41,7 @@ public class CalculatorFunctions {
         if (node instanceof BooleanNode) {
             return (BooleanNode) node;
         }
-        throw new CalculatorError("'" + function + "' expected boolean argument");
+        throw expected(function, "boolean");
     }
     
     private static ListNode toList(String function, Calculator environment, Node node) {
@@ -49,7 +49,7 @@ public class CalculatorFunctions {
         if (node instanceof ListNode) {
             return (ListNode) node;
         }
-        throw new CalculatorError("'" + function + "' expected list argument");
+        throw expected(function, "list");
     }
     
     private static NumberNode toNumber(String function, Calculator environment, Node node) {
@@ -57,7 +57,7 @@ public class CalculatorFunctions {
         if (node instanceof NumberNode) {
             return (NumberNode) node;
         }
-        throw new CalculatorError("'" + function + "' expected numeric argument");
+        throw expected(function, "numeric");
     }
     
     private static IntegerNode toInteger(String function, Calculator environment, Node node) {
@@ -65,7 +65,7 @@ public class CalculatorFunctions {
         if (node instanceof IntegerNode) {
             return (IntegerNode) node;
         }
-        throw new CalculatorError("'" + function + "' expected integer argument");
+        throw expected(function, "integer");
     }
     
     private static RealNode toReal(String function, Calculator environment, Node node) {
@@ -75,7 +75,41 @@ public class CalculatorFunctions {
         } else if (node instanceof IntegerNode) {
             return ((IntegerNode) node).toReal();
         }
-        throw new CalculatorError("'" + function + "' expected real argument");
+        throw expected(function, "real");
+    }
+    
+    private static CalculatorError expected(String function, String type) {
+        throw new CalculatorError("'" + function + "' expected " + type + " argument");
+    }
+    
+    // Returns [rowCount, columnCount], or null if 'node' is not a matrix.
+    private static ListNode matrixDimensions(Node node) {
+        if (!(node instanceof ListNode)) {
+            return null;
+        }
+        // 2. each element is a list...
+        final ListNode list = (ListNode) node;
+        int columnCount = 0;
+        for (Node element : list) {
+            if (!(element instanceof ListNode)) {
+                return null;
+            }
+            // 3. of the same length...
+            ListNode row = (ListNode) element;
+            int rowLength = row.size();
+            if (columnCount != 0 && columnCount != rowLength) {
+                return null;
+            }
+            columnCount = rowLength;
+            // 4. where none of the elements itself contains a list.
+            for (Node rowElement : row) {
+                if (rowElement instanceof ListNode) {
+                    return null;
+                }
+            }
+        }
+        int rowCount = list.size();
+        return new ListNode().add(IntegerNode.valueOf(rowCount)).add(IntegerNode.valueOf(columnCount));
     }
     
     public static class Abs extends CalculatorFunction {
@@ -282,6 +316,20 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Dimensions extends CalculatorFunction {
+        public Dimensions() {
+            super("Dimensions", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            final ListNode dimensions = matrixDimensions(args.get(0).evaluate(environment));
+            if (dimensions == null) {
+                throw expected("Dimensions", "matrix");
+            }
+            return dimensions;
+        }
+    }
+    
     public static class Divide extends CalculatorFunction {
         public Divide() {
             super("Divide", 2);
@@ -431,6 +479,19 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment) {
             return toInteger("IsPrime", environment, args.get(0)).isPrime();
+        }
+    }
+    
+    public static class IsMatrix extends CalculatorFunction {
+        public IsMatrix() {
+            super("IsMatrix", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            // A node is a matrix if:
+            // 1. it's a list..
+            final Node node = args.get(0).evaluate(environment);
+            return BooleanNode.valueOf(matrixDimensions(node) != null);
         }
     }
     
