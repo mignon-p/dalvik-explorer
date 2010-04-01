@@ -36,6 +36,35 @@ public class CalculatorFunctions {
         return (n instanceof IntegerNode) && (((IntegerNode) n).compareTo(IntegerNode.ONE) == 0);
     }
     
+    private static int cmp(Calculator environment, List<Node> args) {
+        final NumberNode lhs = toNumber("cmp", environment, args.get(0));
+        final NumberNode rhs = toNumber("cmp", environment, args.get(1));
+        return cmp(lhs, rhs);
+    }
+    
+    private static int cmp(NumberNode lhs, NumberNode rhs) {
+        if (lhs instanceof IntegerNode && rhs instanceof IntegerNode) {
+            return ((IntegerNode) lhs).compareTo((IntegerNode) rhs);
+        } else {
+            // FIXME: what about an integer too large to be represented as a real, compared to a real?
+            return lhs.toReal().compareTo(rhs.toReal());
+        }
+    }
+    
+    private static BooleanNode equal(Node lhs, Node rhs) {
+        if (lhs instanceof BooleanNode && rhs instanceof BooleanNode) {
+            return BooleanNode.valueOf(lhs == rhs);
+        } else if (lhs instanceof NumberNode && rhs instanceof NumberNode) {
+            return BooleanNode.valueOf(cmp((NumberNode) lhs, (NumberNode) rhs) == 0);
+        } else {
+            throw new CalculatorError("equality only applies to booleans and numbers");
+        }
+    }
+    
+    private static BooleanNode unequal(Node lhs, Node rhs) {
+        return equal(lhs, rhs).not();
+    }
+    
     private static BooleanNode toBoolean(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof BooleanNode) {
@@ -270,21 +299,6 @@ public class CalculatorFunctions {
         }
     }
     
-    private static int cmp(Calculator environment, List<Node> args) {
-        final NumberNode lhs = toNumber("cmp", environment, args.get(0));
-        final NumberNode rhs = toNumber("cmp", environment, args.get(1));
-        return cmp(lhs, rhs);
-    }
-    
-    private static int cmp(NumberNode lhs, NumberNode rhs) {
-        if (lhs instanceof IntegerNode && rhs instanceof IntegerNode) {
-            return ((IntegerNode) lhs).compareTo((IntegerNode) rhs);
-        } else {
-            // FIXME: what about an integer too large to be represented as a real, compared to a real?
-            return lhs.toReal().compareTo(rhs.toReal());
-        }
-    }
-    
     public static class Cos extends CalculatorFunction {
         public Cos() {
             super("cos", 1);
@@ -355,15 +369,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final Node lhs = args.get(0).evaluate(environment);
-            final Node rhs = args.get(1).evaluate(environment);
-            if (lhs instanceof BooleanNode && rhs instanceof BooleanNode) {
-                return BooleanNode.valueOf(lhs == rhs);
-            } else if (lhs instanceof NumberNode && rhs instanceof NumberNode) {
-                return BooleanNode.valueOf(cmp((NumberNode) lhs, (NumberNode) rhs) == 0);
-            } else {
-                throw new CalculatorError("equality only applies to booleans and numbers");
-            }
+            return equal(args.get(0).evaluate(environment), args.get(1).evaluate(environment));
         }
     }
     
@@ -1103,15 +1109,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final Node lhs = args.get(0).evaluate(environment);
-            final Node rhs = args.get(1).evaluate(environment);
-            if (lhs instanceof BooleanNode && rhs instanceof BooleanNode) {
-                return BooleanNode.valueOf(lhs != rhs);
-            } else if (lhs instanceof NumberNode && rhs instanceof NumberNode) {
-                return BooleanNode.valueOf(cmp((NumberNode) lhs, (NumberNode) rhs) != 0);
-            } else {
-                throw new CalculatorError("inequality only applies to booleans and numbers");
-            }
+            return unequal(args.get(0).evaluate(environment), args.get(1).evaluate(environment));
         }
     }
 }
