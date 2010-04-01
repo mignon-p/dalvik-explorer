@@ -56,9 +56,23 @@ public class CalculatorFunctions {
             return BooleanNode.valueOf(lhs == rhs);
         } else if (lhs instanceof NumberNode && rhs instanceof NumberNode) {
             return BooleanNode.valueOf(cmp((NumberNode) lhs, (NumberNode) rhs) == 0);
+        } else if (lhs instanceof ListNode && rhs instanceof ListNode) {
+            return equalLists((ListNode) lhs, (ListNode) rhs);
         } else {
-            throw new CalculatorError("equality only applies to booleans and numbers");
+            return BooleanNode.FALSE;
         }
+    }
+    
+    private static BooleanNode equalLists(ListNode lhs, ListNode rhs) {
+        if (lhs.size() != rhs.size()) {
+            return BooleanNode.FALSE;
+        }
+        for (int i = 0, size = lhs.size(); i < size; ++i) {
+            if (equal(lhs.get(i), rhs.get(i)) == BooleanNode.FALSE) {
+                return BooleanNode.FALSE;
+            }
+        }
+        return BooleanNode.TRUE;
     }
     
     private static BooleanNode unequal(Node lhs, Node rhs) {

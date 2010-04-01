@@ -321,6 +321,15 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("true!=false"), "true");
         Assert.equals(new Calculator().evaluate("false!=true"), "true");
         Assert.equals(new Calculator().evaluate("false!=false"), "false");
+        Assert.equals(new Calculator().evaluate("[]==[]"), "true");
+        Assert.equals(new Calculator().evaluate("[[]]==[[]]"), "true");
+        Assert.equals(new Calculator().evaluate("[[], []]==[[], []]"), "true");
+        Assert.equals(new Calculator().evaluate("[0]==[0]"), "true");
+        Assert.equals(new Calculator().evaluate("[0]==[1]"), "false");
+        Assert.equals(new Calculator().evaluate("[0, 1]==[0, 1]"), "true");
+        Assert.equals(new Calculator().evaluate("[0, 1]==[1, 0]"), "false");
+        Assert.equals(new Calculator().evaluate("[0, 1]==[0, [1]]"), "false");
+        Assert.equals(new Calculator().evaluate("[0, [1]]==[0, [1]]"), "true");
     }
     
     @Test private static void testLogicalNot() {
