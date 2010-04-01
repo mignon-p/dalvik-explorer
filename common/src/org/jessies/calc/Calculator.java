@@ -628,6 +628,23 @@ public class Calculator {
         Assert.equals(calculator.evaluate("[[0,1],[0,0]]*[[1,2],[3,4]]"), "[[3, 4], [0, 0]]");
         Assert.equals(calculator.evaluate("[[1,0,2],[-1,3,1]]*[[3,1],[2,1],[1,0]]"), "[[5, 1], [4, 2]]");
         
+        // Scalar addition.
+        Assert.equals(calculator.evaluate("2+[[1, 8, -3], [4, -2, 5]]"), "[[3, 10, -1], [6, 0, 7]]");
+        Assert.equals(calculator.evaluate("[[1, 8, -3], [4, -2, 5]]+2"), "[[3, 10, -1], [6, 0, 7]]");
+        
+        // Matrix addition.
+        Assert.equals(calculator.evaluate("[[1,3,1],[1,0,0]] + [[0,0,5],[7,5,0]]"), "[[1, 3, 6], [8, 5, 0]]");
+        
+        // Scalar subtraction.
+        Assert.equals(calculator.evaluate("2-[[1, 8, -3], [4, -2, 5]]"), "[[1, -6, 5], [-2, 4, -3]]");
+        Assert.equals(calculator.evaluate("[[1, 8, -3], [4, -2, 5]]-2"), "[[-1, 6, -5], [2, -4, 3]]");
+        
+        // Matrix subtraction.
+        Assert.equals(calculator.evaluate("[[1,3,1],[1,0,0]] - [[0,0,5],[7,5,0]]"), "[[1, 3, -4], [-6, -5, 0]]");
+        
+        // Negation.
+        Assert.equals(calculator.evaluate("-[[1, 8, -3], [4, -2, 5]]"), "[[-1, -8, 3], [-4, 2, -5]]");
+        
         // Transposition.
         Assert.equals(calculator.evaluate("Transpose([])"), "[]");
         Assert.equals(calculator.evaluate("Transpose([[1, 2]])"), "[[1], [2]]");

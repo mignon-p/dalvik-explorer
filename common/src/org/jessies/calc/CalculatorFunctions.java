@@ -157,9 +157,69 @@ public class CalculatorFunctions {
     
     // Returns the 'j'th element of row 'i' of 'm'.
     // Uses zero-based indexes, for internal use only.
-    private static NumberNode matrixElementAt(ListNode m, IntegerNode i, IntegerNode j) {
+    private static Node matrixElementAt(ListNode m, IntegerNode i, IntegerNode j) {
         ListNode row = (ListNode) m.get(i);
-        return (NumberNode) row.get(j);
+        Node element = row.get(j);
+        return element;
+    }
+    
+    private enum MatrixOp {
+        ADD("addition"),
+        MUL("multiplication"),
+        SUB("subtraction"),
+        RSB("subtraction");
+        private final String name;
+        private MatrixOp(String name) { this.name = name; }
+        @Override public String toString() { return name; }
+    }
+    
+    private static Node matrixMatrixOp(ListNode lhs, ListNode lhsDimensions, ListNode rhs, ListNode rhsDimensions, MatrixOp op) {
+        if (equal(lhsDimensions, rhsDimensions) == BooleanNode.FALSE) {
+            throw new CalculatorError("matrix " + op + " requires compatible matrices");
+        }
+        final IntegerNode rowCount = (IntegerNode) lhsDimensions.get(0);
+        final IntegerNode columnCount = (IntegerNode) rhsDimensions.get(1);
+        final ListNode result = new ListNode();
+        for (IntegerNode i = IntegerNode.ZERO; cmp(i, rowCount) < 0; i = i.increment()) {
+            final ListNode newRow = new ListNode();
+            for (IntegerNode j = IntegerNode.ZERO; cmp(j, columnCount) < 0; j = j.increment()) {
+                Node lhsNode = matrixElementAt(lhs, i, j);
+                Node rhsNode = matrixElementAt(rhs, i, j);
+                if (!isNumber(lhsNode) || !isNumber(rhsNode)) {
+                    throw new CalculatorError(op + " of a matrix and a scalar requires numeric matrices");
+                }
+                NumberNode lhsNumber = (NumberNode) lhsNode;
+                NumberNode rhsNumber = (NumberNode) rhsNode;
+                switch (op) {
+                case ADD: newRow.add(lhsNumber.plus(rhsNumber)); break;
+                case SUB: newRow.add(lhsNumber.subtract(rhsNumber)); break;
+                default: throw new CalculatorError("elementwise matrix multiplication/reverse-subtract not implemented");
+                }
+            }
+            result.add(newRow);
+        }
+        return result;
+    }
+    
+    private static Node matrixScalarOp(ListNode matrix, ListNode dimensions, NumberNode scalar, MatrixOp op) {
+        final ListNode result = new ListNode();
+        for (Node row : matrix) {
+            final ListNode newRow = new ListNode();
+            for (Node value : (ListNode) row) {
+                if (!isNumber(value)) {
+                    throw new CalculatorError(op + " of a matrix and a scalar requires numeric matrices");
+                }
+                NumberNode element = (NumberNode) value;
+                switch (op) {
+                case ADD: newRow.add(element.plus(scalar)); break;
+                case MUL: newRow.add(element.times(scalar)); break;
+                case RSB: newRow.add(scalar.subtract(element)); break;
+                case SUB: newRow.add(element.subtract(scalar)); break;
+                }
+            }
+            result.add(newRow);
+        }
+        return result;
     }
     
     public static class Abs extends CalculatorFunction {
@@ -741,9 +801,26 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final NumberNode lhs = toNumber("Plus", environment, args.get(0));
-            final NumberNode rhs = toNumber("Plus", environment, args.get(1));
-            return lhs.plus(rhs);
+            final Node lhs = args.get(0).evaluate(environment);
+            final Node rhs = args.get(1).evaluate(environment);
+            if (isNumber(lhs) && isNumber(rhs)) {
+                // scalar + scalar
+                return ((NumberNode) lhs).plus((NumberNode) rhs);
+            }
+            final ListNode lhsDimensions = matrixDimensions(lhs);
+            final ListNode rhsDimensions = matrixDimensions(rhs);
+            if (lhsDimensions != null && rhsDimensions != null) {
+                // matrix + matrix
+                return matrixMatrixOp((ListNode) lhs, lhsDimensions, (ListNode) rhs, rhsDimensions, MatrixOp.ADD);
+            } else if (isNumber(lhs) && rhsDimensions != null) {
+                // scalar + matrix
+                return matrixScalarOp((ListNode) rhs, rhsDimensions, (NumberNode) lhs, MatrixOp.ADD);
+            } else if (lhsDimensions != null && isNumber(rhs)) {
+                // matrix + scalar
+                return matrixScalarOp((ListNode) lhs, lhsDimensions, (NumberNode) rhs, MatrixOp.ADD);
+            } else {
+                throw expected("Plus", "numeric or matrix");
+            }
         }
         
         @Override public Node simplify(Calculator environment) {
@@ -953,9 +1030,26 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final NumberNode lhs = toNumber("Subtract", environment, args.get(0));
-            final NumberNode rhs = toNumber("Subtract", environment, args.get(1));
-            return lhs.subtract(rhs);
+            final Node lhs = args.get(0).evaluate(environment);
+            final Node rhs = args.get(1).evaluate(environment);
+            if (isNumber(lhs) && isNumber(rhs)) {
+                // scalar - scalar
+                return ((NumberNode) lhs).subtract((NumberNode) rhs);
+            }
+            final ListNode lhsDimensions = matrixDimensions(lhs);
+            final ListNode rhsDimensions = matrixDimensions(rhs);
+            if (lhsDimensions != null && rhsDimensions != null) {
+                // matrix - matrix
+                return matrixMatrixOp((ListNode) lhs, lhsDimensions, (ListNode) rhs, rhsDimensions, MatrixOp.SUB);
+            } else if (isNumber(lhs) && rhsDimensions != null) {
+                // scalar - matrix
+                return matrixScalarOp((ListNode) rhs, rhsDimensions, (NumberNode) lhs, MatrixOp.RSB);
+            } else if (lhsDimensions != null && isNumber(rhs)) {
+                // matrix - scalar
+                return matrixScalarOp((ListNode) lhs, lhsDimensions, (NumberNode) rhs, MatrixOp.SUB);
+            } else {
+                throw expected("Subtract", "numeric or matrix");
+            }
         }
     }
     
@@ -1005,13 +1099,13 @@ public class CalculatorFunctions {
             final ListNode rhsDimensions = matrixDimensions(rhs);
             if (lhsDimensions != null && rhsDimensions != null) {
                 // matrix * matrix
-                return matrixTimes((ListNode) lhs, (ListNode) rhs, lhsDimensions, rhsDimensions);
+                return matrixTimes((ListNode) lhs, lhsDimensions, (ListNode) rhs, rhsDimensions);
             } else if (isNumber(lhs) && rhsDimensions != null) {
                 // scalar * matrix
-                return matrixTimesScalar((ListNode) rhs, rhsDimensions, (NumberNode) lhs);
+                return matrixScalarOp((ListNode) rhs, rhsDimensions, (NumberNode) lhs, MatrixOp.MUL);
             } else if (lhsDimensions != null && isNumber(rhs)) {
                 // matrix * scalar
-                return matrixTimesScalar((ListNode) lhs, lhsDimensions, (NumberNode) rhs);
+                return matrixScalarOp((ListNode) lhs, lhsDimensions, (NumberNode) rhs, MatrixOp.MUL);
             } else {
                 throw expected("Times", "numeric or matrix");
             }
@@ -1019,7 +1113,7 @@ public class CalculatorFunctions {
         
         // Multiply an m*n matrix by an n*p matrix.
         // http://en.wikipedia.org/wiki/Matrix_multiplication
-        private static Node matrixTimes(ListNode lhs, ListNode rhs, ListNode lhsDimensions, ListNode rhsDimensions) {
+        private static Node matrixTimes(ListNode lhs, ListNode lhsDimensions, ListNode rhs, ListNode rhsDimensions) {
             final IntegerNode n = (IntegerNode) lhsDimensions.get(1);
             if (!n.equals((IntegerNode) rhsDimensions.get(0))) {
                 throw new CalculatorError("matrix multiplication requires compatible matrices");
@@ -1043,24 +1137,9 @@ public class CalculatorFunctions {
         private static Node dotProduct(ListNode A, ListNode B, IntegerNode i, IntegerNode j, IntegerNode n) {
             NumberNode result = IntegerNode.ZERO;
             for (IntegerNode r = IntegerNode.ZERO; cmp(r, n) < 0; r = r.increment()) {
-                final NumberNode Air = matrixElementAt(A, i, r);
-                final NumberNode Brj = matrixElementAt(B, r, j);
+                final NumberNode Air = (NumberNode) matrixElementAt(A, i, r);
+                final NumberNode Brj = (NumberNode) matrixElementAt(B, r, j);
                 result = result.plus(Air.times(Brj));
-            }
-            return result;
-        }
-        
-        private static Node matrixTimesScalar(ListNode matrix, ListNode dimensions, NumberNode scalar) {
-            final ListNode result = new ListNode();
-            for (Node row : matrix) {
-                final ListNode newRow = new ListNode();
-                for (Node value : (ListNode) row) {
-                    if (!isNumber(value)) {
-                        throw new CalculatorError("multiplication of a matrix by a scalar requires numeric matrices");
-                    }
-                    newRow.add(((NumberNode) value).times(scalar));
-                }
-                result.add(newRow);
             }
             return result;
         }
