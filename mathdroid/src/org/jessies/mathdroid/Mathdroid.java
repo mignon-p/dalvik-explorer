@@ -9,6 +9,7 @@ import android.text.*;
 import android.text.style.*;
 import android.util.Log;
 import android.view.*;
+import android.view.inputmethod.*;
 import android.widget.*;
 import java.util.*;
 import org.jessies.calc.Calculator;
@@ -51,12 +52,13 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         final EditText queryView = (EditText) findViewById(R.id.q);
         queryView.setOnEditorActionListener(this);
         queryView.requestFocus();
+        queryView.setInputType(0);
         
         initButtonMap();
         
-        initButtonClickListener(R.id.clear);
         initButtonClickListener(R.id.del);
         initButtonClickListener(R.id.exe);
+        initButtonClickListener(R.id.kbd);
         initButtonClickListener(R.id.left);
         initButtonClickListener(R.id.less);
         initButtonClickListener(R.id.more);
@@ -253,8 +255,8 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         switch (id) {
         case R.id.transcript:
             break;
-        case R.id.clear:
-            clear(queryView);
+        case R.id.kbd:
+            showSoftKeyboard(queryView);
             break;
         case R.id.left:
             moveCaret(queryView, -1);
@@ -309,6 +311,11 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     private void clear(EditText queryView) {
         queryView.setText("");
         history.clear();
+    }
+    
+    private void showSoftKeyboard(EditText queryView) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(queryView, 0);
     }
     
     private void del(EditText queryView) {
