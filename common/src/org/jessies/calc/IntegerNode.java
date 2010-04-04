@@ -150,6 +150,10 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
     }
     
+    public IntegerNode bitLength() {
+        return IntegerNode.valueOf(big().bitLength());
+    }
+    
     public IntegerNode bitNot() {
         if (isBig()) {
             return IntegerNode.valueOf(bignum.not());

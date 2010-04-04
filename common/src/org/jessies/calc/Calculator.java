@@ -97,6 +97,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Atan2(),          "Atan2");
         addFunction(new CalculatorFunctions.Atan(),           "Atan", "ArcTan");
         addFunction(new CalculatorFunctions.BitAnd(),         "BitAnd");
+        addFunction(new CalculatorFunctions.BitLength(),      "BitLength");
         addFunction(new CalculatorFunctions.BitNot(),         "BitNot");
         addFunction(new CalculatorFunctions.BitOr(),          "BitOr");
         addFunction(new CalculatorFunctions.BitShiftRight() , "BitShiftRight");
@@ -368,6 +369,14 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("((0x1234 & ~0xff) | 0x56) == 0x1256"), "true");
         Assert.equals(new Calculator().evaluate("~3"), "-4");
         Assert.equals(new Calculator().evaluate("~~3"), "3");
+        Assert.equals(new Calculator().evaluate("BitLength(0)"), "0");
+        Assert.equals(new Calculator().evaluate("BitLength(32)"), "6");
+        Assert.equals(new Calculator().evaluate("BitLength(255)"), "8");
+        Assert.equals(new Calculator().evaluate("BitLength(256)"), "9");
+        Assert.equals(new Calculator().evaluate("BitLength(257)"), "9");
+        Assert.equals(new Calculator().evaluate("BitLength(-255)"), "8");
+        Assert.equals(new Calculator().evaluate("BitLength(-256)"), "8");
+        Assert.equals(new Calculator().evaluate("BitLength(-257)"), "9");
     }
     
     @Test private static void testExponentiation() {

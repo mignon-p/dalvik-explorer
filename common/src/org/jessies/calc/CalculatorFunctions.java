@@ -294,6 +294,17 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class BitLength extends CalculatorFunction {
+        public BitLength() {
+            super("BitLength", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode lhs = toInteger("BitLength", environment, args.get(0));
+            return lhs.bitLength();
+        }
+    }
+    
     public static class BitNot extends CalculatorFunction {
         public BitNot() {
             super("BitNot", 1);
