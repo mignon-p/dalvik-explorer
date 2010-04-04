@@ -539,13 +539,20 @@ public class CalculatorFunctions {
     // Returns the number of decimal digits in the given integer.
     public static class IntegerLength extends CalculatorFunction {
         public IntegerLength() {
-            // FIXME: support IntegerLength(n, base) too!
-            super("IntegerLength", 1);
+            super("IntegerLength", 1, 2);
         }
         
         public Node apply(Calculator environment) {
             final IntegerNode n = toInteger("IntegerLength", environment, args.get(0));
-            return IntegerNode.valueOf(n.abs().toString().length());
+            int radix = 10;
+            if (args.size() == 2) {
+                final IntegerNode b = toInteger("IntegerLength", environment, args.get(1));
+                if (b.compareTo(IntegerNode.valueOf(2)) < 0 || b.compareTo(IntegerNode.valueOf(36)) > 0) {
+                    throw new CalculatorError("radix must be between 2 and 36");
+                }
+                radix = b.intValue();
+            }
+            return IntegerNode.valueOf(n.abs().toString(radix).length());
         }
     }
     

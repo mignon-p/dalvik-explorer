@@ -469,6 +469,9 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("IntegerLength(100)"), "3");
         Assert.equals(new Calculator().evaluate("IntegerLength(-100)"), "3");
         Assert.equals(new Calculator().evaluate("IntegerLength(170!)"), "307");
+        Assert.equals(new Calculator().evaluate("IntegerLength(100!, 2)"), "525");
+        Assert.equals(new Calculator().evaluate("IntegerLength(255, 16)"), "2");
+        Assert.equals(new Calculator().evaluate("IntegerLength(256, 16)"), "3");
     }
     
     @Test private static void testIntegerPartAndFractionalPart() {

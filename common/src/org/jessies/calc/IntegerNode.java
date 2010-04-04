@@ -415,11 +415,15 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         return toString();
     }
     
-    @Override public String toString() {
+    public String toString(int radix) {
         if (isBig()) {
-            return big().toString();
+            return big().toString(radix);
         } else {
-            return Long.toString(fixnum);
+            return Long.toString(fixnum, radix);
         }
+    }
+    
+    @Override public String toString() {
+        return toString(10);
     }
 }
