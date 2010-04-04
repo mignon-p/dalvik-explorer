@@ -150,6 +150,23 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
     }
     
+    private static int bitIndex(IntegerNode k) {
+        if (k.isBig() || k.fix() > Integer.MAX_VALUE) {
+            throw new CalculatorError("bit index too large");
+        } else if (k.compareTo(IntegerNode.ZERO) < 0) {
+            throw new CalculatorError("bit index negative");
+        }
+        return (int) k.fix();
+    }
+    
+    public IntegerNode bitClear(IntegerNode k) {
+        return IntegerNode.valueOf(big().clearBit(bitIndex(k)));
+    }
+    
+    public IntegerNode bitGet(IntegerNode k) {
+        return big().testBit(bitIndex(k)) ? IntegerNode.ONE : IntegerNode.ZERO;
+    }
+    
     public IntegerNode bitLength() {
         return IntegerNode.valueOf(big().bitLength());
     }
@@ -168,6 +185,10 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         } else {
             return IntegerNode.valueOf(fixnum | rhs.fixnum);
         }
+    }
+    
+    public IntegerNode bitSet(IntegerNode k) {
+        return IntegerNode.valueOf(big().setBit(bitIndex(k)));
     }
     
     public IntegerNode bitShiftLeft(IntegerNode rhs) {

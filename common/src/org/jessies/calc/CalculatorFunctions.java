@@ -294,6 +294,30 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class BitClear extends CalculatorFunction {
+        public BitClear() {
+            super("BitClear", 2);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode n = toInteger("BitClear", environment, args.get(0));
+            final IntegerNode k = toInteger("BitClear", environment, args.get(1));
+            return n.bitClear(k);
+        }
+    }
+    
+    public static class BitGet extends CalculatorFunction {
+        public BitGet() {
+            super("BitGet", 2);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode n = toInteger("BitGet", environment, args.get(0));
+            final IntegerNode k = toInteger("BitGet", environment, args.get(1));
+            return n.bitGet(k);
+        }
+    }
+    
     public static class BitLength extends CalculatorFunction {
         public BitLength() {
             super("BitLength", 1);
@@ -325,6 +349,18 @@ public class CalculatorFunctions {
             final IntegerNode lhs = toInteger("BitOr", environment, args.get(0));
             final IntegerNode rhs = toInteger("BitOr", environment, args.get(1));
             return lhs.bitOr(rhs);
+        }
+    }
+    
+    public static class BitSet extends CalculatorFunction {
+        public BitSet() {
+            super("BitSet", 2);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode n = toInteger("BitSet", environment, args.get(0));
+            final IntegerNode k = toInteger("BitSet", environment, args.get(1));
+            return n.bitSet(k);
         }
     }
     

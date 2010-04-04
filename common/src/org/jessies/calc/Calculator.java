@@ -97,9 +97,12 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Atan2(),          "Atan2");
         addFunction(new CalculatorFunctions.Atan(),           "Atan", "ArcTan");
         addFunction(new CalculatorFunctions.BitAnd(),         "BitAnd");
+        addFunction(new CalculatorFunctions.BitClear(),       "BitClear");
+        addFunction(new CalculatorFunctions.BitGet(),         "BitGet");
         addFunction(new CalculatorFunctions.BitLength(),      "BitLength");
         addFunction(new CalculatorFunctions.BitNot(),         "BitNot");
         addFunction(new CalculatorFunctions.BitOr(),          "BitOr");
+        addFunction(new CalculatorFunctions.BitSet(),         "BitSet");
         addFunction(new CalculatorFunctions.BitShiftRight() , "BitShiftRight");
         addFunction(new CalculatorFunctions.BitShiftLeft(),   "BitShiftLeft");
         addFunction(new CalculatorFunctions.BitXor(),         "BitXor");
@@ -377,6 +380,17 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("BitLength(-255)"), "8");
         Assert.equals(new Calculator().evaluate("BitLength(-256)"), "8");
         Assert.equals(new Calculator().evaluate("BitLength(-257)"), "9");
+        Assert.equals(new Calculator().evaluate("BitGet(5, 0)"), "1");
+        Assert.equals(new Calculator().evaluate("BitGet(5, 1)"), "0");
+        Assert.equals(new Calculator().evaluate("BitGet(5, 2)"), "1");
+        Assert.equals(new Calculator().evaluate("BitGet(5, 3)"), "0");
+        Assert.equals(new Calculator().evaluate("BitGet(5, 4)"), "0");
+        Assert.equals(new Calculator().evaluate("BitClear(0, 0)"), "0");
+        Assert.equals(new Calculator().evaluate("BitClear(1, 0)"), "0");
+        Assert.equals(new Calculator().evaluate("BitClear(5, 0)"), "4");
+        Assert.equals(new Calculator().evaluate("BitClear(5, 16)"), "5");
+        Assert.equals(new Calculator().evaluate("BitSet(0, 0)"), "1");
+        Assert.equals(new Calculator().evaluate("BitSet(1, 2)"), "5");
     }
     
     @Test private static void testExponentiation() {
