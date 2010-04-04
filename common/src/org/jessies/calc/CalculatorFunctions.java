@@ -487,6 +487,18 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class GCD extends CalculatorFunction {
+        public GCD() {
+            super("GCD", 2);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode a = toInteger("GCD", environment, args.get(0));
+            final IntegerNode b = toInteger("GCD", environment, args.get(1));
+            return IntegerNode.gcd(a, b);
+        }
+    }
+    
     public static class Greater extends CalculatorFunction {
         public Greater() {
             super("Greater", 2);
@@ -586,6 +598,22 @@ public class CalculatorFunctions {
             // 1. it's a list..
             final Node node = args.get(0).evaluate(environment);
             return BooleanNode.valueOf(matrixDimensions(node) != null);
+        }
+    }
+    
+    public static class LCM extends CalculatorFunction {
+        public LCM() {
+            super("LCM", 2);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode a = toInteger("LCM", environment, args.get(0));
+            final IntegerNode b = toInteger("LCM", environment, args.get(1));
+            if (a.compareTo(IntegerNode.ZERO) == 0 || b.compareTo(IntegerNode.ZERO) == 0) {
+                return IntegerNode.ZERO;
+            }
+            // lcm(a,b) = abs(a*b)/gcd(a,b)
+            return a.times(b).abs().divide(IntegerNode.gcd(a, b));
         }
     }
     

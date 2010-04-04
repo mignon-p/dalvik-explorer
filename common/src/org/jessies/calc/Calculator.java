@@ -114,6 +114,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Factorial(),      "Factorial");
         addFunction(new CalculatorFunctions.Floor(),          "Floor");
         addFunction(new CalculatorFunctions.FractionalPart(), "FractionalPart");
+        addFunction(new CalculatorFunctions.GCD(),            "GCD");
         addFunction(new CalculatorFunctions.GreaterEqual(),   "GreaterEqual");
         addFunction(new CalculatorFunctions.Greater(),        "Greater");
         addFunction(new CalculatorFunctions.Hypot(),          "Hypot");
@@ -122,6 +123,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.IntegerPart(),    "IntegerPart");
         addFunction(new CalculatorFunctions.IsMatrix(),       "IsMatrix");
         addFunction(new CalculatorFunctions.IsPrime(),        "IsPrime");
+        addFunction(new CalculatorFunctions.LCM(),            "LCM");
         addFunction(new CalculatorFunctions.Length(),         "Length");
         addFunction(new CalculatorFunctions.LessEqual(),      "LessEqual");
         addFunction(new CalculatorFunctions.Less(),           "Less");
@@ -464,6 +466,19 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("3!!"), "720");
     }
     
+    @Test private static void testGCD() {
+        Assert.equals(new Calculator().evaluate("GCD(0, 0)"), "0");
+        Assert.equals(new Calculator().evaluate("GCD(12, 0)"), "12");
+        Assert.equals(new Calculator().evaluate("GCD(12, 18)"), "6");
+        Assert.equals(new Calculator().evaluate("GCD(6, 21)"), "3");
+        Assert.equals(new Calculator().evaluate("GCD(21, 6)"), "3");
+        Assert.equals(new Calculator().evaluate("GCD(-4, 14)"), "2");
+        Assert.equals(new Calculator().evaluate("GCD(4, -14)"), "2");
+        Assert.equals(new Calculator().evaluate("GCD(-4, -14)"), "2");
+        Assert.equals(new Calculator().evaluate("GCD(9, 28)"), "1");
+        Assert.equals(new Calculator().evaluate("GCD(6E100000, 21E100000)/1E100000"), "3");
+    }
+    
     @Test private static void testIntegerLength() {
         Assert.equals(new Calculator().evaluate("IntegerLength(1234)"), "4");
         Assert.equals(new Calculator().evaluate("IntegerLength(100)"), "3");
@@ -552,6 +567,18 @@ public class Calculator {
         Assert.equals(calculator.evaluate("a = 2"), "2");
         Assert.equals(calculator.evaluate("a"), "2");
         Assert.equals(calculator.evaluate("2*a"), "4");
+    }
+    
+    @Test private static void testLCM() {
+        Assert.equals(new Calculator().evaluate("LCM(0, 0)"), "0");
+        Assert.equals(new Calculator().evaluate("LCM(12, 0)"), "0");
+        Assert.equals(new Calculator().evaluate("LCM(0, 12)"), "0");
+        Assert.equals(new Calculator().evaluate("LCM(4, 6)"), "12");
+        Assert.equals(new Calculator().evaluate("LCM(6, 21)"), "42");
+        Assert.equals(new Calculator().evaluate("LCM(21, 6)"), "42");
+        Assert.equals(new Calculator().evaluate("LCM(-3, 7)"), "21");
+        Assert.equals(new Calculator().evaluate("LCM(3, -7)"), "21");
+        Assert.equals(new Calculator().evaluate("LCM(-3, -7)"), "21");
     }
     
     @Test private static void testLists() {

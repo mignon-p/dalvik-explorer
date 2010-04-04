@@ -216,22 +216,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
         
         IntegerNode iRhs = (IntegerNode) rhs;
-        if (isBig() || iRhs.isBig()) {
-            BigInteger[] divmod = big().divideAndRemainder(iRhs.big());
-            if (divmod[1].equals(BigInteger.ZERO)) {
-                return new IntegerNode(divmod[0]);
-            } else {
-                return toReal().divide(rhs);
-            }
+        BigInteger[] divmod = big().divideAndRemainder(iRhs.big());
+        if (divmod[1].equals(BigInteger.ZERO)) {
+            return new IntegerNode(divmod[0]);
         } else {
-            final long a = fixnum;
-            final long b = iRhs.fixnum;
-            // https://www.securecoding.cert.org/confluence/display/seccode/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow?showComments=false
-            if ((b == 0) || (a == Long.MIN_VALUE && b == -1)) {
-                return IntegerNode.valueOf(a / b);
-            } else {
-                return toReal().divide(rhs);
-            }
+            return toReal().divide(rhs);
         }
     }
     
@@ -245,6 +234,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         }
         // Based on fact6 from Richard J Fateman's "Comments on Factorial Programs".
         return IntegerNode.valueOf(factorialHelper(n, BigInteger.ONE));
+    }
+    
+    public static IntegerNode gcd(IntegerNode a, IntegerNode b) {
+        // If you special-case !isBig, don't forget to test Long.MIN_VALUE!
+        return IntegerNode.valueOf(a.big().abs().gcd(b.big().abs()));
     }
     
     private static BigInteger factorialHelper(BigInteger n, BigInteger m) {

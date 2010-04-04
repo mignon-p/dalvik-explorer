@@ -54,7 +54,7 @@ public class RationalNode implements Comparable<RationalNode>, NumberNode {
         }
     }
     
-    private static long gcd(long a, long b) {
+    static long gcd(long a, long b) {
         if (a == 0) {
             return b;
         }
