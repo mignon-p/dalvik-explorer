@@ -50,6 +50,9 @@ public class HistoryAdapter extends BaseAdapter {
     }
     
     public void fromString(String serializedHistory) {
+        if (serializedHistory.length() == 0) {
+            return;
+        }
         String[] historyLines = serializedHistory.split("\n");
         for (int i = 0; i < historyLines.length; i += 2) {
             add(new HistoryItem(historyLines[i], historyLines[i + 1].substring(" = ".length())));
