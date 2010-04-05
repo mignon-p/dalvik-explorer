@@ -111,6 +111,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Cosh(),           "Cosh");
         addFunction(new CalculatorFunctions.Cos(),            "Cos");
         addFunction(new CalculatorFunctions.Define(),         "Define");
+        addFunction(new CalculatorFunctions.DigitCount(),     "DigitCount");
         addFunction(new CalculatorFunctions.Dimensions(),     "Dimensions");
         addFunction(new CalculatorFunctions.Divide(),         "Divide");
         addFunction(new CalculatorFunctions.Equal(),          "Equal");
@@ -471,6 +472,20 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("Sqrt(81)"), "9.0");
         Assert.equals(new Calculator().evaluate("Tan(0)"), "0.0");
         Assert.equals(new Calculator().evaluate("Tanh(0)"), "0.0");
+    }
+    
+    @Test private static void testDigitCount() {
+        Assert.equals(new Calculator().evaluate("DigitCount(0)"), "[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]");
+        Assert.equals(new Calculator().evaluate("DigitCount(-12)"), "[0, 1, 1, 0, 0, 0, 0, 0, 0, 0]");
+        Assert.equals(new Calculator().evaluate("DigitCount(12)"), "[0, 1, 1, 0, 0, 0, 0, 0, 0, 0]");
+        Assert.equals(new Calculator().evaluate("DigitCount(123456789)"), "[0, 1, 1, 1, 1, 1, 1, 1, 1, 1]");
+        Assert.equals(new Calculator().evaluate("DigitCount(1234567890)"), "[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]");
+        Assert.equals(new Calculator().evaluate("DigitCount(9876543210123456789)"), "[1, 2, 2, 2, 2, 2, 2, 2, 2, 2]");
+        Assert.equals(new Calculator().evaluate("DigitCount(100!)"), "[30, 15, 19, 10, 10, 14, 19, 7, 14, 20]");
+        Assert.equals(new Calculator().evaluate("DigitCount(0, 2)"), "[1, 0]");
+        Assert.equals(new Calculator().evaluate("DigitCount(1, 2)"), "[0, 1]");
+        Assert.equals(new Calculator().evaluate("DigitCount(2, 2)"), "[1, 1]");
+        Assert.equals(new Calculator().evaluate("DigitCount(3, 2)"), "[0, 2]");
     }
     
     @Test private static void testFactorial() {

@@ -434,11 +434,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         return toString();
     }
     
-    public String toString(int radix) {
+    public String toString(int base) {
         if (isBig()) {
-            return big().toString(radix);
+            return big().toString(base);
         } else {
-            return Long.toString(fixnum, radix);
+            return Long.toString(fixnum, base);
         }
     }
     

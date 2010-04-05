@@ -125,6 +125,13 @@ public class CalculatorFunctions {
         throw new CalculatorError("'" + function + "' expected " + type + " argument");
     }
     
+    private static int toBase(IntegerNode base) {
+        if (base.compareTo(IntegerNode.valueOf(2)) < 0 || base.compareTo(IntegerNode.valueOf(36)) > 0) {
+            throw new CalculatorError("base must be between 2 and 36");
+        }
+        return base.intValue();
+    }
+    
     // Returns [rowCount, columnCount], or null if 'node' is not a matrix.
     private static ListNode matrixDimensions(Node node) {
         if (!(node instanceof ListNode)) {
@@ -458,6 +465,35 @@ public class CalculatorFunctions {
         }
     }
     
+    // DigitCount(n, base) - returns the number of instances of each digit in the given base representation of 'n'.
+    // base defaults to 10
+    public static class DigitCount extends CalculatorFunction {
+        public DigitCount() {
+            super("DigitCount", 1, 2);
+        }
+        
+        public Node apply(Calculator environment) {
+            final IntegerNode n = toInteger("DigitCount", environment, args.get(0));
+            final int base = (args.size() == 2) ? toBase(toInteger("DigitCount", environment, args.get(1))) : 10;
+            
+            final String rep = n.toString(base);
+            int[] counts = new int[base];
+            for (int i = 0; i < rep.length(); ++i) {
+                final char ch = rep.charAt(i);
+                if (ch != '-') {
+                    final int digit = Character.digit(ch, base);
+                    ++counts[digit];
+                }
+            }
+            
+            final ListNode result = new ListNode();
+            for (int count : counts) {
+                result.add(IntegerNode.valueOf(count));
+            }
+            return result;
+        }
+    }
+    
     public static class Dimensions extends CalculatorFunction {
         public Dimensions() {
             super("Dimensions", 1);
@@ -603,15 +639,8 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment) {
             final IntegerNode n = toInteger("IntegerLength", environment, args.get(0));
-            int radix = 10;
-            if (args.size() == 2) {
-                final IntegerNode b = toInteger("IntegerLength", environment, args.get(1));
-                if (b.compareTo(IntegerNode.valueOf(2)) < 0 || b.compareTo(IntegerNode.valueOf(36)) > 0) {
-                    throw new CalculatorError("radix must be between 2 and 36");
-                }
-                radix = b.intValue();
-            }
-            return IntegerNode.valueOf(n.abs().toString(radix).length());
+            int base = (args.size() == 2) ? toBase(toInteger("IntegerLength", environment, args.get(1))) : 10;
+            return IntegerNode.valueOf(n.abs().toString(base).length());
         }
     }
     
