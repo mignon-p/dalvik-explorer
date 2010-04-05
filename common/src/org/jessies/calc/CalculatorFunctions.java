@@ -657,16 +657,6 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class IsPrime extends CalculatorFunction {
-        public IsPrime() {
-            super("IsPrime", 1);
-        }
-        
-        public Node apply(Calculator environment) {
-            return toInteger("IsPrime", environment, args.get(0)).isPrime();
-        }
-    }
-    
     public static class IsMatrix extends CalculatorFunction {
         public IsMatrix() {
             super("IsMatrix", 1);
@@ -677,6 +667,16 @@ public class CalculatorFunctions {
             // 1. it's a list..
             final Node node = args.get(0).evaluate(environment);
             return BooleanNode.valueOf(matrixDimensions(node) != null);
+        }
+    }
+    
+    public static class IsPrime extends CalculatorFunction {
+        public IsPrime() {
+            super("IsPrime", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            return toInteger("IsPrime", environment, args.get(0)).isPrime();
         }
     }
     
@@ -1084,9 +1084,9 @@ public class CalculatorFunctions {
     }
     
     private static NumberNode series(Calculator environment, List<Node> args, IntegerNode initial, boolean isSum) {
-        NumberNode iMin = toNumber("series", environment, args.get(0));
-        NumberNode iMax = toNumber("series", environment, args.get(1));
-        final Node expr = args.get(2);
+        final Node expr = args.get(0);
+        NumberNode iMin = toNumber("series", environment, args.get(1));
+        NumberNode iMax = toNumber("series", environment, args.get(2));
         
         // Ensure we have two integers or two reals.
         if (iMin instanceof RealNode || iMax instanceof RealNode) {

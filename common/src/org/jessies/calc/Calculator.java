@@ -572,17 +572,17 @@ public class Calculator {
     }
     
     @Test private static void testSum() {
-        Assert.equals(new Calculator().evaluate("Sum(0, 10, i)"), "55");
-        Assert.equals(new Calculator().evaluate("Sum(0, 10.2, i)"), "55.0");
-        Assert.equals(new Calculator().evaluate("Sum(0, 10, i^2)"), "385");
-        Assert.equals(Double.valueOf(new Calculator().evaluate("Sum(0,30,1/i!)-e")), 0.0, 0.000001);
+        Assert.equals(new Calculator().evaluate("Sum(i, 0, 10)"), "55");
+        Assert.equals(new Calculator().evaluate("Sum(i, 0, 10.2)"), "55.0");
+        Assert.equals(new Calculator().evaluate("Sum(i^2, 0, 10)"), "385");
+        Assert.equals(Double.valueOf(new Calculator().evaluate("Sum(1/i!, 0, 30)-e")), 0.0, 0.000001);
         // FIXME: failure test for min > max.
     }
     
     @Test private static void testProduct() {
-        Assert.equals(new Calculator().evaluate("Product(1, 10, i)"), "3628800");
-        Assert.equals(new Calculator().evaluate("Product(1, 10.2, i)"), "3628800.0");
-        Assert.equals(new Calculator().evaluate("Product(1, 6, i^2)"), "518400");
+        Assert.equals(new Calculator().evaluate("Product(i, 1, 10)"), "3628800");
+        Assert.equals(new Calculator().evaluate("Product(i, 1, 10.2)"), "3628800.0");
+        Assert.equals(new Calculator().evaluate("Product(i^2, 1, 6)"), "518400");
         // FIXME: failure test for min > max.
     }
     
