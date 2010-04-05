@@ -137,6 +137,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Log2(),           "Log2");
         addFunction(new CalculatorFunctions.LogE(),           "LogE", "Ln");
         addFunction(new CalculatorFunctions.Log(),            "Log");
+        addFunction(new CalculatorFunctions.Map(),            "Map");
         addFunction(new CalculatorFunctions.Max(),            "Max");
         addFunction(new CalculatorFunctions.Min(),            "Min");
         addFunction(new CalculatorFunctions.Mod(),            "Mod");
@@ -658,6 +659,15 @@ public class Calculator {
         Assert.equals(calculator.evaluate("Reverse([7])"), "[7]");
         Assert.equals(calculator.evaluate("Reverse([3, 4])"), "[4, 3]");
         Assert.equals(calculator.evaluate("Reverse(Reverse([-1, 0, 1]))"), "[-1, 0, 1]");
+    }
+    
+    @Test private static void testMap() {
+        Assert.equals(new Calculator().evaluate("Map(x, x, [])"), "[]");
+        Assert.equals(new Calculator().evaluate("Map(x, x, [1])"), "[1]");
+        Assert.equals(new Calculator().evaluate("Map(2, x, [1])"), "[2]");
+        Assert.equals(new Calculator().evaluate("Map(2, x, [1, 2, 3])"), "[2, 2, 2]");
+        Assert.equals(new Calculator().evaluate("Map(x, x, Range(0, 10))"), "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]");
+        Assert.equals(new Calculator().evaluate("Map(x!, x, Range(0, 10))"), "[1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800]");
     }
     
     @Test private static void testMatrices() {

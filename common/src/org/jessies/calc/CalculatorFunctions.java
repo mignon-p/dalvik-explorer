@@ -121,6 +121,14 @@ public class CalculatorFunctions {
         throw expected(function, "real");
     }
     
+    private static CalculatorVariableNode toVariable(String function, Node node) {
+        // We don't evaluate 'node' because we don't want its value; we want it as a variable, and it may be bound.
+        if (node instanceof CalculatorVariableNode) {
+            return (CalculatorVariableNode) node;
+        }
+        throw expected(function, "variable name");
+    }
+    
     private static CalculatorError expected(String function, String type) {
         throw new CalculatorError("'" + function + "' expected " + type + " argument");
     }
@@ -453,13 +461,8 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final Node lhs = args.get(0);
-            final Node rhs = args.get(1);
-            if (!(lhs instanceof CalculatorVariableNode)) {
-                throw new CalculatorError("lhs of an assignment must be a variable name (user-defined functions not yet implemented)");
-            }
-            final CalculatorVariableNode variable = (CalculatorVariableNode) lhs;
-            final Node value = rhs.evaluate(environment);
+            final CalculatorVariableNode variable = toVariable("Define", args.get(0));
+            final Node value = args.get(1).evaluate(environment);
             environment.setVariable(variable.name(), value);
             return value;
         }
@@ -786,6 +789,31 @@ public class CalculatorFunctions {
         }
     }
     
+    // Map(expr, var, list) - returns a list of the results of evaluating 'expr' with 'var' bound to each value in 'list' in turn.
+    public static class Map extends CalculatorFunction {
+        public Map() {
+            super("Map", 3);
+        }
+        
+        public Node apply(Calculator environment) {
+            final Node expr = args.get(0);
+            final CalculatorVariableNode var = toVariable("Map", args.get(1));
+            final ListNode list = toList("Map", environment, args.get(2));
+            
+            final Node originalVarValue = environment.getVariable(var.name());
+            try {
+                final ListNode result = new ListNode();
+                for (int i = 0; i < list.size(); ++i) {
+                    environment.setVariable(var.name(), list.get(i));
+                    result.add(expr.evaluate(environment));
+                }
+                return result;
+            } finally {
+                environment.setVariable(var.name(), originalVarValue);
+            }
+        }
+    }
+    
     public static class Max extends CalculatorFunction {
         public Max() {
             super("Max", 2);
@@ -861,10 +889,7 @@ public class CalculatorFunctions {
             // FIXME: automatic guesses? (trig => pi? differentiate to find minima? solve to find axis crossings?).
             
             final Node expression = args.get(0);
-            if (args.get(1) instanceof CalculatorVariableNode == false) {
-                throw new CalculatorError("expected a variable as the second argument to Plot");
-            }
-            final CalculatorVariableNode variable = (CalculatorVariableNode) args.get(1);
+            final CalculatorVariableNode variable = toVariable("Plot", args.get(1));
             final RealNode xMin = toReal("Plot", environment, args.get(2));
             final RealNode xMax = toReal("Plot", environment, args.get(3));
             
