@@ -106,6 +106,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.BitShiftRight() , "BitShiftRight");
         addFunction(new CalculatorFunctions.BitShiftLeft(),   "BitShiftLeft");
         addFunction(new CalculatorFunctions.BitXor(),         "BitXor");
+        addFunction(new CalculatorFunctions.Boole(),          "Boole");
         addFunction(new CalculatorFunctions.Cbrt(),           "Cbrt");
         addFunction(new CalculatorFunctions.Ceiling(),        "Ceiling", "Ceil");
         addFunction(new CalculatorFunctions.Cosh(),           "Cosh");
@@ -443,6 +444,8 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("Asin(0)"), "0.0");
         Assert.equals(new Calculator().evaluate("Acos(0) == Asin(1)"), "true");
         Assert.equals(new Calculator().evaluate("Atan(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Boole(true)"), "1");
+        Assert.equals(new Calculator().evaluate("Boole(false)"), "0");
         Assert.equals(new Calculator().evaluate("Cbrt(27)"), "3.0");
         Assert.equals(new Calculator().evaluate("Ceil(1.2)"), "2.0");
         Assert.equals(new Calculator().evaluate("Cos(0)"), "1.0");

@@ -415,6 +415,17 @@ public class CalculatorFunctions {
         }
     }
     
+    // Converts true and false into 1 and 0, respectively.
+    public static class Boole extends CalculatorFunction {
+        public Boole() {
+            super("Boole", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            return toBoolean("Boole", environment, args.get(0)) == BooleanNode.TRUE ? IntegerNode.ONE : IntegerNode.ZERO;
+        }
+    }
+    
     public static class Cbrt extends CalculatorFunction {
         public Cbrt() {
             super("cbrt", 1);
