@@ -484,7 +484,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Equal extends CalculatorFunction {
+    public static class Equal extends CalculatorFunction { // FIXME: CAS support.
         public Equal() {
             super("Equal", 2);
         }
@@ -511,6 +511,13 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment, IntegerNode n) {
             return n.factorial();
+        }
+    }
+    
+    // Filter(expr, var, list) - returns a list of the elements of 'list' for which evaluating 'expr' with 'var' bound to that value gives True.
+    public static class Filter extends MapOrFilter {
+        public Filter() {
+            super("Filter", false);
         }
     }
     
@@ -544,7 +551,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Greater extends CalculatorFunction {
+    public static class Greater extends CalculatorFunction { // FIXME: CAS support.
         public Greater() {
             super("Greater", 2);
         }
@@ -554,7 +561,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class GreaterEqual extends CalculatorFunction {
+    public static class GreaterEqual extends CalculatorFunction { // FIXME: CAS support.
         public GreaterEqual() {
             super("GreaterEqual", 2);
         }
@@ -613,7 +620,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class IsMatrix extends CalculatorFunction {
+    public static class IsMatrix extends CalculatorFunction { // FIXME: CAS support.
         public IsMatrix() {
             super("IsMatrix", 1);
         }
@@ -647,7 +654,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Length extends CalculatorFunction {
+    public static class Length extends CalculatorFunction { // FIXME: CAS support.
         public Length() {
             super("Length", 1);
         }
@@ -662,7 +669,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Less extends CalculatorFunction {
+    public static class Less extends CalculatorFunction { // FIXME: CAS support.
         public Less() {
             super("Less", 2);
         }
@@ -672,7 +679,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class LessEqual extends CalculatorFunction {
+    public static class LessEqual extends CalculatorFunction { // FIXME: CAS support.
         public LessEqual() {
             super("LessEqual", 2);
         }
@@ -739,22 +746,44 @@ public class CalculatorFunctions {
     }
     
     // Map(expr, var, list) - returns a list of the results of evaluating 'expr' with 'var' bound to each value in 'list' in turn.
-    public static class Map extends CalculatorFunction {
+    public static class Map extends MapOrFilter {
         public Map() {
-            super("Map", 3);
+            super("Map", true);
+        }
+    }
+    
+    public static class MapOrFilter extends CalculatorFunction {
+        private final boolean isMap;
+        
+        public MapOrFilter(String name, boolean isMap) {
+            super(name, 3);
+            this.isMap = isMap;
         }
         
         public Node apply(Calculator environment) {
             final Node expr = args.get(0);
-            final CalculatorVariableNode var = toVariable("Map", args.get(1));
-            final ListNode list = toList("Map", environment, args.get(2));
+            final CalculatorVariableNode var = toVariable(name(), args.get(1));
+            final Node maybeList = arg(environment, 2);
             
+            if (!(maybeList instanceof ListNode)) {
+                if (maybeList instanceof BooleanNode || maybeList instanceof NumberNode) {
+                    throw new CalculatorError("'" + name() + "' requires a list argument");
+                }
+                return this;
+            }
+            
+            final ListNode list = (ListNode) maybeList;
             final Node originalVarValue = environment.getVariable(var.name());
             try {
                 final ListNode result = new ListNode();
                 for (int i = 0; i < list.size(); ++i) {
                     environment.setVariable(var.name(), list.get(i));
-                    result.add(expr.evaluate(environment));
+                    Node value = expr.evaluate(environment);
+                    if (isMap) {
+                        result.add(value);
+                    } else  if (value == BooleanNode.TRUE) {
+                        result.add(list.get(i));
+                    }
                 }
                 return result;
             } finally {
@@ -874,7 +903,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Plus extends CalculatorFunction {
+    public static class Plus extends CalculatorFunction { // FIXME: CAS support.
         public Plus() {
             super("Plus", 2);
         }
@@ -935,7 +964,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Product extends CalculatorFunction {
+    public static class Product extends CalculatorFunction { // FIXME: CAS support.
         public Product() {
             super("product", 3);
         }
@@ -955,7 +984,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Range extends CalculatorFunction {
+    public static class Range extends CalculatorFunction { // FIXME: CAS support.
         public Range() {
             super("Range", 1, 3);
         }
@@ -1004,13 +1033,13 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Reverse extends CalculatorFunction {
+    public static class Reverse extends CalculatorFunctionL {
         public Reverse() {
-            super("Reverse", 1);
+            super("Reverse");
         }
         
-        public Node apply(Calculator environment) {
-            return toList("Reverse", environment, args.get(0)).reverse();
+        public Node apply(Calculator environment, ListNode list) {
+            return list.reverse();
         }
     }
     
@@ -1101,7 +1130,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Subtract extends CalculatorFunction {
+    public static class Subtract extends CalculatorFunction { // FIXME: CAS support.
         public Subtract() {
             super("Subtract", 2);
         }
@@ -1130,7 +1159,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Sum extends CalculatorFunction {
+    public static class Sum extends CalculatorFunction { // FIXME: CAS support.
         public Sum() {
             super("sum", 3);
         }
@@ -1160,7 +1189,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Times extends CalculatorFunction {
+    public static class Times extends CalculatorFunction { // FIXME: CAS support.
         public Times() {
             super("Times", 2);
         }
@@ -1247,26 +1276,22 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Total extends CalculatorFunction {
+    public static class Total extends CalculatorFunctionL {
         public Total() {
-            super("Total", 1);
+            super("Total");
         }
         
-        public Node apply(Calculator environment) {
-            final ListNode list = toList("Total", environment, args.get(0));
-            NumberNode result = IntegerNode.ZERO;
+        public Node apply(Calculator environment, ListNode list) {
+            final CalculatorFunction plus = environment.getFunction("Plus");
+            Node result = IntegerNode.ZERO;
             for (Node element : list) {
-                // FIXME: symbolic too!
-                if (!(element instanceof NumberNode)) {
-                    throw expected("Total", "numeric");
-                }
-                result = result.plus((NumberNode) element);
+                result = plus.bind(result, element);
             }
-            return result;
+            return result.evaluate(environment);
         }
     }
     
-    public static class Transpose extends CalculatorFunction {
+    public static class Transpose extends CalculatorFunction { // FIXME: CAS support.
         public Transpose() {
             super("Transpose", 1);
         }
@@ -1292,7 +1317,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Unequal extends CalculatorFunction {
+    public static class Unequal extends CalculatorFunction { // FIXME: CAS support.
         public Unequal() {
             super("Unequal", 2);
         }

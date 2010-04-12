@@ -118,6 +118,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Equal(),          "Equal");
         addFunction(new CalculatorFunctions.Exp(),            "Exp");
         addFunction(new CalculatorFunctions.Factorial(),      "Factorial");
+        addFunction(new CalculatorFunctions.Filter(),         "Filter");
         addFunction(new CalculatorFunctions.Floor(),          "Floor");
         addFunction(new CalculatorFunctions.FractionalPart(), "FractionalPart");
         addFunction(new CalculatorFunctions.GCD(),            "GCD");
@@ -509,6 +510,13 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("3!!"), "720");
     }
     
+    @Test private static void testFilter() {
+        Assert.equals(new Calculator().evaluate("Filter(IsPrime(x), x, [])"), "[]");
+        Assert.equals(new Calculator().evaluate("Filter(IsPrime(x), x, [1])"), "[]");
+        Assert.equals(new Calculator().evaluate("Filter(IsPrime(x), x, [2])"), "[2]");
+        Assert.equals(new Calculator().evaluate("Filter(IsPrime(x), x, Range(0, 10))"), "[2, 3, 5, 7]");
+    }
+    
     @Test private static void testGCD() {
         Assert.equals(new Calculator().evaluate("GCD(0, 0)"), "0");
         Assert.equals(new Calculator().evaluate("GCD(12, 0)"), "12");
@@ -663,6 +671,11 @@ public class Calculator {
         Assert.equals(calculator.evaluate("Reverse([7])"), "[7]");
         Assert.equals(calculator.evaluate("Reverse([3, 4])"), "[4, 3]");
         Assert.equals(calculator.evaluate("Reverse(Reverse([-1, 0, 1]))"), "[-1, 0, 1]");
+        
+        // Total.
+        Assert.equals(calculator.evaluate("Total([])"), "0");
+        Assert.equals(calculator.evaluate("Total([123])"), "123");
+        Assert.equals(calculator.evaluate("Total([1, 2, 3])"), "6");
     }
     
     @Test private static void testMap() {
