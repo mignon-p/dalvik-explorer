@@ -1,7 +1,7 @@
 package org.jessies.calc;
 
 /*
- * This file is part of LittleHelper.
+ * This file is part of org.jessies.calc.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
  * 
  * LittleHelper is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ public class CalculatorParser {
         Node result = parseOrExpression();
         if (lexer.token() == CalculatorToken.ASSIGN) {
             lexer.nextToken();
-            result = getFunction("define").bind(Arrays.asList(result, parseOrExpression()));
+            result = getFunction("define").bind(result, parseOrExpression());
         }
         return result;
         
@@ -58,7 +58,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.L_OR) {
             lexer.nextToken();
             // FIXME: make Or varargs.
-            result = getFunction(CalculatorToken.L_OR).bind(Arrays.asList(result, parseAndExpression()));
+            result = getFunction(CalculatorToken.L_OR).bind(result, parseAndExpression());
         }
         return result;
     }
@@ -69,7 +69,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.L_AND) {
             lexer.nextToken();
             // FIXME: make And varargs.
-            result = getFunction(CalculatorToken.L_AND).bind(Arrays.asList(result, parseBitOrExpression()));
+            result = getFunction(CalculatorToken.L_AND).bind(result, parseBitOrExpression());
         }
         return result;
     }
@@ -80,7 +80,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.B_OR) {
             lexer.nextToken();
             // FIXME: make BitOr varargs.
-            result = getFunction(CalculatorToken.B_OR).bind(Arrays.asList(result, parseBitAndExpression()));
+            result = getFunction(CalculatorToken.B_OR).bind(result, parseBitAndExpression());
         }
         return result;
     }
@@ -91,7 +91,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.B_AND) {
             lexer.nextToken();
             // FIXME: make BitAnd varargs.
-            result = getFunction(CalculatorToken.B_AND).bind(Arrays.asList(result, parseRelationalExpression()));
+            result = getFunction(CalculatorToken.B_AND).bind(result, parseRelationalExpression());
         }
         return result;
     }
@@ -102,7 +102,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.EQ || lexer.token() == CalculatorToken.GE || lexer.token() == CalculatorToken.GT || lexer.token() == CalculatorToken.LE || lexer.token() == CalculatorToken.LT || lexer.token() == CalculatorToken.NE) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = function.bind(Arrays.asList(result, parseShiftExpression()));
+            result = function.bind(result, parseShiftExpression());
         }
         return result;
     }
@@ -113,7 +113,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.SHL || lexer.token() == CalculatorToken.SHR) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = function.bind(Arrays.asList(result, parseAdditiveExpression()));
+            result = function.bind(result, parseAdditiveExpression());
         }
         return result;
     }
@@ -124,7 +124,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.PLUS || lexer.token() == CalculatorToken.MINUS) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = function.bind(Arrays.asList(result, parseMultiplicativeExpression()));
+            result = function.bind(result, parseMultiplicativeExpression());
         }
         return result;
     }
@@ -135,7 +135,7 @@ public class CalculatorParser {
         while (lexer.token() == CalculatorToken.MUL || lexer.token() == CalculatorToken.DIV || lexer.token() == CalculatorToken.MOD) {
             final CalculatorFunction function = getFunction(lexer.token());
             lexer.nextToken();
-            result = function.bind(Arrays.asList(result, parseSqrtExpression()));
+            result = function.bind(result, parseSqrtExpression());
         }
         return result;
     }
@@ -144,7 +144,7 @@ public class CalculatorParser {
     private Node parseSqrtExpression() {
         if (lexer.token() == CalculatorToken.SQRT) {
             lexer.nextToken();
-            return getFunction("sqrt").bind(Collections.singletonList(parseSqrtExpression()));
+            return getFunction("sqrt").bind(parseSqrtExpression());
         } else {
             return parseExponentiationExpression();
         }
@@ -155,7 +155,7 @@ public class CalculatorParser {
         Node result = parseUnaryExpression();
         if (lexer.token() == CalculatorToken.POW) {
             lexer.nextToken();
-            result = getFunction(CalculatorToken.POW).bind(Arrays.asList(result, parseExponentiationExpression()));
+            result = getFunction(CalculatorToken.POW).bind(result, parseExponentiationExpression());
         }
         return result;
     }
@@ -166,13 +166,13 @@ public class CalculatorParser {
         if (lexer.token() == CalculatorToken.MINUS) {
             lexer.nextToken();
             // Convert (-f) to (-1*f) for simplicity.
-            return getFunction(CalculatorToken.MUL).bind(Arrays.asList(IntegerNode.MINUS_ONE, parseUnaryExpression()));
+            return getFunction(CalculatorToken.MUL).bind(IntegerNode.MINUS_ONE, parseUnaryExpression());
         } else if (lexer.token() == CalculatorToken.B_NOT) {
             lexer.nextToken();
-            return getFunction(CalculatorToken.B_NOT).bind(Collections.singletonList(parseUnaryExpression()));
+            return getFunction(CalculatorToken.B_NOT).bind(parseUnaryExpression());
         } else if (lexer.token() == CalculatorToken.PLING) {
             lexer.nextToken();
-            return getFunction("Not").bind(Collections.singletonList(parseUnaryExpression()));
+            return getFunction("Not").bind(parseUnaryExpression());
         }
         
         Node result = parseFactor();
@@ -180,7 +180,7 @@ public class CalculatorParser {
         // Postfix unary operators...
         while (lexer.token() == CalculatorToken.PLING) {
             expect(CalculatorToken.PLING);
-            result = getFunction("Factorial").bind(Collections.singletonList(result));
+            result = getFunction("Factorial").bind(result);
         }
         return result;
     }

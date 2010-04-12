@@ -1,7 +1,7 @@
 package org.jessies.calc;
 
 /*
- * This file is part of LittleHelper.
+ * This file is part of org.jessies.calc.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
  * 
  * LittleHelper is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ public class CalculatorVariableNode implements Node {
     public Node evaluate(Calculator environment) {
         final Node value = environment.getVariable(name);
         if (value == null) {
-            throw new CalculatorError("use of undefined variable '" + name + "'");
+            return this;
         }
         return value;
     }

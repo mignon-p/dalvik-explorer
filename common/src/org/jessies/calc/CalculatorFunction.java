@@ -1,7 +1,7 @@
 package org.jessies.calc;
 
 /*
- * This file is part of LittleHelper.
+ * This file is part of org.jessies.calc.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
  * 
  * LittleHelper is free software; you can redistribute it and/or modify
@@ -42,6 +42,15 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         this.name = name;
         this.minArity = minArity;
         this.maxArity = maxArity;
+    }
+    
+    // For use in subclass implementations of evaluate.
+    protected Node arg(Calculator environment, int i) {
+        return args.get(i).evaluate(environment);
+    }
+    
+    public CalculatorFunction bind(Node... args) {
+        return bind(Arrays.asList(args));
     }
     
     public CalculatorFunction bind(List<Node> args) {

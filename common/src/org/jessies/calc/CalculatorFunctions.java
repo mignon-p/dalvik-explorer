@@ -1,7 +1,7 @@
 package org.jessies.calc;
 
 /*
- * This file is part of LittleHelper.
+ * This file is part of org.jessies.calc.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
  * 
  * LittleHelper is free software; you can redistribute it and/or modify
@@ -75,18 +75,6 @@ public class CalculatorFunctions {
         return BooleanNode.TRUE;
     }
     
-    private static BooleanNode unequal(Node lhs, Node rhs) {
-        return equal(lhs, rhs).not();
-    }
-    
-    private static BooleanNode toBoolean(String function, Calculator environment, Node node) {
-        node = node.evaluate(environment);
-        if (node instanceof BooleanNode) {
-            return (BooleanNode) node;
-        }
-        throw expected(function, "boolean");
-    }
-    
     private static ListNode toList(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof ListNode) {
@@ -103,24 +91,6 @@ public class CalculatorFunctions {
         throw expected(function, "numeric");
     }
     
-    private static IntegerNode toInteger(String function, Calculator environment, Node node) {
-        node = node.evaluate(environment);
-        if (node instanceof IntegerNode) {
-            return (IntegerNode) node;
-        }
-        throw expected(function, "integer");
-    }
-    
-    private static RealNode toReal(String function, Calculator environment, Node node) {
-        node = node.evaluate(environment);
-        if (node instanceof RealNode) {
-            return (RealNode) node;
-        } else if (node instanceof IntegerNode) {
-            return ((IntegerNode) node).toReal();
-        }
-        throw expected(function, "real");
-    }
-    
     private static CalculatorVariableNode toVariable(String function, Node node) {
         // We don't evaluate 'node' because we don't want its value; we want it as a variable, and it may be bound.
         if (node instanceof CalculatorVariableNode) {
@@ -129,7 +99,7 @@ public class CalculatorFunctions {
         throw expected(function, "variable name");
     }
     
-    private static CalculatorError expected(String function, String type) {
+    public static CalculatorError expected(String function, String type) {
         throw new CalculatorError("'" + function + "' expected " + type + " argument");
     }
     
@@ -142,6 +112,8 @@ public class CalculatorFunctions {
     
     // Returns [rowCount, columnCount], or null if 'node' is not a matrix.
     private static ListNode matrixDimensions(Node node) {
+        // A node is a matrix if:
+        // 1. it's a list..
         if (!(node instanceof ListNode)) {
             return null;
         }
@@ -237,232 +209,214 @@ public class CalculatorFunctions {
         return result;
     }
     
-    public static class Abs extends CalculatorFunction {
+    public static class Abs extends CalculatorFunctionN {
         public Abs() {
-            super("Abs", 1);
+            super("Abs");
         }
         
-        public Node apply(Calculator environment) {
-            return toNumber("Abs", environment, args.get(0)).abs();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.abs();
         }
     }
     
-    public static class Acos extends CalculatorFunction {
+    public static class Acos extends CalculatorFunctionN {
         public Acos() {
-            super("acos", 1);
+            super("acos");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("acos", environment, args.get(0)).acos();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().acos();
         }
     }
     
-    public static class And extends CalculatorFunction {
+    public static class And extends CalculatorFunctionZZ {
         public And() {
-            super("And", 2);
+            super("And");
         }
         
-        public Node apply(Calculator environment) {
-            return toBoolean("And", environment, args.get(0)).and(toBoolean("And", environment, args.get(1)));
+        public Node apply(Calculator environment, BooleanNode lhs, BooleanNode rhs) {
+            return lhs.and(rhs);
         }
     }
     
-    public static class Asin extends CalculatorFunction {
+    public static class Asin extends CalculatorFunctionN {
         public Asin() {
-            super("asin", 1);
+            super("asin");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("asin", environment, args.get(0)).asin();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().asin();
         }
     }
     
-    public static class Atan extends CalculatorFunction {
+    public static class Atan extends CalculatorFunctionN {
         public Atan() {
-            super("atan", 1);
+            super("atan");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("atan", environment, args.get(0)).atan();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().atan();
         }
     }
     
-    public static class Atan2 extends CalculatorFunction {
+    public static class Atan2 extends CalculatorFunctionNN {
         public Atan2() {
-            super("atan2", 2);
+            super("atan2");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("atan2", environment, args.get(0)).atan2(toReal("atan2", environment, args.get(1)));
+        public Node apply(Calculator environment, NumberNode arg1, NumberNode arg2) {
+            return arg1.toReal().atan2(arg2.toReal());
         }
     }
     
-    public static class BitAnd extends CalculatorFunction {
+    public static class BitAnd extends CalculatorFunctionII {
         public BitAnd() {
-            super("BitAnd", 2);
+            super("BitAnd");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("BitAnd", environment, args.get(0));
-            final IntegerNode rhs = toInteger("BitAnd", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitAnd(rhs);
         }
     }
     
-    public static class BitClear extends CalculatorFunction {
+    public static class BitClear extends CalculatorFunctionII {
         public BitClear() {
-            super("BitClear", 2);
+            super("BitClear");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode n = toInteger("BitClear", environment, args.get(0));
-            final IntegerNode k = toInteger("BitClear", environment, args.get(1));
-            return n.bitClear(k);
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
+            return lhs.bitClear(rhs);
         }
     }
     
-    public static class BitGet extends CalculatorFunction {
+    public static class BitGet extends CalculatorFunctionII {
         public BitGet() {
-            super("BitGet", 2);
+            super("BitGet");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode n = toInteger("BitGet", environment, args.get(0));
-            final IntegerNode k = toInteger("BitGet", environment, args.get(1));
-            return n.bitGet(k);
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
+            return lhs.bitGet(rhs);
         }
     }
     
-    public static class BitLength extends CalculatorFunction {
+    public static class BitLength extends CalculatorFunctionI {
         public BitLength() {
-            super("BitLength", 1);
+            super("BitLength");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("BitLength", environment, args.get(0));
-            return lhs.bitLength();
+        public Node apply(Calculator environment, IntegerNode arg) {
+            return arg.bitLength();
         }
     }
     
-    public static class BitNot extends CalculatorFunction {
+    public static class BitNot extends CalculatorFunctionI {
         public BitNot() {
-            super("BitNot", 1);
+            super("BitNot");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("BitNot", environment, args.get(0));
-            return lhs.bitNot();
+        public Node apply(Calculator environment, IntegerNode arg) {
+            return arg.bitNot();
         }
     }
     
-    public static class BitOr extends CalculatorFunction {
+    public static class BitOr extends CalculatorFunctionII {
         public BitOr() {
-            super("BitOr", 2);
+            super("BitOr");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("BitOr", environment, args.get(0));
-            final IntegerNode rhs = toInteger("BitOr", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitOr(rhs);
         }
     }
     
-    public static class BitSet extends CalculatorFunction {
+    public static class BitSet extends CalculatorFunctionII {
         public BitSet() {
-            super("BitSet", 2);
+            super("BitSet");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode n = toInteger("BitSet", environment, args.get(0));
-            final IntegerNode k = toInteger("BitSet", environment, args.get(1));
-            return n.bitSet(k);
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
+            return lhs.bitSet(rhs);
         }
     }
     
-    public static class BitShiftLeft extends CalculatorFunction {
+    public static class BitShiftLeft extends CalculatorFunctionII {
         public BitShiftLeft() {
-            super("BitShiftLeft", 2);
+            super("BitShiftLeft");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("BitShiftLeft", environment, args.get(0));
-            final IntegerNode rhs = toInteger("BitShiftLeft", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitShiftLeft(rhs);
         }
     }
     
-    public static class BitShiftRight extends CalculatorFunction {
+    public static class BitShiftRight extends CalculatorFunctionII {
         public BitShiftRight() {
-            super("BitShiftRight", 2);
+            super("BitShiftRight");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("BitShiftRight", environment, args.get(0));
-            final IntegerNode rhs = toInteger("BitShiftRight", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitShiftRight(rhs);
         }
     }
     
-    public static class BitXor extends CalculatorFunction {
+    public static class BitXor extends CalculatorFunctionII {
         public BitXor() {
-            super("BitXor", 2);
+            super("BitXor");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("BitXor", environment, args.get(0));
-            final IntegerNode rhs = toInteger("BitXot", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitXor(rhs);
         }
     }
     
     // Converts true and false into 1 and 0, respectively.
-    public static class Boole extends CalculatorFunction {
+    public static class Boole extends CalculatorFunctionZ {
         public Boole() {
-            super("Boole", 1);
+            super("Boole");
         }
         
-        public Node apply(Calculator environment) {
-            return toBoolean("Boole", environment, args.get(0)) == BooleanNode.TRUE ? IntegerNode.ONE : IntegerNode.ZERO;
+        public Node apply(Calculator environment, BooleanNode arg) {
+            return arg == BooleanNode.TRUE ? IntegerNode.ONE : IntegerNode.ZERO;
         }
     }
     
-    public static class Cbrt extends CalculatorFunction {
+    public static class Cbrt extends CalculatorFunctionN {
         public Cbrt() {
-            super("cbrt", 1);
+            super("cbrt");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("cbrt", environment, args.get(0)).cbrt();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().cbrt();
         }
     }
     
-    public static class Ceiling extends CalculatorFunction {
+    public static class Ceiling extends CalculatorFunctionN {
         public Ceiling() {
-            super("ceiling", 1);
+            super("ceiling");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("ceiling", environment, args.get(0)).ceiling();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().ceiling();
         }
     }
     
-    public static class Cos extends CalculatorFunction {
+    public static class Cos extends CalculatorFunctionN {
         public Cos() {
-            super("cos", 1);
+            super("cos");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("cos", environment, args.get(0)).cos();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().cos();
         }
     }
     
-    public static class Cosh extends CalculatorFunction {
+    public static class Cosh extends CalculatorFunctionN {
         public Cosh() {
-            super("cosh", 1);
+            super("cosh");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("cosh", environment, args.get(0)).cosh();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().cosh();
         }
     }
     
@@ -473,7 +427,7 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment) {
             final CalculatorVariableNode variable = toVariable("Define", args.get(0));
-            final Node value = args.get(1).evaluate(environment);
+            final Node value = arg(environment, 1);
             environment.setVariable(variable.name(), value);
             return value;
         }
@@ -481,15 +435,13 @@ public class CalculatorFunctions {
     
     // DigitCount(n, base) - returns the number of instances of each digit in the given base representation of 'n'.
     // base defaults to 10
-    public static class DigitCount extends CalculatorFunction {
+    public static class DigitCount extends CalculatorFunctionII {
         public DigitCount() {
-            super("DigitCount", 1, 2);
+            super("DigitCount", IntegerNode.valueOf(10));
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode n = toInteger("DigitCount", environment, args.get(0));
-            final int base = (args.size() == 2) ? toBase(toInteger("DigitCount", environment, args.get(1))) : 10;
-            
+        public Node apply(Calculator environment, IntegerNode n, IntegerNode bigBase) {
+            final int base = toBase(bigBase);
             final String rep = n.toString(base);
             int[] counts = new int[base];
             for (int i = 0; i < rep.length(); ++i) {
@@ -508,7 +460,7 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Dimensions extends CalculatorFunction {
+    public static class Dimensions extends CalculatorFunction { // FIXME: CAS support.
         public Dimensions() {
             super("Dimensions", 1);
         }
@@ -522,14 +474,12 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Divide extends CalculatorFunction {
+    public static class Divide extends CalculatorFunctionNN {
         public Divide() {
-            super("Divide", 2);
+            super("Divide");
         }
         
-        public Node apply(Calculator environment) {
-            final NumberNode lhs = toNumber("Divide", environment, args.get(0));
-            final NumberNode rhs = toNumber("Divide", environment, args.get(1));
+        public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return lhs.divide(rhs);
         }
     }
@@ -540,58 +490,56 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            return equal(args.get(0).evaluate(environment), args.get(1).evaluate(environment));
+            return equal(arg(environment, 0), arg(environment, 1));
         }
     }
     
-    public static class Exp extends CalculatorFunction {
+    public static class Exp extends CalculatorFunctionN {
         public Exp() {
-            super("exp", 1);
+            super("exp");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("exp", environment, args.get(0)).exp();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().exp();
         }
     }
     
-    public static class Factorial extends CalculatorFunction {
+    public static class Factorial extends CalculatorFunctionI {
         public Factorial() {
-            super("Factorial", 1);
+            super("Factorial");
         }
         
-        public Node apply(Calculator environment) {
-            return toInteger("Factorial", environment, args.get(0)).factorial();
+        public Node apply(Calculator environment, IntegerNode n) {
+            return n.factorial();
         }
     }
     
-    public static class Floor extends CalculatorFunction {
+    public static class Floor extends CalculatorFunctionN {
         public Floor() {
-            super("floor", 1);
+            super("floor");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("floor", environment, args.get(0)).floor();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().floor();
         }
     }
     
-    public static class FractionalPart extends CalculatorFunction {
+    public static class FractionalPart extends CalculatorFunctionN {
         public FractionalPart() {
-            super("FractionalPart", 1);
+            super("FractionalPart");
         }
         
-        public Node apply(Calculator environment) {
-            return toNumber("FractionalPart", environment, args.get(0)).fractionalPart();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.fractionalPart();
         }
     }
     
-    public static class GCD extends CalculatorFunction {
+    public static class GCD extends CalculatorFunctionII {
         public GCD() {
-            super("GCD", 2);
+            super("GCD");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode a = toInteger("GCD", environment, args.get(0));
-            final IntegerNode b = toInteger("GCD", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode a, IntegerNode b) {
             return IntegerNode.gcd(a, b);
         }
     }
@@ -616,23 +564,22 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Hypot extends CalculatorFunction {
+    public static class Hypot extends CalculatorFunctionNN {
         public Hypot() {
-            super("hypot", 2);
+            super("hypot");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("hypot", environment, args.get(0)).hypot(toReal("hypot", environment, args.get(1)));
+        public Node apply(Calculator environment, NumberNode arg1, NumberNode arg2) {
+            return arg1.toReal().hypot(arg2.toReal());
         }
     }
     
-    public static class IdentityMatrix extends CalculatorFunction {
+    public static class IdentityMatrix extends CalculatorFunctionI {
         public IdentityMatrix() {
-            super("IdentityMatrix", 1);
+            super("IdentityMatrix");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode dimension = toInteger("IdentityMatrix", environment, args.get(0));
+        public Node apply(Calculator environment, IntegerNode dimension) {
             final ListNode result = new ListNode();
             for (NumberNode i = IntegerNode.ONE; cmp(i, dimension) <= 0; i = i.increment()) {
                 final ListNode row = new ListNode();
@@ -646,25 +593,23 @@ public class CalculatorFunctions {
     }
     
     // Returns the number of decimal digits in the given integer.
-    public static class IntegerLength extends CalculatorFunction {
+    public static class IntegerLength extends CalculatorFunctionII {
         public IntegerLength() {
-            super("IntegerLength", 1, 2);
+            super("IntegerLength", IntegerNode.valueOf(10));
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode n = toInteger("IntegerLength", environment, args.get(0));
-            int base = (args.size() == 2) ? toBase(toInteger("IntegerLength", environment, args.get(1))) : 10;
-            return IntegerNode.valueOf(n.abs().toString(base).length());
+        public Node apply(Calculator environment, IntegerNode n, IntegerNode base) {
+            return IntegerNode.valueOf(n.abs().toString(toBase(base)).length());
         }
     }
     
-    public static class IntegerPart extends CalculatorFunction {
+    public static class IntegerPart extends CalculatorFunctionN {
         public IntegerPart() {
-            super("IntegerPart", 1);
+            super("IntegerPart");
         }
         
-        public Node apply(Calculator environment) {
-            return toNumber("IntegerPart", environment, args.get(0)).integerPart();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.integerPart();
         }
     }
     
@@ -674,31 +619,26 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            // A node is a matrix if:
-            // 1. it's a list..
-            final Node node = args.get(0).evaluate(environment);
-            return BooleanNode.valueOf(matrixDimensions(node) != null);
+            return BooleanNode.valueOf(matrixDimensions(arg(environment, 0)) != null);
         }
     }
     
-    public static class IsPrime extends CalculatorFunction {
+    public static class IsPrime extends CalculatorFunctionI {
         public IsPrime() {
-            super("IsPrime", 1);
+            super("IsPrime");
         }
         
-        public Node apply(Calculator environment) {
-            return toInteger("IsPrime", environment, args.get(0)).isPrime();
+        public Node apply(Calculator environment, IntegerNode arg) {
+            return arg.isPrime();
         }
     }
     
-    public static class LCM extends CalculatorFunction {
+    public static class LCM extends CalculatorFunctionII {
         public LCM() {
-            super("LCM", 2);
+            super("LCM");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode a = toInteger("LCM", environment, args.get(0));
-            final IntegerNode b = toInteger("LCM", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode a, IntegerNode b) {
             if (a.compareTo(IntegerNode.ZERO) == 0 || b.compareTo(IntegerNode.ZERO) == 0) {
                 return IntegerNode.ZERO;
             }
@@ -758,45 +698,43 @@ public class CalculatorFunctions {
     }
     
     // log(base, n).
-    public static class Log extends CalculatorFunction {
+    public static class Log extends CalculatorFunctionNN {
         public Log() {
-            super("log", 2);
+            super("log");
         }
         
-        public Node apply(Calculator environment) {
-            final RealNode base = toReal("log2", environment, args.get(0));
-            final RealNode n = toReal("log2", environment, args.get(1));
-            return n.log(base);
+        public Node apply(Calculator environment, NumberNode base, NumberNode n) {
+            return n.toReal().log(base.toReal());
         }
     }
     
-    public static class Log2 extends CalculatorFunction {
+    public static class Log2 extends CalculatorFunctionN {
         public Log2() {
-            super("log2", 1);
+            super("log2");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("log2", environment, args.get(0)).log2();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().log2();
         }
     }
     
-    public static class LogE extends CalculatorFunction {
+    public static class LogE extends CalculatorFunctionN {
         public LogE() {
-            super("logE", 1);
+            super("logE");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("logE", environment, args.get(0)).logE();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().logE();
         }
     }
     
-    public static class Log10 extends CalculatorFunction {
+    public static class Log10 extends CalculatorFunctionN {
         public Log10() {
-            super("log10", 1);
+            super("log10");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("log10", environment, args.get(0)).log10();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().log10();
         }
     }
     
@@ -825,59 +763,53 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Max extends CalculatorFunction {
+    public static class Max extends CalculatorFunctionNN {
         public Max() {
-            super("Max", 2);
+            super("Max");
         }
         
-        public Node apply(Calculator environment) {
-            final NumberNode lhs = toNumber("Max", environment, args.get(0));
-            final NumberNode rhs = toNumber("Max", environment, args.get(1));
+        public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return cmp(lhs, rhs) >= 0 ? lhs : rhs;
         }
     }
     
-    public static class Min extends CalculatorFunction {
+    public static class Min extends CalculatorFunctionNN {
         public Min() {
-            super("Min", 2);
+            super("Min");
         }
         
-        public Node apply(Calculator environment) {
-            final NumberNode lhs = toNumber("Min", environment, args.get(0));
-            final NumberNode rhs = toNumber("Min", environment, args.get(1));
+        public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return cmp(lhs, rhs) < 0 ? lhs : rhs;
         }
     }
     
-    public static class Mod extends CalculatorFunction {
+    public static class Mod extends CalculatorFunctionII {
         public Mod() {
-            super("Mod", 2);
+            super("Mod");
         }
         
-        public Node apply(Calculator environment) {
-            final IntegerNode lhs = toInteger("Mod", environment, args.get(0));
-            final IntegerNode rhs = toInteger("Mod", environment, args.get(1));
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.mod(rhs);
         }
     }
     
-    public static class Not extends CalculatorFunction {
+    public static class Not extends CalculatorFunctionZ {
         public Not() {
-            super("Not", 1);
+            super("Not");
         }
         
-        public Node apply(Calculator environment) {
-            return toBoolean("Not", environment, args.get(0)).not();
+        public Node apply(Calculator environment, BooleanNode arg) {
+            return arg.not();
         }
     }
     
-    public static class Or extends CalculatorFunction {
+    public static class Or extends CalculatorFunctionZZ {
         public Or() {
-            super("Or", 2);
+            super("Or");
         }
         
-        public Node apply(Calculator environment) {
-            return toBoolean("Or", environment, args.get(0)).or(toBoolean("Or", environment, args.get(1)));
+        public Node apply(Calculator environment, BooleanNode lhs, BooleanNode rhs) {
+            return lhs.or(rhs);
         }
     }
     
@@ -901,8 +833,8 @@ public class CalculatorFunctions {
             
             final Node expression = args.get(0);
             final CalculatorVariableNode variable = toVariable("Plot", args.get(1));
-            final RealNode xMin = toReal("Plot", environment, args.get(2));
-            final RealNode xMax = toReal("Plot", environment, args.get(3));
+            final RealNode xMin = toNumber("Plot", environment, args.get(2)).toReal();
+            final RealNode xMax = toNumber("Plot", environment, args.get(3)).toReal();
             
             final int pixelWidth = 300;
             CalculatorPlotData plotData = new CalculatorPlotData(pixelWidth, xMin, xMax);
@@ -948,8 +880,8 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final Node lhs = args.get(0).evaluate(environment);
-            final Node rhs = args.get(1).evaluate(environment);
+            final Node lhs = arg(environment, 0);
+            final Node rhs = arg(environment, 1);
             if (isNumber(lhs) && isNumber(rhs)) {
                 // scalar + scalar
                 return ((NumberNode) lhs).plus((NumberNode) rhs);
@@ -966,7 +898,7 @@ public class CalculatorFunctions {
                 // matrix + scalar
                 return matrixScalarOp((ListNode) lhs, lhsDimensions, (NumberNode) rhs, MatrixOp.ADD);
             } else {
-                throw expected("Plus", "numeric or matrix");
+                return bind(lhs, rhs);
             }
         }
         
@@ -993,14 +925,12 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Power extends CalculatorFunction {
+    public static class Power extends CalculatorFunctionNN {
         public Power() {
-            super("power", 2);
+            super("power");
         }
         
-        public Node apply(Calculator environment) {
-            final NumberNode lhs = toNumber("power", environment, args.get(0));
-            final NumberNode rhs = toNumber("power", environment, args.get(1));
+        public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return lhs.power(rhs);
         }
     }
@@ -1084,13 +1014,13 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Round extends CalculatorFunction {
+    public static class Round extends CalculatorFunctionN {
         public Round() {
-            super("round", 1);
+            super("round");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("round", environment, args.get(0)).round();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().round();
         }
     }
     
@@ -1131,43 +1061,43 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Sign extends CalculatorFunction {
+    public static class Sign extends CalculatorFunctionN {
         public Sign() {
-            super("Sign", 1);
+            super("Sign");
         }
         
-        public Node apply(Calculator environment) {
-            return toNumber("Sign", environment, args.get(0)).sign();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.sign();
         }
     }
     
-    public static class Sin extends CalculatorFunction {
+    public static class Sin extends CalculatorFunctionN {
         public Sin() {
-            super("sin", 1);
+            super("sin");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("sin", environment, args.get(0)).sin();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().sin();
         }
     }
     
-    public static class Sinh extends CalculatorFunction {
+    public static class Sinh extends CalculatorFunctionN {
         public Sinh() {
-            super("sinh", 1);
+            super("sinh");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("sinh", environment, args.get(0)).sinh();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().sinh();
         }
     }
     
-    public static class Sqrt extends CalculatorFunction {
+    public static class Sqrt extends CalculatorFunctionN {
         public Sqrt() {
-            super("sqrt", 1);
+            super("sqrt");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("sqrt", environment, args.get(0)).sqrt();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().sqrt();
         }
     }
     
@@ -1177,8 +1107,8 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final Node lhs = args.get(0).evaluate(environment);
-            final Node rhs = args.get(1).evaluate(environment);
+            final Node lhs = arg(environment, 0);
+            final Node rhs = arg(environment, 1);
             if (isNumber(lhs) && isNumber(rhs)) {
                 // scalar - scalar
                 return ((NumberNode) lhs).subtract((NumberNode) rhs);
@@ -1210,23 +1140,23 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Tan extends CalculatorFunction {
+    public static class Tan extends CalculatorFunctionN {
         public Tan() {
-            super("tan", 1);
+            super("tan");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("tan", environment, args.get(0)).tan();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().tan();
         }
     }
     
-    public static class Tanh extends CalculatorFunction {
+    public static class Tanh extends CalculatorFunctionN {
         public Tanh() {
-            super("tanh", 1);
+            super("tanh");
         }
         
-        public Node apply(Calculator environment) {
-            return toReal("tanh", environment, args.get(0)).tanh();
+        public Node apply(Calculator environment, NumberNode n) {
+            return n.toReal().tanh();
         }
     }
     
@@ -1236,8 +1166,8 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            final Node lhs = args.get(0).evaluate(environment);
-            final Node rhs = args.get(1).evaluate(environment);
+            final Node lhs = arg(environment, 0);
+            final Node rhs = arg(environment, 1);
             if (isNumber(lhs) && isNumber(rhs)) {
                 // scalar * scalar
                 return ((NumberNode) lhs).times((NumberNode) rhs);
@@ -1317,13 +1247,32 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class Total extends CalculatorFunction {
+        public Total() {
+            super("Total", 1);
+        }
+        
+        public Node apply(Calculator environment) {
+            final ListNode list = toList("Total", environment, args.get(0));
+            NumberNode result = IntegerNode.ZERO;
+            for (Node element : list) {
+                // FIXME: symbolic too!
+                if (!(element instanceof NumberNode)) {
+                    throw expected("Total", "numeric");
+                }
+                result = result.plus((NumberNode) element);
+            }
+            return result;
+        }
+    }
+    
     public static class Transpose extends CalculatorFunction {
         public Transpose() {
             super("Transpose", 1);
         }
         
         public Node apply(Calculator environment) {
-            final Node node = args.get(0).evaluate(environment);
+            final Node node = arg(environment, 0);
             final ListNode dimensions = matrixDimensions(node);
             if (dimensions == null) {
                 throw expected("Dimensions", "matrix");
@@ -1349,7 +1298,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment) {
-            return unequal(args.get(0).evaluate(environment), args.get(1).evaluate(environment));
+            return equal(arg(environment, 0), arg(environment, 1)).not();
         }
     }
 }
