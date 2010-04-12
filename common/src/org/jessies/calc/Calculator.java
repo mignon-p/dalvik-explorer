@@ -648,7 +648,6 @@ public class Calculator {
         Assert.equals(calculator.evaluate("[34, [24, 12]]"), "[34, [24, 12]]");
         
         // Length.
-        Assert.equals(calculator.evaluate("Length(1 + 2)"), "0");
         Assert.equals(calculator.evaluate("Length([])"), "0");
         Assert.equals(calculator.evaluate("Length([7])"), "1");
         Assert.equals(calculator.evaluate("Length([30 + 4, 6 * 2])"), "2");

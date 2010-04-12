@@ -654,17 +654,12 @@ public class CalculatorFunctions {
         }
     }
     
-    public static class Length extends CalculatorFunction { // FIXME: CAS support.
+    public static class Length extends CalculatorFunctionL {
         public Length() {
-            super("Length", 1);
+            super("Length");
         }
         
-        public Node apply(Calculator environment) {
-            Node node = args.get(0).evaluate(environment);
-            if (!(node instanceof ListNode)) {
-                return IntegerNode.ZERO;
-            }
-            ListNode list = (ListNode) node;
+        public Node apply(Calculator environment, ListNode list) {
             return IntegerNode.valueOf(list.size());
         }
     }
