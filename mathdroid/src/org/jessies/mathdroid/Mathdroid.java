@@ -52,7 +52,8 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         final EditText queryView = (EditText) findViewById(R.id.q);
         queryView.setOnEditorActionListener(this);
         queryView.requestFocus();
-        queryView.setInputType(0);
+        // Prevent the soft keyboard from appearing until the user presses our keyboard button.
+        queryView.setInputType(InputType.TYPE_NULL);
         
         initButtonMap();
         
