@@ -225,7 +225,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, NumberNode n) {
-            return n.toReal().acos();
+            return environment.angleResult(n.toReal().acos());
         }
     }
     
@@ -245,7 +245,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, NumberNode n) {
-            return n.toReal().asin();
+            return environment.angleResult(n.toReal().asin());
         }
     }
     
@@ -255,7 +255,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, NumberNode n) {
-            return n.toReal().atan();
+            return environment.angleResult(n.toReal().atan());
         }
     }
     
@@ -265,7 +265,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, NumberNode arg1, NumberNode arg2) {
-            return arg1.toReal().atan2(arg2.toReal());
+            return environment.angleResult(arg1.toReal().atan2(arg2.toReal()));
         }
     }
     
@@ -406,7 +406,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, NumberNode n) {
-            return n.toReal().cos();
+            return environment.angleArgument(n).cos();
         }
     }
     
@@ -1101,7 +1101,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, NumberNode n) {
-            return n.toReal().sin();
+            return environment.angleArgument(n).sin();
         }
     }
     
@@ -1170,7 +1170,7 @@ public class CalculatorFunctions {
         }
         
         public Node apply(Calculator environment, NumberNode n) {
-            return n.toReal().tan();
+            return environment.angleArgument(n).tan();
         }
     }
     

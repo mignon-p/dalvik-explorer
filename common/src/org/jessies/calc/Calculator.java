@@ -30,6 +30,7 @@ public class Calculator {
     private final Map<CalculatorToken, CalculatorFunction> operators;
     private final Map<String, Variable> variables;
     private final Variable ans;
+    private boolean degreesMode = false;
     private CalculatorPlotter plotter;
     
     // Variable names are case-insensitive but case-preserving.
@@ -265,6 +266,29 @@ public class Calculator {
         v.value = newValue;
     }
     
+    /**
+     * Tells all trigonometric functions to take/return degrees rather than radians.
+     */
+    public void setDegreesMode(boolean degreesMode) {
+        this.degreesMode = degreesMode;
+    }
+    
+    public RealNode angleArgument(NumberNode n) {
+        RealNode value = n.toReal();
+        if (degreesMode) {
+            value = new RealNode(Math.toRadians(value.toDouble()));
+        }
+        return value;
+    }
+    
+    public RealNode angleResult(NumberNode n) {
+        RealNode value = n.toReal();
+        if (degreesMode) {
+            value = new RealNode(Math.toDegrees(value.toDouble()));
+        }
+        return value;
+    }
+    
     @Test private static void testArithmetic() {
         Assert.equals(new Calculator().evaluate("0"), "0");
         Assert.equals(new Calculator().evaluate("1"), "1");
@@ -276,7 +300,7 @@ public class Calculator {
         
         Assert.equals(new Calculator().evaluate("1.2E3"), "1200.0");
         Assert.equals(new Calculator().evaluate("1E3"), "1000");
-        Assert.equals(new Calculator().evaluate("1E-3"), "0.0010");
+        Assert.equals(new Calculator().evaluate("1E-3"), "0.001");
         Assert.equals(new Calculator().evaluate("1.E3"), "1000.0");
         Assert.equals(new Calculator().evaluate(".1E3"), "100.0");
         
@@ -477,7 +501,19 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("Sinh(0)"), "0.0");
         Assert.equals(new Calculator().evaluate("Sqrt(81)"), "9.0");
         Assert.equals(new Calculator().evaluate("Tan(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Abs(Tan(pi/4) - 1.0) < 0.01"), "true");
         Assert.equals(new Calculator().evaluate("Tanh(0)"), "0.0");
+    }
+    
+    @Test private static void testDegreesMode() {
+        Calculator c = new Calculator();
+        c.setDegreesMode(true);
+        Assert.equals(new Calculator().evaluate("Abs(Acos(0.5) - 60) < 0.01"), "true");
+        Assert.equals(new Calculator().evaluate("Abs(Asin(0.5) - 30) < 0.01"), "true");
+        Assert.equals(new Calculator().evaluate("Atan(0)"), "0.0");
+        Assert.equals(new Calculator().evaluate("Abs(Cos(60) - 0.5) < 0.01"), "true");
+        Assert.equals(new Calculator().evaluate("Abs(Sin(90) - 1.0) < 0.01"), "true");
+        Assert.equals(new Calculator().evaluate("Abs(Tan(45) - 1.0) < 0.01"), "true");
     }
     
     @Test private static void testDigitCount() {
