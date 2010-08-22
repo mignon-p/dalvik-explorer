@@ -5,6 +5,7 @@ import android.content.*;
 import android.content.res.*;
 import android.graphics.*;
 import android.os.Bundle;
+import android.preference.*;
 import android.text.*;
 import android.text.style.*;
 import android.util.Log;
@@ -24,6 +25,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     // Constants identifying the options menu items.
     private static final int OPTIONS_MENU_CLEAR = 0;
     private static final int OPTIONS_MENU_HELP  = 1;
+    private static final int OPTIONS_MENU_SETTINGS  = 2;
     
     // Constants for the transcript context menu items.
     private static final int CONTEXT_MENU_COPY_SELECTED = 0;
@@ -146,6 +148,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, OPTIONS_MENU_CLEAR, 0, "Clear").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
         menu.add(0, OPTIONS_MENU_HELP,  0, "Help").setIcon(android.R.drawable.ic_menu_help);
+        menu.add(0, OPTIONS_MENU_SETTINGS, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
         return super.onCreateOptionsMenu(menu);
     }
     
@@ -156,6 +159,9 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             return true;
         case OPTIONS_MENU_HELP:
             showHelp();
+            return true;
+        case OPTIONS_MENU_SETTINGS:
+            showSettings();
             return true;
         default:
             return super.onOptionsItemSelected(item);
@@ -250,7 +256,15 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         saveState();
     }
     
-    public void onClick(View view) {
+    @Override public void onResume() {
+        super.onResume();
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        
+        String angleMode = settings.getString("angleMode", "Radians");
+        calculator.setDegreesMode(angleMode.equals("Degrees"));
+    }
+    
+    @Override public void onClick(View view) {
         final EditText queryView = (EditText) findViewById(R.id.q);
         final int id = view.getId();
         switch (id) {
@@ -432,6 +446,10 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     
     private void showHelp() {
         startActivity(new Intent(this, MathdroidHelp.class));
+    }
+    
+    private void showSettings() {
+        startActivity(new Intent(this, MathdroidSettings.class));
     }
     
     public void showPlot(CalculatorPlotData plotData) {
