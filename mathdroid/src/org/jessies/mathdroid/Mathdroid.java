@@ -42,6 +42,8 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     
     private HistoryAdapter history;
     
+    private boolean hapticFeedback;
+    
     // Called when the activity is first created or recreated.
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -262,9 +264,22 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         
         String angleMode = settings.getString("angleMode", "Radians");
         calculator.setDegreesMode(angleMode.equals("Degrees"));
+        
+        this.hapticFeedback = settings.getBoolean("hapticFeedback", false);
+    }
+    
+    private void performHapticFeedback(View view) {
+        if (!hapticFeedback) {
+            return;
+        }
+        int HapticFeedbackConstants_VIRTUAL_KEY = 1; // HapticFeedbackConstants.VIRTUAL_KEY not available until API 5.
+        int SDK_INT = Integer.parseInt(android.os.Build.VERSION.SDK); // SDK_INT not available until API 4.
+        int type = SDK_INT >= 5 ? HapticFeedbackConstants.LONG_PRESS : HapticFeedbackConstants_VIRTUAL_KEY;
+        view.performHapticFeedback(type, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
     }
     
     @Override public void onClick(View view) {
+        performHapticFeedback(view);
         final EditText queryView = (EditText) findViewById(R.id.q);
         final int id = view.getId();
         switch (id) {
