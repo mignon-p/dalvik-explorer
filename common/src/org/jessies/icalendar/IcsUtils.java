@@ -31,7 +31,7 @@ public class IcsUtils {
      *        time-numzone = ("+" / "-") time-hour time-minute [time-second]
      */
     public static int parseUtcOffset(String value) {
-        final Pattern utcOffsetPattern = Pattern.compile("([-+])(\\d{2})(\\d{2})(?:\\d{2})?");
+        final Pattern utcOffsetPattern = Pattern.compile("([-+])(\\d{1,2})(\\d{2})(?:\\d{2})?");
         final Matcher matcher = utcOffsetPattern.matcher(value);
         if (!matcher.matches()) {
             throw new IllegalArgumentException(value);
@@ -44,8 +44,10 @@ public class IcsUtils {
     }
     
     @Test private static void testParseUtcOffset() {
+        Assert.equals(-18000000, parseUtcOffset("-500")); // Lotus Notes does this.
         Assert.equals(-18000000, parseUtcOffset("-0500"));
         Assert.equals(-18000000, parseUtcOffset("-050000"));
+        Assert.equals(3600000, parseUtcOffset("+100")); // Lotus Notes does this.
         Assert.equals(3600000, parseUtcOffset("+0100"));
     }
     
