@@ -23,7 +23,7 @@
 <li>Factorial (postfix !).
 <li>Relational operators (==, !=, &lt;, &lt;=, &gt;, &gt;=).
 <li>Bitwise operations (&amp;, |, ~, &lt;&lt;, &gt;&gt;).
-<li>Boolean logic.
+<li>Boolean logic (&amp;&amp;, ||).
 <li>Matrices.
 <li>Variable assignment (=).
 <li>A wide range of mathematical functions (see below).
@@ -71,10 +71,10 @@ Lists may include nested lists, allowing the construction of matrices and tensor
 <p>Where a function has an operator form or alternate spelling, the alternatives are given in parentheses.
 For example, <code>BitShiftLeft(1, 32)</code> and <code>1 &lt;&lt; 32</code> are equivalent, as are <code>Ceil(1.2)</code> and <code>Ceiling(1.2)</code>.
 
-<p>Although the function names given above contain capital letters, <code>isprime</code> is equivalent to <code>IsPrime</code> to make it easier to type on phone keyboards.
+<p>Although the function names given above contain capital letters, <code>isprime</code> is equivalent to <code>IsPrime</code> but easier to type on phone keyboards.
 If you have a convenient underscore key and value readability, you can insert an underscore between words: so <code>is_prime</code> is equivalent to <code>IsPrime</code>.
 
-<p>All trigonometric functions use radians.
+<p>All trigonometric functions use radians or degrees, depending on the current angle mode setting. (See <a href="#settings">Settings</a>.)
 
 <a name="constants_and_variables"><h2>Constants and variables</h2></a>
 
@@ -93,7 +93,7 @@ If you have a convenient underscore key and value readability, you can insert an
 
 <p>The EXP button is used to enter numbers in engineering notation, such as <code>1.2E6</code>, which is the same as <code>1.2*10^6</code>.
 The EXP button provides the "E".
-If you're using your phone's keyboard, you can just type E.
+If you're using your device's keyboard, you can just type E.
 
 <p>The Ans button is used to refer to the previous answer.
 It can be thought of as a variable whose value changes after each calculation.
@@ -103,15 +103,25 @@ For example, executing <code>1</code> and then repeatedly executing <code>2*Ans<
 Unlike pocket calculators, the "2nd" button is sticky; it changes to say "1st", and you have to press it again to go back.
 (On a pocket calculator, pressing any other button generally resets.)
 
-<p>If your phone has a trackball, you can use that to move the caret in the text field.
+<p>If your device has a trackball, you can use that to move the caret in the text field.
 
-<a name="copy_and_paste"><h2>Copy and paste</h2></a>
+<a name="history"><h2>History</h2></a>
 
-<p>A long press on the history brings up a context menu that lets you "Copy last" or "Copy all" to the clipboard.
+<p>A press on an item in the history copies that entry back into the input. This is useful for repeating or editing an earlier calculation.
+
+<p>A long press on an item in the history brings up a context menu that lets you "Copy last" or "Copy all" to the clipboard.
 
 <a name="settings"><h2>Settings</h2></a>
 
-<p>Use the settings to switch angle mode between degrees and radians (the default).
+<p><i>Angle mode</i> lets you choose whether trigonometric functions use degrees or radians (the default).
+
+<p><i>Haptic feedback</i> lets you choose whether or not the device should vibrate when on-screen keys are pressed.
+
+<p><i>Continuation mode</i> causes "Ans" to be automatically inserted when an operator (such as "*") is typed at the start of an expression. For example, in normal mode, "1*2", EXE, followed by "*3", EXE, gives an error because "*3" is meaningless. In continuation mode, the act of typing "*3" causes "Ans*3" to be inserted, giving the presumably desired result.
+
+<p>Why isn't this the default? Primarily because "-" is ambiguous. It's both a unary and a binary operator: the negative sign or the subtraction operator. Repeating the previous example with "-" instead of "*", typing "-3" might mean "subtract 3 from the previous result" (that is, "Ans-3"), but it might also mean "start a new calculation where the first term is -3" (as in "-3+12").
+
+<p>If you're in continuation mode and need to start a new calculation with "-", work-arounds include "0-3" or "(-3)". (An alternative would be for Mathdroid to exclude "-" from continuation; feedback appreciated.)
 
 <a name="finding_out_more"><h2>Finding out more</h2></a>
 

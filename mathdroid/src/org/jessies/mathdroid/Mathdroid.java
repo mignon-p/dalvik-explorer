@@ -42,6 +42,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     
     private HistoryAdapter history;
     
+    private boolean continuationMode;
     private boolean hapticFeedback;
     
     // Called when the activity is first created or recreated.
@@ -55,6 +56,13 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         
         final EditText queryView = (EditText) findViewById(R.id.q);
         queryView.setOnEditorActionListener(this);
+        queryView.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                onQueryTextChanged(queryView);
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        });
         queryView.requestFocus();
         // Prevent the soft keyboard from appearing until the user presses our keyboard button.
         queryView.setInputType(InputType.TYPE_NULL);
@@ -207,7 +215,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         String text = null;
         if (menuInfo instanceof AdapterView.AdapterContextMenuInfo) {
             final int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
-            final HistoryItem historyItem = (HistoryItem) history.getItem(position);
+            final HistoryItem historyItem = history.getItem(position);
             text = historyItem.question + " = " + historyItem.answer;
         }
         return text;
@@ -248,7 +256,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final EditText queryView = (EditText) findViewById(R.id.q);
-        final HistoryItem historyItem = (HistoryItem) history.getItem(position);
+        final HistoryItem historyItem = history.getItem(position);
         queryView.setText(historyItem.question);
         queryView.setSelection(queryView.length());
     }
@@ -265,6 +273,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         String angleMode = settings.getString("angleMode", "Radians");
         calculator.setDegreesMode(angleMode.equals("Degrees"));
         
+        this.continuationMode = settings.getBoolean("continuationMode", false);
         this.hapticFeedback = settings.getBoolean("hapticFeedback", false);
     }
     
@@ -377,14 +386,46 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         queryView.setSelection(offset);
     }
     
+    private void onQueryTextChanged(final EditText queryView) {
+        if (!continuationMode) {
+            return;
+        }
+        // Implement continuation mode, where we insert "Ans" before an operator at the start of an expression.
+        // Note that this is ambiguous in the case of '-' which may be part of a numeric literal starting a new expression, or subtraction, indicating a continuation.
+        // This is the price people who want this feature have to pay.
+        final String newInput = queryView.getText().toString();
+        if (isContinuationOperator(newInput)) {
+            // We could actually include the text of the previous expression, but you can just click the history item to get that behavior.
+            // String lastInput = history.getItem(history.getCount() - 1).question;
+            String lastInput = "Ans";
+            final String replacement = lastInput + newInput;
+            queryView.post(new Runnable() {
+                public void run() {
+                    // We have to do this later on the UI thread, or the selection change doesn't happen.
+                    queryView.setText(replacement);
+                    queryView.setSelection(replacement.length());
+                }
+            });
+        }
+    }
+    
+    private static boolean isContinuationOperator(String s) {
+        return s.length() == 1 && "-=+*\u00d7^/\u00f7%<>&|".indexOf(s.charAt(0)) != -1;
+    }
+    
     private void exe(EditText queryView) {
         final String queryText = queryView.getText().toString().trim();
         if (queryText.length() == 0) {
             // Nothing to do. Finger flub.
             return;
         }
-        // Select the input to make it easy to replace while allowing the possibility of further editing.
-        queryView.selectAll();
+        if (continuationMode) {
+            // Clear the input; we may put it back depending on what the user types next...
+            queryView.setText("");
+        } else {
+            // Select the input to make it easy to replace while allowing the possibility of further editing.
+            queryView.selectAll();
+        }
         // Adding to the history automatically updates the display.
         history.add(new HistoryItem(queryText, computeAnswer(queryText)));
     }

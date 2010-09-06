@@ -31,7 +31,7 @@ public class HistoryAdapter extends BaseAdapter {
         return mItems.size();
     }
     
-    public Object getItem(int index) {
+    public HistoryItem getItem(int index) {
         return mItems.get(index);
     }
     
