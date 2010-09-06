@@ -817,6 +817,19 @@ public class CalculatorFunctions {
         }
     }
     
+    public static class nCr extends CalculatorFunctionII {
+        public nCr() {
+            super("nCr");
+        }
+        
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
+            // nCr(n,r) := n!/(r! * (n-r)!)
+            IntegerNode n = lhs;
+            IntegerNode r = rhs;
+            return n.factorial().divide(r.factorial().times(((IntegerNode) n.subtract(r)).factorial()));
+        }
+    }
+    
     public static class Not extends CalculatorFunctionZ {
         public Not() {
             super("Not");
@@ -824,6 +837,19 @@ public class CalculatorFunctions {
         
         public Node apply(Calculator environment, BooleanNode arg) {
             return arg.not();
+        }
+    }
+    
+    public static class nPr extends CalculatorFunctionII {
+        public nPr() {
+            super("nPr");
+        }
+        
+        public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
+            // nPr(n,r) := n!/(n-r)!
+            IntegerNode n = lhs;
+            IntegerNode r = rhs;
+            return n.factorial().divide(((IntegerNode) n.subtract(r)).factorial());
         }
     }
     

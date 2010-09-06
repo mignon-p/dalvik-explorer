@@ -144,7 +144,9 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Max(),            "Max");
         addFunction(new CalculatorFunctions.Min(),            "Min");
         addFunction(new CalculatorFunctions.Mod(),            "Mod");
+        addFunction(new CalculatorFunctions.nCr(),            "nCr");
         addFunction(new CalculatorFunctions.Not(),            "Not");
+        addFunction(new CalculatorFunctions.nPr(),            "nPr");
         addFunction(new CalculatorFunctions.Or(),             "Or");
         addFunction(new CalculatorFunctions.Plot(),           "Plot");
         addFunction(new CalculatorFunctions.Plus(),           "Plus");
@@ -625,6 +627,15 @@ public class Calculator {
         Assert.equals(new Calculator().evaluate("Sum(i^2, 0, 10)"), "385");
         Assert.equals(Double.valueOf(new Calculator().evaluate("Sum(1/i!, 0, 30)-e")), 0.0, 0.000001);
         // FIXME: failure test for min > max.
+    }
+    
+    @Test private static void testPermutations() {
+        Assert.equals(new Calculator().evaluate("nCr(5, 5)"), "1");
+        Assert.equals(new Calculator().evaluate("nPr(5, 5)"), "120");
+        Assert.equals(new Calculator().evaluate("nCr(10, 4)"), "210");
+        Assert.equals(new Calculator().evaluate("nPr(10, 4)"), "5040");
+        Assert.equals(new Calculator().evaluate("nCr(52, 3)"), "22100");
+        Assert.equals(new Calculator().evaluate("nPr(52, 3)"), "132600");
     }
     
     @Test private static void testProduct() {
