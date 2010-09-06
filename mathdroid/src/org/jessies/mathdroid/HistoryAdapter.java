@@ -22,6 +22,11 @@ public class HistoryAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
     
+    public void remove(int index) {
+        mItems.remove(index);
+        notifyDataSetChanged();
+    }
+    
     public void clear() {
         mItems.clear();
         notifyDataSetChanged();

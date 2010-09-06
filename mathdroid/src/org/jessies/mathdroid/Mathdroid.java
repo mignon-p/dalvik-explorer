@@ -28,8 +28,11 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     private static final int OPTIONS_MENU_SETTINGS  = 2;
     
     // Constants for the transcript context menu items.
-    private static final int CONTEXT_MENU_COPY_SELECTED = 0;
-    private static final int CONTEXT_MENU_COPY_ALL  = 1;
+    private static final int CONTEXT_MENU_RETYPE_SELECTED = 0;
+    private static final int CONTEXT_MENU_COPY_SELECTED = 1;
+    private static final int CONTEXT_MENU_COPY_ALL  = 2;
+    private static final int CONTEXT_MENU_FORGET_SELECTED = 3;
+    private static final int CONTEXT_MENU_FORGET_ALL  = 4;
     
     // Constants identifying dialogs.
     private static final int DIALOG_PLOT = 0;
@@ -211,14 +214,12 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         return dialog;
     }
     
-    private String selectedHistoryItemText(ContextMenu.ContextMenuInfo menuInfo) {
-        String text = null;
-        if (menuInfo instanceof AdapterView.AdapterContextMenuInfo) {
-            final int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
-            final HistoryItem historyItem = history.getItem(position);
-            text = historyItem.question + " = " + historyItem.answer;
+    private HistoryItem selectedHistoryItem(ContextMenu.ContextMenuInfo menuInfo) {
+        if (!(menuInfo instanceof AdapterView.AdapterContextMenuInfo)) {
+            return null;
         }
-        return text;
+        final int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
+        return history.getItem(position);
     }
     
     @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -229,20 +230,38 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("History");
-        final String selectedItem = selectedHistoryItemText(menuInfo);
-        if (selectedItem != null) {
-            menu.add(0, CONTEXT_MENU_COPY_SELECTED, 0, "Copy '" + selectedItem + "'");
+        final HistoryItem historyItem = selectedHistoryItem(menuInfo);
+        if (historyItem != null) {
+            menu.add(0, CONTEXT_MENU_RETYPE_SELECTED, 0, "Retype '" + historyItem.question + "'");
+            menu.add(0, CONTEXT_MENU_COPY_SELECTED, 0, "Copy '" + historyItem.question + " = " + historyItem.answer + "'");
         }
         menu.add(0, CONTEXT_MENU_COPY_ALL,  0, "Copy all");
+        if (historyItem != null) {
+            menu.add(0, CONTEXT_MENU_FORGET_SELECTED, 0, "Forget '" + historyItem.question + " = " + historyItem.answer + "'");
+        }
+        menu.add(0, CONTEXT_MENU_FORGET_ALL,  0, "Forget all");
     }
     
     @Override public boolean onContextItemSelected(MenuItem item) {
         final int id = item.getItemId();
+        final ContextMenu.ContextMenuInfo menuInfo = item.getMenuInfo();
+        final HistoryItem historyItem = selectedHistoryItem(menuInfo);
         switch (id) {
+        case CONTEXT_MENU_RETYPE_SELECTED:
+            final EditText queryView = (EditText) findViewById(R.id.q);
+            queryView.setText(historyItem.question);
+            queryView.setSelection(queryView.length());
+            return true;
         case CONTEXT_MENU_COPY_SELECTED:
-            return copyToClipboard(selectedHistoryItemText(item.getMenuInfo()));
+            return copyToClipboard(historyItem.question + " = " + historyItem.answer);
         case CONTEXT_MENU_COPY_ALL:
             return copyToClipboard(history.toString());
+        case CONTEXT_MENU_FORGET_SELECTED:
+            history.remove(((AdapterView.AdapterContextMenuInfo) menuInfo).position);
+            return true;
+        case CONTEXT_MENU_FORGET_ALL:
+            history.clear();
+            return true;
         default:
             return super.onContextItemSelected(item);
         }
