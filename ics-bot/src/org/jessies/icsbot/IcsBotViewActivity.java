@@ -84,9 +84,24 @@ public class IcsBotViewActivity extends Activity {
         
         // TODO: show a UI with the calendar-choice spinner if the user has more than one writable calendar?
         populateCalendarSpinner();
+        
+        findButtonById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
         // TODO: summarize the events and offer "Add All", "Add & Edit", and "Cancel"?
-        parseCalendar(data);
-        finish();
+        findButtonById(R.id.import_button).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // TODO: get and parse the data off the UI thread.
+                final String data = getIntentDataAsString();
+                parseCalendar(data, false);
+            }
+        });
+    }
+    
+    private Button findButtonById(int id) {
+        return (Button) findViewById(id);
     }
     
     private void toastAndLog(String message, Throwable th) {
@@ -127,12 +142,12 @@ public class IcsBotViewActivity extends Activity {
         return null;
     }
     
-    private void parseCalendar(String data) {
+    private int parseCalendar(String data, boolean dryRun) {
         try {
             mCalendar = ICalendar.parseCalendar(data);
         } catch (ICalendar.FormatException fe) {
             toastAndLog("Couldn't parse calendar data", fe);
-            return;
+            return 0;
         }
         
         final IcsTimeZones timeZones = new IcsTimeZones(mCalendar);
@@ -143,7 +158,7 @@ public class IcsBotViewActivity extends Activity {
             for (ICalendar.Component component : mCalendar.getComponents()) {
                 if (component.getName().equals(ICalendar.Component.VEVENT)) {
                     ++eventCount;
-                    if (insertVEvent(component, timeZones)) {
+                    if (!dryRun && insertVEvent(component, timeZones)) {
                         ++importedEventCount;
                     }
                 }
@@ -155,6 +170,7 @@ public class IcsBotViewActivity extends Activity {
         if (importedEventCount != eventCount) {
             toastAndLog("Not all events were added");
         }
+        return eventCount;
     }
     
     // Secrets we shouldn't know about Calendar's database schema...
@@ -304,6 +320,7 @@ public class IcsBotViewActivity extends Activity {
         intent.putExtra(EVENT_BEGIN_TIME, dtStart.utcMillis);
         intent.putExtra(EVENT_END_TIME, dtEnd.utcMillis);
         startActivity(intent);
+        finish();
         return true;
     }
 }
