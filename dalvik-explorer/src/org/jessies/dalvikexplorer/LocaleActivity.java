@@ -83,6 +83,8 @@ public class LocaleActivity extends TextViewActivity {
         NumberFormat nf = NumberFormat.getInstance(locale);
         if (nf instanceof DecimalFormat) {
             describeDecimalFormatSymbols(result, ((DecimalFormat) nf).getDecimalFormatSymbols());
+        } else {
+            result.append("(Didn't expect " + nf.getClass() + ".)");
         }
         
         Date now = new Date(); // FIXME: it might be more useful to always show a time in the afternoon, to make 24-hour patterns more obvious.
@@ -103,8 +105,9 @@ public class LocaleActivity extends TextViewActivity {
         
         result.append("Date Format Symbols\n\n");
         DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, locale);
+        DateFormatSymbols dfs = null;
         if (df instanceof SimpleDateFormat) {
-            DateFormatSymbols dfs = ((SimpleDateFormat) df).getDateFormatSymbols();
+            dfs = ((SimpleDateFormat) df).getDateFormatSymbols();
             result.append("Am/pm: " + Arrays.toString(dfs.getAmPmStrings()) + "\n");
             result.append("Eras: " + Arrays.toString(dfs.getEras()) + "\n");
             result.append("Local Pattern Chars: " + dfs.getLocalPatternChars() + "\n");
@@ -112,10 +115,28 @@ public class LocaleActivity extends TextViewActivity {
             result.append("Short Months: " + Arrays.toString(dfs.getShortMonths()) + "\n");
             result.append("Weekdays: " + Arrays.toString(dfs.getWeekdays()) + "\n");
             result.append("Short Weekdays: " + Arrays.toString(dfs.getShortWeekdays()) + "\n");
+        } else {
+            result.append("(Didn't expect " + df.getClass() + ".)");
         }
+        result.append('\n');
+        result.append('\n');
+        
+        result.append("Calendar\n\n");
+        Calendar c = Calendar.getInstance(locale);
+        int firstDayOfWeek = c.getFirstDayOfWeek();
+        String firstDayOfWeekString = (dfs != null) ? dfs.getWeekdays()[firstDayOfWeek] : "unknown";
+        String englishFirstDayOfWeekString = ENGLISH_WEEKDAYS[firstDayOfWeek];
+        result.append("First Day of the Week: " + firstDayOfWeek + " '" + firstDayOfWeekString + "'");
+        if (!englishFirstDayOfWeekString.equals(firstDayOfWeekString)) {
+            result.append(" (" + englishFirstDayOfWeekString + ")");
+        }
+        result.append("\n");
+        result.append("Minimal Days in First Week: " + c.getMinimalDaysInFirstWeek() + "\n");
         
         return result.toString();
     }
+    
+    private static final String[] ENGLISH_WEEKDAYS = new String[] { "invalid", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
     
     private static void describeDecimalFormatSymbols(StringBuilder result, DecimalFormatSymbols dfs) {
         result.append("Currency Symbol: " + dfs.getCurrencySymbol() + "\n");
