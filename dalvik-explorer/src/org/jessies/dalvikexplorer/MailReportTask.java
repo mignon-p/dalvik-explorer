@@ -42,9 +42,11 @@ public class MailReportTask extends AsyncTask<Void, Void, String> implements Dia
         appendReport(result, "Build/Device Details", BuildActivity.getBuildDetailsAsString());
         appendReport(result, "Charsets", CharsetsActivity.describeCharsets());
         appendReport(result, "Environment Variables", EnvironmentVariablesActivity.getEnvironmentAsString());
-        appendReport(result, "Locales", LocalesActivity.describeLocales());
+        // FIXME: this doesn't scale well.
+        //appendReport(result, "Locales", LocalesActivity.describeLocales());
         appendReport(result, "System Properties", SystemPropertiesActivity.getSystemPropertiesAsString());
-        appendReport(result, "Time Zones", TimeZonesActivity.describeTimeZones());
+        // FIXME: this doesn't scale well.
+        //appendReport(result, "Time Zones", TimeZonesActivity.describeTimeZones());
         return result.toString();
     }
     
