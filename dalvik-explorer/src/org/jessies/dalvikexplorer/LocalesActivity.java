@@ -31,9 +31,9 @@ public class LocalesActivity extends ListActivity {
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
-        final Intent intent = new Intent(this, LocaleActivity.class);
+        final Intent intent = new Intent(this, LocaleCountriesActivity.class);
         final LocaleListItem item = (LocaleListItem) l.getAdapter().getItem(position);
-        intent.putExtra("org.jessies.dalvikexplorer.Locale", item.locale.toString());
+        intent.putExtra("org.jessies.dalvikexplorer.Language", item.locale.toString());
         startActivity(intent);
     }
     
@@ -41,13 +41,15 @@ public class LocalesActivity extends ListActivity {
         final Locale[] availableLocales = Locale.getAvailableLocales();
         final Locale defaultLocale = Locale.getDefault();
         // Put the default locale at the top of the list...
-        final List<LocaleListItem> result = new ArrayList<LocaleListItem>(availableLocales.length);
+        final ArrayList<LocaleListItem> result = new ArrayList<LocaleListItem>(availableLocales.length);
         result.add(new LocaleListItem(defaultLocale));
-        // ...followed by all the others.
+        // ...followed by all the distinct languages...
+        TreeSet<String> languages = new TreeSet<String>();
         for (Locale locale : availableLocales) {
-            if (!locale.equals(defaultLocale)) {
-                result.add(new LocaleListItem(locale));
-            }
+            languages.add(locale.getLanguage());
+        }
+        for (String language : languages) {
+            result.add(new LocaleListItem(new Locale(language)));
         }
         return result;
     }
