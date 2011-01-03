@@ -2,13 +2,13 @@
 
 ASDK_ROOT=~/Downloads/android-sdk-linux
 ASDK_PLATFORM_ROOT=${ASDK_ROOT}/platforms/android-1.6
-JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
+JAVA_ROOT=/usr/bin #JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
 
 
 # Various Android tools.
 AAPT=${ASDK_PLATFORM_ROOT}/tools/aapt
-ADB=${ASDK_ROOT}/tools/adb
+ADB=${ASDK_ROOT}/platform-tools/adb
 APKBUILDER=${ASDK_ROOT}/tools/apkbuilder
 DX=${ASDK_PLATFORM_ROOT}/tools/dx
 ZIPALIGN=${ASDK_ROOT}/tools/zipalign
