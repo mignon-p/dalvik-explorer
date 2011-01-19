@@ -31,9 +31,17 @@ public class LocalesActivity extends ListActivity {
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
-        final Intent intent = new Intent(this, LocaleCountriesActivity.class);
         final LocaleListItem item = (LocaleListItem) l.getAdapter().getItem(position);
-        intent.putExtra("org.jessies.dalvikexplorer.Language", item.locale.toString());
+        String languageName = item.locale.toString();
+        final Intent intent;
+        if (languageName.contains("_")) {
+            intent = new Intent(this, LocaleActivity.class);
+            final String localeName = languageName.replace(" (default)", "");
+            intent.putExtra("org.jessies.dalvikexplorer.Locale", localeName);
+        } else {
+            intent = new Intent(this, LocaleCountriesActivity.class);
+            intent.putExtra("org.jessies.dalvikexplorer.Language", languageName);
+        }
         startActivity(intent);
     }
     
