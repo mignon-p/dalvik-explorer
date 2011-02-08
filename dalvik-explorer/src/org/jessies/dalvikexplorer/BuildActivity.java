@@ -27,7 +27,9 @@ public class BuildActivity extends TextViewActivity {
         final StringBuilder result = new StringBuilder();
         result.append("Manufacturer: " + manufacturer + "\n"); // "Motorola"
         result.append("Model: " + build.MODEL + "\n"); // "Droid"
+        result.append('\n');
         result.append("CPU ABI: " + cpuAbi + "\n"); // "armeabi-v7a"
+        result.append("Cores: " + Runtime.getRuntime().availableProcessors() + "\n"); // 1
         result.append('\n');
         result.append("Brand: " + build.BRAND + "\n"); // "verizon"
         result.append("Board: " + build.BOARD + "\n"); // "sholes"
