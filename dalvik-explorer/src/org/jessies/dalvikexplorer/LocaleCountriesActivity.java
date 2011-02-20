@@ -25,9 +25,10 @@ public class LocaleCountriesActivity extends ListActivity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        List<LocaleListItem> locales = gatherLocales();
+        String languageCode = getIntent().getStringExtra("org.jessies.dalvikexplorer.Language");
+        List<LocaleListItem> locales = gatherLocales(languageCode);
         setListAdapter(new ArrayAdapter<LocaleListItem>(this, android.R.layout.simple_list_item_1, locales));
-        setTitle("Locales (" + locales.size() + ")");
+        setTitle(new Locale(languageCode).getDisplayLanguage() + " Locales (" + locales.size() + ")");
         getListView().setTextFilterEnabled(true);
     }
     
@@ -38,12 +39,11 @@ public class LocaleCountriesActivity extends ListActivity {
         startActivity(intent);
     }
     
-    private List<LocaleListItem> gatherLocales() {
-        String language = getIntent().getStringExtra("org.jessies.dalvikexplorer.Language");
+    private List<LocaleListItem> gatherLocales(String languageCode) {
         // List all the locales for this language.
         final ArrayList<LocaleListItem> result = new ArrayList<LocaleListItem>();
         for (Locale locale : Locale.getAvailableLocales()) {
-            if (locale.getLanguage().equals(language)) {
+            if (locale.getLanguage().equals(languageCode)) {
                 result.add(new LocaleListItem(locale));
             }
         }

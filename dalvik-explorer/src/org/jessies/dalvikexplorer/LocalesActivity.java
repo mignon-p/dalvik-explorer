@@ -21,12 +21,13 @@ public class LocalesActivity extends ListActivity {
             return result;
         }
     }
-    private static final List<LocaleListItem> LOCALES = gatherLocales();
+    private static final List<LocaleListItem> LANGUAGES = gatherLanguages();
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new ArrayAdapter<LocaleListItem>(this, android.R.layout.simple_list_item_1, LOCALES));
-        setTitle("Locales (" + LOCALES.size() + ")");
+        setListAdapter(new ArrayAdapter<LocaleListItem>(this, android.R.layout.simple_list_item_1, LANGUAGES));
+        int languageCount = LANGUAGES.size() - 1; // Don't count the extra entry for the default locale.
+        setTitle("Languages (" + languageCount + ")");
         getListView().setTextFilterEnabled(true);
     }
     
@@ -45,7 +46,7 @@ public class LocalesActivity extends ListActivity {
         startActivity(intent);
     }
     
-    private static List<LocaleListItem> gatherLocales() {
+    private static List<LocaleListItem> gatherLanguages() {
         final Locale[] availableLocales = Locale.getAvailableLocales();
         final Locale defaultLocale = Locale.getDefault();
         // Put the default locale at the top of the list...
@@ -64,7 +65,7 @@ public class LocalesActivity extends ListActivity {
     
     static String describeLocales() {
         StringBuilder result = new StringBuilder();
-        for (LocaleListItem item : gatherLocales()) {
+        for (LocaleListItem item : gatherLanguages()) {
             if (Thread.currentThread().isInterrupted()) return null;
             result.append(LocaleActivity.describeLocale(item.locale.toString()));
             result.append('\n');
