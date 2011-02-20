@@ -51,22 +51,26 @@ public class LocaleActivity extends TextViewActivity {
         final Locale locale = localeByName(name);
         
         result.append("Display Name: " + locale.getDisplayName() + "\n");
+        result.append("Localized Display Name: " + locale.getDisplayName(locale) + "\n");
         result.append('\n');
         
         if (locale.getLanguage().length() > 0) {
             result.append("Display Language: " + locale.getDisplayLanguage() + "\n");
+            result.append("Localized Display Language: " + locale.getDisplayLanguage(locale) + "\n");
             result.append("2-Letter Language Code: " + locale.getLanguage() + "\n");
             result.append("3-Letter Language Code: " + locale.getISO3Language() + "\n");
             result.append('\n');
         }
         if (locale.getCountry().length() > 0) {
             result.append("Display Country: " + locale.getDisplayCountry() + "\n");
+            result.append("Localized Display Country: " + locale.getDisplayCountry(locale) + "\n");
             result.append("2-Letter Country Code: " + locale.getCountry() + "\n");
             result.append("3-Letter Country Code: " + locale.getISO3Country() + "\n");
             result.append('\n');
         }
         if (locale.getVariant().length() > 0) {
             result.append("Display Variant: " + locale.getDisplayVariant() + "\n");
+            result.append("Localized Display Variant: " + locale.getDisplayVariant(locale) + "\n");
             result.append("Variant Code: " + locale.getVariant() + "\n");
         }
         result.append('\n');
