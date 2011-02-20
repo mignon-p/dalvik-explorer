@@ -39,7 +39,7 @@ public class MailReportTask extends AsyncTask<Void, Void, String> implements Dia
     
     private String generateReport() {
         StringBuilder result = new StringBuilder();
-        appendReport(result, "Build/Device Details", BuildActivity.getBuildDetailsAsString());
+        appendReport(result, "Build/Device Details", BuildActivity.getBuildDetailsAsString(activity.getWindowManager()));
         appendReport(result, "Charsets", CharsetsActivity.describeCharsets());
         appendReport(result, "Environment Variables", EnvironmentVariablesActivity.getEnvironmentAsString());
         // FIXME: this doesn't scale well.
