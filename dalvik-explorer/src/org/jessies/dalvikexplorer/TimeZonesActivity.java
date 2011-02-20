@@ -3,8 +3,9 @@ package org.jessies.dalvikexplorer;
 import android.app.*;
 import android.content.*;
 import android.os.*;
-import android.widget.*;
+import android.util.*;
 import android.view.*;
+import android.widget.*;
 import java.util.*;
 
 public class TimeZonesActivity extends ListActivity {
@@ -26,7 +27,7 @@ public class TimeZonesActivity extends ListActivity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setListAdapter(new ArrayAdapter<TimeZoneListItem>(this, android.R.layout.simple_list_item_1, TIME_ZONES));
-        setTitle("Time Zones (" + TIME_ZONES.size() + ")");
+        setTitle("Time Zones (" + TIME_ZONES.size() + " / tzdata" +  TimeUtils.getTimeZoneDatabaseVersion() + ")");
         getListView().setTextFilterEnabled(true);
     }
     

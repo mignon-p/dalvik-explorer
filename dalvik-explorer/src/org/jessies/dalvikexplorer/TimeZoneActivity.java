@@ -3,6 +3,7 @@ package org.jessies.dalvikexplorer;
 import android.app.*;
 import android.content.*;
 import android.os.*;
+import android.util.*;
 import android.view.*;
 import android.widget.*;
 import java.util.*;
@@ -46,6 +47,9 @@ public class TimeZoneActivity extends TextViewActivity {
             result.append("DST Savings: " + timeZone.getDSTSavings()/1000/60 + " minutes\n");
             result.append("In DST Now: " + timeZone.inDaylightTime(new Date()) + "\n");
         }
+        result.append('\n');
+        
+        result.append("Source: tzdata" + TimeUtils.getTimeZoneDatabaseVersion() + "\n");
         
         return result.toString();
     }
