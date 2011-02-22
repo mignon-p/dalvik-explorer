@@ -25,7 +25,7 @@ public class LocalesActivity extends ListActivity {
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new ArrayAdapter<LocaleListItem>(this, android.R.layout.simple_list_item_1, LANGUAGES));
+        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, LANGUAGES));
         int languageCount = LANGUAGES.size() - 1; // Don't count the extra entry for the default locale.
         setTitle("Languages (" + languageCount + ")");
         getListView().setTextFilterEnabled(true);

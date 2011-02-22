@@ -37,7 +37,7 @@ public class DalvikExplorerActivity extends ListActivity {
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new ArrayAdapter<NamedActivity>(this, android.R.layout.simple_list_item_1, ACTIVITIES));
+        setListAdapter(new BetterArrayAdapter<NamedActivity>(this, ACTIVITIES));
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {

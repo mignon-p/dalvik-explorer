@@ -26,7 +26,7 @@ public class CharsetsActivity extends ListActivity {
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new ArrayAdapter<CharsetListItem>(this, android.R.layout.simple_list_item_1, CHARSETS));
+        setListAdapter(new BetterArrayAdapter<CharsetListItem>(this, CHARSETS));
         setTitle("Charsets (" + CHARSETS.size() + ")");
         getListView().setTextFilterEnabled(true);
     }

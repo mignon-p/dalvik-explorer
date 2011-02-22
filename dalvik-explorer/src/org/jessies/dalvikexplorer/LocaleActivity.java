@@ -134,10 +134,32 @@ public class LocaleActivity extends TextViewActivity {
         if (!englishFirstDayOfWeekString.equals(firstDayOfWeekString)) {
             result.append(" (" + englishFirstDayOfWeekString + ")");
         }
-        result.append("\n");
+        result.append('\n');
         result.append("Minimal Days in First Week: " + c.getMinimalDaysInFirstWeek() + "\n");
+        result.append('\n');
+        result.append('\n');
+        
+        result.append("Data Availability\n\n");
+        appendAvailability(result, locale, "BreakIterator", BreakIterator.class);
+        appendAvailability(result, locale, "Calendar", NumberFormat.class);
+        appendAvailability(result, locale, "Collator", Collator.class);
+        appendAvailability(result, locale, "DateFormat", DateFormat.class);
+        appendAvailability(result, locale, "DateFormatSymbols", DateFormatSymbols.class);
+        appendAvailability(result, locale, "DecimalFormatSymbols", DecimalFormatSymbols.class);
+        appendAvailability(result, locale, "NumberFormat", NumberFormat.class);
         
         return result.toString();
+    }
+    
+    private static void appendAvailability(StringBuilder result, Locale locale, String name, Class<?> c) {
+        String state = "unknown";
+        try {
+            Locale[] locales = (Locale[]) c.getMethod("getAvailableLocales").invoke(null);
+            state = Arrays.asList(locales).contains(locale) ? "present" : "missing";
+        } catch (Exception ex) {
+            // DateFormatSymbols.getAvailableLocales and DecimalFormatSymbols.getAvailableLocales weren't added until Java 6.
+        }
+        result.append(name + ": " + state + "\n");
     }
     
     private static final String[] ENGLISH_WEEKDAYS = new String[] { "invalid", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };

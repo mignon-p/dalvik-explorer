@@ -27,7 +27,7 @@ public class LocaleCountriesActivity extends ListActivity {
         
         String languageCode = getIntent().getStringExtra("org.jessies.dalvikexplorer.Language");
         List<LocaleListItem> locales = gatherLocales(languageCode);
-        setListAdapter(new ArrayAdapter<LocaleListItem>(this, android.R.layout.simple_list_item_1, locales));
+        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, locales));
         setTitle(new Locale(languageCode).getDisplayLanguage() + " Locales (" + locales.size() + ")");
         getListView().setTextFilterEnabled(true);
     }
