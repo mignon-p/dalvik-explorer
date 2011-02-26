@@ -1,16 +1,16 @@
 #!/bin/bash -x
 
 ASDK_ROOT=~/Downloads/android-sdk-linux
-ASDK_PLATFORM_ROOT=${ASDK_ROOT}/platforms/android-1.6
+MIN_ANDROID_RELEASE=1.6
 JAVA_ROOT=/usr/bin #JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
 
 
 # Various Android tools.
-AAPT=${ASDK_PLATFORM_ROOT}/tools/aapt
+AAPT=${ASDK_ROOT}/platform-tools/aapt
 ADB=${ASDK_ROOT}/platform-tools/adb
 APKBUILDER=${ASDK_ROOT}/tools/apkbuilder
-DX=${ASDK_PLATFORM_ROOT}/tools/dx
+DX=${ASDK_ROOT}/platform-tools/dx
 ZIPALIGN=${ASDK_ROOT}/tools/zipalign
 
 # Various JDK tools.
@@ -18,10 +18,11 @@ JAVAC=${JAVA_ROOT}/javac
 JARSIGNER=${JAVA_ROOT}/jarsigner
 
 # The Android class library.
-ANDROID_JAR=${ASDK_PLATFORM_ROOT}/android.jar
+ANDROID_JAR=${ASDK_ROOT}/platforms/android-${MIN_ANDROID_RELEASE}/android.jar
 
 # Find out what we're building from the manifest.
 APP_NAME=`sed -n 's/.*name="app_name">\(.*\)<.*/\1/ p' res/values/strings.xml | sed 's/[ ]//'`
+APP_PACKAGE=`sed -n 's/.*package="\([^"]*\)".*/\1/ p' AndroidManifest.xml`
 APP_VERSION=`sed -n 's/.*android:versionName="\(.*\)".*/\1/ p' AndroidManifest.xml`
 
 # javac options.
@@ -107,6 +108,7 @@ if [ "$target" == "debug" ]; then
   # FIXME: does debug always imply install, or should they be two separate targets?
   # FIXME: you might want to choose a destination
   echo "-- Installing apk..."
+  #${ADB} shell pm uninstall -k ${APP_PACKAGE} || exit 1
   ${ADB} install -r ${apkbuilder_out} || exit 1
   # That's the end of the line for "debug"...
   exit 0
