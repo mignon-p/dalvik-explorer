@@ -27,7 +27,7 @@ public class TimeZonesActivity extends ListActivity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, TIME_ZONES));
-        setTitle("Time Zones (" + TIME_ZONES.size() + " / tzdata" +  TimeUtils.getTimeZoneDatabaseVersion() + ")");
+        setTitle("Time Zones (" + TIME_ZONES.size() + ")");
         getListView().setTextFilterEnabled(true);
     }
     
