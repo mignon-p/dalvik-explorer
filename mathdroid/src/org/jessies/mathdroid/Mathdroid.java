@@ -67,8 +67,15 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
         });
         queryView.requestFocus();
-        // Prevent the soft keyboard from appearing until the user presses our keyboard button.
-        queryView.setInputType(InputType.TYPE_NULL);
+
+        final View onScreenKeyboard = findViewById(R.id.on_screen_keyboard);
+        if (onScreenKeyboard != null) {
+            // Prevent the soft keyboard from appearing until the user presses our keyboard button.
+            queryView.setInputType(InputType.TYPE_NULL);
+        } else {
+            // We don't have our own keyboard, so bring up the system one right away.
+            showSoftKeyboard(queryView);
+        }
         
         initButtonMap();
         
@@ -107,7 +114,9 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         // Show our on-screen keyboard if there's no physical keyboard currently available, and hide it when there is.
         final boolean keyboardHidden = (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES);
         final View onScreenKeyboard = findViewById(R.id.on_screen_keyboard);
-        onScreenKeyboard.setVisibility(keyboardHidden ? View.VISIBLE : View.GONE);
+        if (onScreenKeyboard != null) {
+            onScreenKeyboard.setVisibility(keyboardHidden ? View.VISIBLE : View.GONE);
+        }
     }
     
     private void initButtonClickListener(int id) {
