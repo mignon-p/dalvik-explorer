@@ -2,6 +2,7 @@
 
 ASDK_ROOT=~/Downloads/android-sdk-linux
 MIN_ANDROID_RELEASE=1.6
+MAX_ANDROID_RELEASE=11
 JAVA_ROOT=/usr/bin #JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
 
@@ -18,7 +19,8 @@ JAVAC=${JAVA_ROOT}/javac
 JARSIGNER=${JAVA_ROOT}/jarsigner
 
 # The Android class library.
-ANDROID_JAR=${ASDK_ROOT}/platforms/android-${MIN_ANDROID_RELEASE}/android.jar
+ANDROID_CLASSES_JAR=${ASDK_ROOT}/platforms/android-${MIN_ANDROID_RELEASE}/android.jar
+ANDROID_RESOURCES_JAR=${ASDK_ROOT}/platforms/android-${MAX_ANDROID_RELEASE}/android.jar
 
 # Find out what we're building from the manifest.
 APP_NAME=`sed -n 's/.*name="app_name">\(.*\)<.*/\1/ p' res/values/strings.xml | sed 's/[ ]//'`
@@ -28,7 +30,7 @@ APP_VERSION=`sed -n 's/.*android:versionName="\(.*\)".*/\1/ p' AndroidManifest.x
 # javac options.
 JAVAC_FLAGS="-d .generated/classes/"
 JAVAC_FLAGS="${JAVAC_FLAGS} -sourcepath src/"
-JAVAC_FLAGS="${JAVAC_FLAGS} -bootclasspath ${ANDROID_JAR}"
+JAVAC_FLAGS="${JAVAC_FLAGS} -bootclasspath ${ANDROID_CLASSES_JAR}"
 JAVAC_FLAGS="${JAVAC_FLAGS} -g"
 # Turn on warnings.
 JAVAC_FLAGS="${JAVAC_FLAGS} -deprecation"
@@ -70,7 +72,7 @@ fi
 
 echo "-- Generating R.java and Manifest.java from resources..."
 mkdir -p gen
-${AAPT} package -m -J gen -M AndroidManifest.xml -S res -I ${ANDROID_JAR} || exit 1
+${AAPT} package -m -J gen -M AndroidManifest.xml -S res -I ${ANDROID_RESOURCES_JAR} || exit 1
 
 # FIXME: add aidl support
 
@@ -90,7 +92,7 @@ assets="" # An assets directory is optional.
 if [ -d assets ]; then
   assets="-A assets"
 fi
-${AAPT} package -f -M AndroidManifest.xml ${assets} -S res -I ${ANDROID_JAR} -F ${aapt_out} || exit 1
+${AAPT} package -f -M AndroidManifest.xml ${assets} -S res -I ${ANDROID_RESOURCES_JAR} -F ${aapt_out} || exit 1
 
 echo "-- Creating ${target} apk..."
 if [ "$target" == "release" ]; then

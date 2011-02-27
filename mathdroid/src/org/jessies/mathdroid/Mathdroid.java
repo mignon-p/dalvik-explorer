@@ -22,11 +22,6 @@ import org.jessies.calc.UnitsConverter;
 public class Mathdroid extends Activity implements AdapterView.OnItemClickListener, CalculatorPlotter, TextView.OnEditorActionListener, View.OnClickListener {
     private static final String TAG = "Mathdroid";
     
-    // Constants identifying the options menu items.
-    private static final int OPTIONS_MENU_CLEAR = 0;
-    private static final int OPTIONS_MENU_HELP  = 1;
-    private static final int OPTIONS_MENU_SETTINGS  = 2;
-    
     // Constants for the transcript context menu items.
     private static final int CONTEXT_MENU_RETYPE_SELECTED = 0;
     private static final int CONTEXT_MENU_COPY_SELECTED = 1;
@@ -178,21 +173,19 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     }
     
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, OPTIONS_MENU_CLEAR, 0, "Clear").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-        menu.add(0, OPTIONS_MENU_HELP,  0, "Help").setIcon(android.R.drawable.ic_menu_help);
-        menu.add(0, OPTIONS_MENU_SETTINGS, 0, "Settings").setIcon(android.R.drawable.ic_menu_preferences);
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.options, menu);
+        return true;
     }
     
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case OPTIONS_MENU_CLEAR:
+        case R.id.menu_clear:
             clear((EditText) findViewById(R.id.q));
             return true;
-        case OPTIONS_MENU_HELP:
+        case R.id.menu_help:
             showHelp();
             return true;
-        case OPTIONS_MENU_SETTINGS:
+        case R.id.menu_settings:
             showSettings();
             return true;
         default:
