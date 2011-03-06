@@ -1,7 +1,12 @@
 #!/bin/bash -x
 
-ASDK_ROOT=~/Downloads/android-sdk-linux
-MIN_ANDROID_RELEASE=1.6
+if [ "$(uname)" == "Darwin" ]; then
+  os=mac_x86
+else
+  os=linux
+fi
+ASDK_ROOT=~/Downloads/android-sdk-${os}
+MIN_ANDROID_RELEASE=4
 MAX_ANDROID_RELEASE=11
 JAVA_ROOT=/usr/bin #JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
