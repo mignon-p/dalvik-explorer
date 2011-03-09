@@ -29,8 +29,11 @@ public abstract class TextViewActivity extends Activity {
     }
     
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.options, menu);
-        Compatibility.get().configureSearchView(this, menu);
+        // We don't currently have any fallback text searching pre-honeycomb.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            getMenuInflater().inflate(R.menu.options, menu);
+            Compatibility.get().configureSearchView(this, menu);
+        }
         return true;
     }
     
