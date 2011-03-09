@@ -8,7 +8,7 @@ import android.view.*;
 import android.widget.*;
 import java.util.*;
 
-public class TimeZonesActivity extends ListActivity {
+public class TimeZonesActivity extends BetterListActivity {
     private static class TimeZoneListItem {
         private final TimeZone timeZone;
         private TimeZoneListItem(TimeZone timeZone) {
@@ -28,7 +28,6 @@ public class TimeZonesActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, TIME_ZONES));
         setTitle("Time Zones (" + TIME_ZONES.size() + ")");
-        getListView().setTextFilterEnabled(true);
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {

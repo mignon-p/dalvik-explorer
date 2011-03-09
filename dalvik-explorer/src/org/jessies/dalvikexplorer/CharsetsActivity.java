@@ -8,7 +8,7 @@ import android.widget.*;
 import java.nio.charset.*;
 import java.util.*;
 
-public class CharsetsActivity extends ListActivity {
+public class CharsetsActivity extends BetterListActivity {
     private static class CharsetListItem {
         private final Charset charset;
         private CharsetListItem(Charset charset) {
@@ -28,7 +28,6 @@ public class CharsetsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setListAdapter(new BetterArrayAdapter<CharsetListItem>(this, CHARSETS));
         setTitle("Charsets (" + CHARSETS.size() + ")");
-        getListView().setTextFilterEnabled(true);
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {

@@ -7,7 +7,7 @@ import android.widget.*;
 import android.view.*;
 import java.util.*;
 
-public class LocaleCountriesActivity extends ListActivity {
+public class LocaleCountriesActivity extends BetterListActivity {
     private static class LocaleListItem {
         private final Locale locale;
         private LocaleListItem(Locale locale) {
@@ -29,7 +29,6 @@ public class LocaleCountriesActivity extends ListActivity {
         List<LocaleListItem> locales = gatherLocales(languageCode);
         setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, locales));
         setTitle(new Locale(languageCode).getDisplayLanguage() + " Locales (" + locales.size() + ")");
-        getListView().setTextFilterEnabled(true);
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {

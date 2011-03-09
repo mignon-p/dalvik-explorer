@@ -8,7 +8,7 @@ import android.widget.*;
 import java.io.*;
 import java.util.*;
 
-public class FileSystemActivity extends ListActivity {
+public class FileSystemActivity extends BetterListActivity {
     private static class FileListItem {
         private final File file;
         private final String label;
@@ -38,7 +38,6 @@ public class FileSystemActivity extends ListActivity {
         
         setListAdapter(new BetterArrayAdapter<FileListItem>(this, directoryItems(path)));
         setTitle(path + " (" + getListAdapter().getCount() + ")");
-        getListView().setTextFilterEnabled(true);
     }
     
     private List<FileListItem> directoryItems(String path) {

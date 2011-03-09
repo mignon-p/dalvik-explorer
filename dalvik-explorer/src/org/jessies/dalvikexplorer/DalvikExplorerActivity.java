@@ -8,10 +8,6 @@ import android.view.*;
 import android.widget.*;
 
 public class DalvikExplorerActivity extends ListActivity {
-    // Constants identifying the options menu items.
-    private static final int OPTIONS_MENU_SEND = 0;
-    private static final int OPTIONS_MENU_HELP = 1;
-    
     // A (list view label, activity class) pair.
     private static class NamedActivity {
         private final String name;
@@ -45,25 +41,7 @@ public class DalvikExplorerActivity extends ListActivity {
         startActivity(new Intent(this, destinationActivity.activityClass));
     }
     
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, OPTIONS_MENU_SEND, 0, "Mail Report").setIcon(android.R.drawable.ic_menu_send);
-        menu.add(0, OPTIONS_MENU_HELP, 0, "Help").setIcon(android.R.drawable.ic_menu_help);
-        return super.onCreateOptionsMenu(menu);
-    }
-    
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case OPTIONS_MENU_SEND:
-            new MailReportTask(this).execute();
-            return true;
-        case OPTIONS_MENU_HELP:
-            showHelp();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-    
+    // TODO: currently unused; wire up to help menu.
     private void showHelp() {
         final Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("http://code.google.com/p/enh/wiki/DalvikExplorer"));

@@ -7,7 +7,7 @@ import android.widget.*;
 import android.view.*;
 import java.util.*;
 
-public class LocalesActivity extends ListActivity {
+public class LocalesActivity extends BetterListActivity {
     private static class LocaleListItem {
         private final Locale locale;
         private LocaleListItem(Locale locale) {
@@ -28,7 +28,6 @@ public class LocalesActivity extends ListActivity {
         setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, LANGUAGES));
         int languageCount = LANGUAGES.size() - 1; // Don't count the extra entry for the default locale.
         setTitle("Languages (" + languageCount + ")");
-        getListView().setTextFilterEnabled(true);
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
