@@ -4,6 +4,8 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.text.ClipboardManager;
+import android.text.*;
+import android.text.style.*;
 import android.view.*;
 import android.widget.*;
 
@@ -22,8 +24,14 @@ public abstract class TextViewActivity extends Activity {
         registerForContextMenu(textView);
         
         final String extraValue = getExtraValue();
-        textView.setText(content(extraValue));
+        textView.setText(content(extraValue), TextView.BufferType.SPANNABLE);
         setTitle(title(extraValue));
+    }
+    
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.options, menu);
+        Compatibility.get().configureSearchView(this, menu);
+        return true;
     }
     
     protected String extraName() {
@@ -73,5 +81,30 @@ public abstract class TextViewActivity extends Activity {
         intent.putExtra(Intent.EXTRA_TEXT, content);
         startActivity(intent);
         return true;
+    }
+    
+    public void setSearchString(String needle) {
+        clearSearch();
+        if (needle.length() == 0) {
+            return;
+        }
+        final TextView textView = (TextView) findViewById(R.id.output);
+        Spannable spannable = (Spannable) textView.getText();
+        String haystack = spannable.toString();
+        for (int index = 0; index != -1; ) {
+            index = haystack.indexOf(needle, index);
+            if (index != -1) {
+                spannable.setSpan(new BackgroundColorSpan(0xff337733), index, index + needle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                index += needle.length();
+            }
+        }
+    }
+    
+    public void clearSearch() {
+        final TextView textView = (TextView) findViewById(R.id.output);
+        SpannableString spannable = (SpannableString) textView.getText();
+        for (Object o : spannable.getSpans(0, spannable.length() - 1, BackgroundColorSpan.class)) {
+            spannable.removeSpan(o);
+        }
     }
 }

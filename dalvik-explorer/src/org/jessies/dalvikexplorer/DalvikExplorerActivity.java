@@ -40,11 +40,4 @@ public class DalvikExplorerActivity extends ListActivity {
         final NamedActivity destinationActivity = ACTIVITIES[position];
         startActivity(new Intent(this, destinationActivity.activityClass));
     }
-    
-    // TODO: currently unused; wire up to help menu.
-    private void showHelp() {
-        final Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("http://code.google.com/p/enh/wiki/DalvikExplorer"));
-        startActivity(intent);
-    }
 }
