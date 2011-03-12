@@ -26,15 +26,35 @@ public abstract class TextViewActivity extends Activity {
         final String extraValue = getExtraValue();
         textView.setText(content(extraValue), TextView.BufferType.SPANNABLE);
         setTitle(title(extraValue));
+        
+        final EditText searchView = (EditText) findViewById(R.id.search);
+        searchView.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                setSearchString(s.toString());
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        });
     }
     
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        // We don't currently have any fallback text searching pre-honeycomb.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            getMenuInflater().inflate(R.menu.options, menu);
-            Compatibility.get().configureSearchView(this, menu);
-        }
+        getMenuInflater().inflate(R.menu.options, menu);
+        Compatibility.get().configureSearchView(this, menu);
         return true;
+    }
+    
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.menu_search:
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+                final EditText searchView = (EditText) findViewById(R.id.search);
+                searchView.setVisibility(View.VISIBLE);
+                searchView.requestFocus();
+            }
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
     
     protected String extraName() {
