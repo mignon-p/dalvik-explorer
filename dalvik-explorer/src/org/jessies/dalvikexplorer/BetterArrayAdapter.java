@@ -137,120 +137,6 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
         init(context, android.R.layout.simple_list_item_1, 0, objects);
     }
     
-    /**
-     * Adds the specified object at the end of the array.
-     * 
-     * @param object The object to add at the end of the array.
-     */
-    public void add(T object) {
-        if (mOriginalValues != null) {
-            synchronized (mLock) {
-                mOriginalValues.add(object);
-                if (mNotifyOnChange) notifyDataSetChanged();
-            }
-        } else {
-            mObjects.add(object);
-            if (mNotifyOnChange) notifyDataSetChanged();
-        }
-    }
-    
-    /**
-     * Adds the specified Collection at the end of the array.
-     * 
-     * @param collection The Collection to add at the end of the array.
-     */
-    public void addAll(Collection<? extends T> collection) {
-        if (mOriginalValues != null) {
-            synchronized (mLock) {
-                mOriginalValues.addAll(collection);
-                if (mNotifyOnChange) notifyDataSetChanged();
-            }
-        } else {
-            mObjects.addAll(collection);
-            if (mNotifyOnChange) notifyDataSetChanged();
-        }
-    }
-    
-    /**
-     * Adds the specified items at the end of the array.
-     * 
-     * @param items The items to add at the end of the array.
-     */
-    public void addAll(T ... items) {
-        if (mOriginalValues != null) {
-            synchronized (mLock) {
-                for (T item : items) {
-                    mOriginalValues.add(item);
-                }
-                if (mNotifyOnChange) notifyDataSetChanged();
-            }
-        } else {
-            for (T item : items) {
-                mObjects.add(item);
-            }
-            if (mNotifyOnChange) notifyDataSetChanged();
-        }
-    }
-    
-    /**
-     * Inserts the specified object at the specified index in the array.
-     * 
-     * @param object The object to insert into the array.
-     * @param index The index at which the object must be inserted.
-     */
-    public void insert(T object, int index) {
-        if (mOriginalValues != null) {
-            synchronized (mLock) {
-                mOriginalValues.add(index, object);
-                if (mNotifyOnChange) notifyDataSetChanged();
-            }
-        } else {
-            mObjects.add(index, object);
-            if (mNotifyOnChange) notifyDataSetChanged();
-        }
-    }
-    
-    /**
-     * Removes the specified object from the array.
-     * 
-     * @param object The object to remove.
-     */
-    public void remove(T object) {
-        if (mOriginalValues != null) {
-            synchronized (mLock) {
-                mOriginalValues.remove(object);
-            }
-        } else {
-            mObjects.remove(object);
-        }
-        if (mNotifyOnChange) notifyDataSetChanged();
-    }
-    
-    /**
-     * Remove all elements from the list.
-     */
-    public void clear() {
-        if (mOriginalValues != null) {
-            synchronized (mLock) {
-                mOriginalValues.clear();
-            }
-        } else {
-            mObjects.clear();
-        }
-        if (mNotifyOnChange) notifyDataSetChanged();
-    }
-    
-    /**
-     * Sorts the content of this adapter using the specified comparator.
-     * 
-     * @param comparator The comparator used to sort the objects contained
-     *        in this adapter.
-     */
-    public void sort(Comparator<? super T> comparator) {
-        Collections.sort(mObjects, comparator);
-        if (mNotifyOnChange) notifyDataSetChanged();
-    }
-    
     @Override public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
         mNotifyOnChange = true;
@@ -319,8 +205,7 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
         return createViewFromResource(position, convertView, parent, mResource);
     }
     
-    private View createViewFromResource(int position, View convertView, ViewGroup parent,
-    int resource) {
+    private View createViewFromResource(int position, View convertView, ViewGroup parent, int resource) {
         View view;
         TextView text;
         
@@ -340,114 +225,112 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
             }
         } catch (ClassCastException e) {
             Log.e("BetterArrayAdapter", "You must supply a resource ID for a TextView");
-            throw new IllegalStateException(
-                "BetterArrayAdapter requires the resource ID to be a TextView", e);
+            throw new IllegalStateException( "BetterArrayAdapter requires the resource ID to be a TextView", e);
+        }
+        
+        T item = getItem(position);
+        if (item instanceof CharSequence) {
+            text.setText((CharSequence)item);
+        } else {
+            text.setText(item.toString());
+        }
+        
+        return view;
+    }
+    
+    /**
+     * <p>Sets the layout resource to create the drop down views.</p>
+     * 
+     * @param resource the layout resource defining the drop down views
+     * @see #getDropDownView(int, android.view.View, android.view.ViewGroup)
+     */
+    public void setDropDownViewResource(int resource) {
+        this.mDropDownResource = resource;
+    }
+    
+    @Override public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return createViewFromResource(position, convertView, parent, mDropDownResource);
+    }
+    
+    public Filter getFilter() {
+        if (mFilter == null) {
+            mFilter = new ArrayFilter();
+        }
+        return mFilter;
+    }
+    
+    /**
+     * <p>An array filter constrains the content of the array adapter with
+     * a prefix. Each item that does not start with the supplied prefix
+     * is removed from the list.</p>
+     */
+    private class ArrayFilter extends Filter {
+        @Override protected FilterResults performFiltering(CharSequence prefix) {
+            FilterResults results = new FilterResults();
+            
+            if (mOriginalValues == null) {
+                synchronized (mLock) {
+                    mOriginalValues = new ArrayList<T>(mObjects);
+                }
             }
             
-            T item = getItem(position);
-            if (item instanceof CharSequence) {
-                text.setText((CharSequence)item);
+            if (prefix == null || prefix.length() == 0) {
+                synchronized (mLock) {
+                    ArrayList<T> list = new ArrayList<T>(mOriginalValues);
+                    results.values = list;
+                    results.count = list.size();
+                }
             } else {
-                text.setText(item.toString());
+                String needle = prefix.toString().toLowerCase();
+                
+                final ArrayList<T> values = mOriginalValues;
+                final int count = values.size();
+                
+                final ArrayList<T> newValues = new ArrayList<T>(count);
+                
+                for (int i = 0; i < count; i++) {
+                    final T value = values.get(i);
+                    final String valueText = value.toString().toLowerCase();
+                    
+                    // TODO: factor this out into a protected performFiltering method on the adapter. or maybe an enum PREFIX, SUBSTRING, REGEX (all with smart casing)?
+                    if (valueText.indexOf(needle) != -1) {
+                        newValues.add(value);
+                    }
+                    
+                    /*
+                     * // First match against the whole, non-splitted value
+                     * if (valueText.startsWith(needle)) {
+                     *     newValues.add(value);
+                     * } else {
+                     *     final String[] words = valueText.split(" ");
+                     *     final int wordCount = words.length;
+                     * 
+                     *     for (int k = 0; k < wordCount; k++) {
+                     *         if (words[k].startsWith(needle)) {
+                     *             newValues.add(value);
+                     *             break;
+                     *         }
+                     *     }
+                     * }
+                     */
+                }
+                
+                results.values = newValues;
+                results.count = newValues.size();
             }
             
-            return view;
+            return results;
         }
         
-        /**
-         * <p>Sets the layout resource to create the drop down views.</p>
-         * 
-         * @param resource the layout resource defining the drop down views
-         * @see #getDropDownView(int, android.view.View, android.view.ViewGroup)
-         */
-        public void setDropDownViewResource(int resource) {
-            this.mDropDownResource = resource;
-        }
-        
-        @Override public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            return createViewFromResource(position, convertView, parent, mDropDownResource);
-        }
-        
-        public Filter getFilter() {
-            if (mFilter == null) {
-                mFilter = new ArrayFilter();
-            }
-            return mFilter;
-        }
-        
-        /**
-         * <p>An array filter constrains the content of the array adapter with
-         * a prefix. Each item that does not start with the supplied prefix
-         * is removed from the list.</p>
-         */
-        private class ArrayFilter extends Filter {
-            @Override protected FilterResults performFiltering(CharSequence prefix) {
-                FilterResults results = new FilterResults();
-                
-                if (mOriginalValues == null) {
-                    synchronized (mLock) {
-                        mOriginalValues = new ArrayList<T>(mObjects);
-                    }
-                }
-                
-                if (prefix == null || prefix.length() == 0) {
-                    synchronized (mLock) {
-                        ArrayList<T> list = new ArrayList<T>(mOriginalValues);
-                        results.values = list;
-                        results.count = list.size();
-                    }
-                } else {
-                    String needle = prefix.toString().toLowerCase();
-                    
-                    final ArrayList<T> values = mOriginalValues;
-                    final int count = values.size();
-                    
-                    final ArrayList<T> newValues = new ArrayList<T>(count);
-                    
-                    for (int i = 0; i < count; i++) {
-                        final T value = values.get(i);
-                        final String valueText = value.toString().toLowerCase();
-                        
-                        // TODO: factor this out into a protected performFiltering method on the adapter. or maybe an enum PREFIX, SUBSTRING, REGEX?
-                        if (valueText.indexOf(needle) != -1) {
-                            newValues.add(value);
-                        }
-                        
-                        /*
-                        // First match against the whole, non-splitted value
-                        if (valueText.startsWith(needle)) {
-                            newValues.add(value);
-                        } else {
-                            final String[] words = valueText.split(" ");
-                            final int wordCount = words.length;
-                            
-                            for (int k = 0; k < wordCount; k++) {
-                                if (words[k].startsWith(needle)) {
-                                    newValues.add(value);
-                                    break;
-                                }
-                            }
-                        }
-                        */
-                    }
-                    
-                    results.values = newValues;
-                    results.count = newValues.size();
-                }
-                
-                return results;
-            }
-            
-            @Override protected void publishResults(CharSequence constraint, FilterResults results) {
-                @SuppressWarnings("unchecked")
-                List<T> typedValues = (List<T>) results.values;
-                mObjects = typedValues;
-                if (results.count > 0) {
-                    notifyDataSetChanged();
-                } else {
-                    notifyDataSetInvalidated();
-                }
+        @Override protected void publishResults(CharSequence constraint, FilterResults results) {
+            @SuppressWarnings("unchecked")
+            List<T> typedValues = (List<T>) results.values;
+            mObjects = typedValues;
+            if (results.count > 0) {
+                notifyDataSetChanged();
+            } else {
+                notifyDataSetInvalidated();
             }
         }
     }
-    
+}
