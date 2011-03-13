@@ -8,31 +8,18 @@ import android.view.*;
 import java.util.*;
 
 public class LocalesActivity extends BetterListActivity {
-    private static class LocaleListItem {
-        private final Locale locale;
-        private LocaleListItem(Locale locale) {
-            this.locale = locale;
-        }
-        @Override public String toString() {
-            String result = locale.toString();
-            if (locale.equals(Locale.getDefault())) {
-                result += " (default)";
-            }
-            return result;
-        }
-    }
     private static final List<LocaleListItem> LANGUAGES = gatherLanguages();
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, LANGUAGES));
+        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, LANGUAGES, LocaleListItem.class, "toSubtitle"));
         int languageCount = LANGUAGES.size() - 1; // Don't count the extra entry for the default locale.
         setTitle("Languages (" + languageCount + ")");
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
         final LocaleListItem item = (LocaleListItem) l.getAdapter().getItem(position);
-        String languageName = item.locale.toString();
+        String languageName = item.locale().toString();
         final Intent intent;
         if (languageName.contains("_")) {
             intent = new Intent(this, LocaleActivity.class);
@@ -60,15 +47,5 @@ public class LocalesActivity extends BetterListActivity {
             result.add(new LocaleListItem(new Locale(language)));
         }
         return result;
-    }
-    
-    static String describeLocales() {
-        StringBuilder result = new StringBuilder();
-        for (LocaleListItem item : gatherLanguages()) {
-            if (Thread.currentThread().isInterrupted()) return null;
-            result.append(LocaleActivity.describeLocale(item.locale.toString()));
-            result.append('\n');
-        }
-        return result.toString();
     }
 }

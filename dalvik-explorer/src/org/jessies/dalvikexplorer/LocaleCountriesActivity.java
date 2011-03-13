@@ -7,34 +7,20 @@ import android.widget.*;
 import android.view.*;
 import java.util.*;
 
-public class LocaleCountriesActivity extends BetterListActivity {
-    private static class LocaleListItem {
-        private final Locale locale;
-        private LocaleListItem(Locale locale) {
-            this.locale = locale;
-        }
-        @Override public String toString() {
-            String result = locale.toString();
-            if (locale.equals(Locale.getDefault())) {
-                result += " (default)";
-            }
-            return result;
-        }
-    }
-    
+public class LocaleCountriesActivity extends BetterListActivity {    
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         String languageCode = getIntent().getStringExtra("org.jessies.dalvikexplorer.Language");
         List<LocaleListItem> locales = gatherLocales(languageCode);
-        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, locales));
+        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, locales, LocaleListItem.class, "toSubtitle"));
         setTitle(new Locale(languageCode).getDisplayLanguage() + " Locales (" + locales.size() + ")");
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
         final Intent intent = new Intent(this, LocaleActivity.class);
         final LocaleListItem item = (LocaleListItem) l.getAdapter().getItem(position);
-        intent.putExtra("org.jessies.dalvikexplorer.Locale", item.locale.toString());
+        intent.putExtra("org.jessies.dalvikexplorer.Locale", item.locale().toString());
         startActivity(intent);
     }
     

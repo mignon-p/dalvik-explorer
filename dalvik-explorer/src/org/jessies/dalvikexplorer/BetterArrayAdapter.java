@@ -20,7 +20,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
-
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -66,11 +66,9 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
     private int mDropDownResource;
     
     /**
-     * If the inflated resource is not a TextView, {@link #mFieldId} is used to find
-     * a TextView inside the inflated views hierarchy. This field must contain the
-     * identifier that matches the one defined in the resource file.
+     * If non-null, the method to invoke to get the subtitle for a 2-line view.
      */
-    private int mFieldId = 0;
+    private Method mSubtitleMethod;
     
     /**
      * Indicates whether or not {@link #notifyDataSetChanged()} must be called whenever
@@ -92,7 +90,22 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
      * @param objects The objects to represent in the ListView.
      */
     public BetterArrayAdapter(Context context, List<T> objects) {
-        init(context, android.R.layout.simple_list_item_1, 0, objects);
+        init(context, android.R.layout.simple_list_item_1, objects, null);
+    }
+    
+    /**
+     * Constructor
+     * 
+     * @param context The current context.
+     * @param objects The objects to represent in the ListView.
+     */
+    public BetterArrayAdapter(Context context, List<T> objects, Class<?> klass, String subtitleMethodName) {
+        try {
+            Method subtitleMethod = klass.getMethod(subtitleMethodName);
+            init(context, android.R.layout.simple_list_item_2, objects, subtitleMethod);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
     
     @Override public void notifyDataSetChanged() {
@@ -118,12 +131,12 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
         mNotifyOnChange = notifyOnChange;
     }
     
-    private void init(Context context, int resource, int textViewResourceId, List<T> objects) {
+    private void init(Context context, int resource, List<T> objects, Method subtitleMethod) {
         mContext = context;
         mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = mDropDownResource = resource;
         mObjects = objects;
-        mFieldId = textViewResourceId;
+        mSubtitleMethod = subtitleMethod;
     }
     
     /**
@@ -165,34 +178,28 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
     
     private View createViewFromResource(int position, View convertView, ViewGroup parent, int resource) {
         View view;
-        TextView text;
-        
         if (convertView == null) {
             view = mInflater.inflate(resource, parent, false);
         } else {
             view = convertView;
         }
         
-        try {
-            if (mFieldId == 0) {
-                //  If no custom field is assigned, assume the whole resource is a TextView
-                text = (TextView) view;
-            } else {
-                //  Otherwise, find the TextView field within the layout
-                text = (TextView) view.findViewById(mFieldId);
-            }
-        } catch (ClassCastException e) {
-            Log.e("BetterArrayAdapter", "You must supply a resource ID for a TextView");
-            throw new IllegalStateException( "BetterArrayAdapter requires the resource ID to be a TextView", e);
-        }
-        
         T item = getItem(position);
-        if (item instanceof CharSequence) {
-            text.setText((CharSequence)item);
-        } else {
-            text.setText(item.toString());
-        }
-        
+        try {
+            if (mSubtitleMethod == null) {
+                // simple_list_item_1
+                TextView text = (TextView) view;
+                text.setText(item.toString());
+            } else {
+                // simple_list_item_2
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+                text1.setText(item.toString());
+                text2.setText(mSubtitleMethod.invoke(item).toString());
+            }
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }        
         return view;
     }
     
