@@ -89,48 +89,6 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
      * Constructor
      * 
      * @param context The current context.
-     */
-    public BetterArrayAdapter(Context context) {
-        init(context, android.R.layout.simple_list_item_1, 0, new ArrayList<T>());
-    }
-    
-    /**
-     * Constructor
-     * 
-     * @param context The current context.
-     * @param resource The resource ID for a layout file containing a layout to use when
-     *                 instantiating views.
-     */
-    public BetterArrayAdapter(Context context, int resource) {
-        init(context, resource, android.R.layout.simple_list_item_1, new ArrayList<T>());
-    }
-    
-    /**
-     * Constructor
-     * 
-     * @param context The current context.
-     * @param objects The objects to represent in the ListView.
-     */
-    public BetterArrayAdapter(Context context, T[] objects) {
-        init(context, android.R.layout.simple_list_item_1, 0, Arrays.asList(objects));
-    }
-    
-    /**
-     * Constructor
-     * 
-     * @param context The current context.
-     * @param resource The resource ID for a layout file containing a layout to use when
-     *                 instantiating views.
-     * @param objects The objects to represent in the ListView.
-     */
-    public BetterArrayAdapter(Context context, int resource, T[] objects) {
-        init(context, resource, android.R.layout.simple_list_item_1, Arrays.asList(objects));
-    }
-    
-    /**
-     * Constructor
-     * 
-     * @param context The current context.
      * @param objects The objects to represent in the ListView.
      */
     public BetterArrayAdapter(Context context, List<T> objects) {

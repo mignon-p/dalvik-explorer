@@ -6,6 +6,7 @@ import android.net.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+import java.util.*;
 
 public class DalvikExplorerActivity extends ListActivity {
     // A (list view label, activity class) pair.
@@ -33,7 +34,7 @@ public class DalvikExplorerActivity extends ListActivity {
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new BetterArrayAdapter<NamedActivity>(this, ACTIVITIES));
+        setListAdapter(new BetterArrayAdapter<NamedActivity>(this, Arrays.asList(ACTIVITIES)));
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
