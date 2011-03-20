@@ -279,8 +279,9 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         }
     }
     
+    @SuppressWarnings("deprecation") // Honeycomb replaces the text-only ClipboardManager.
     private boolean copyToClipboard(String text) {
-        final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        final android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         clipboard.setText(text);
         return true;
     }

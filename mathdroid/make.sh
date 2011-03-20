@@ -6,7 +6,7 @@ else
   os=linux
 fi
 ASDK_ROOT=~/Downloads/android-sdk-${os}
-MIN_ANDROID_RELEASE=4
+MIN_ANDROID_RELEASE=11
 MAX_ANDROID_RELEASE=11
 JAVA_ROOT=/usr/bin #JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
