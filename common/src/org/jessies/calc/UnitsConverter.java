@@ -19,7 +19,6 @@ package org.jessies.calc;
  */
 
 import java.util.regex.*;
-import org.jessies.test.*;
 
 public class UnitsConverter {
     
@@ -92,54 +91,5 @@ public class UnitsConverter {
         final double value = (smallUnitsPerBigUnit * Double.parseDouble(bigValue)) + Double.parseDouble(smallValue);
         // FIXME: choose an appropriate SI prefix and precision based on the input.
         return String.format("%.2f %s", toMetric * value, metricUnit);
-    }
-    
-    @Test private static void testTemperatureConversion() {
-        Assert.equals(convert("0C"), "32.0 F");
-        Assert.equals(convert("-40C"), "-40.0 F");
-        Assert.equals(convert("100C"), "212.0 F");
-        Assert.equals(convert("100.0C"), "212.0 F");
-        Assert.equals(convert("100 C"), "212.0 F");
-        Assert.equals(convert("100.0 C"), "212.0 F");
-        Assert.equals(convert("32 F"), "0.0 C");
-        Assert.equals(convert("78F"), "25.6 C");
-    }
-    
-    @Test private static void testImperialLengthConversion() {
-        Assert.equals(convert("13.3\""), "0.34 m");
-        Assert.equals(convert("13.3 \""), "0.34 m");
-        Assert.equals(convert("13.3 in"), "0.34 m");
-        Assert.equals(convert("13.3 inch"), "0.34 m");
-        Assert.equals(convert("13.3 inches"), "0.34 m");
-        
-        Assert.equals(convert("6 '"), "1.83 m");
-        Assert.equals(convert("6 foot"), "1.83 m");
-        Assert.equals(convert("6 feet"), "1.83 m");
-        Assert.equals(convert("6 ft"), "1.83 m");
-        Assert.equals(convert("6 ft 0 in"), "1.83 m");
-        
-        Assert.equals(convert("5'4\""), "1.63 m");
-        Assert.equals(convert("5' 4\""), "1.63 m");
-        Assert.equals(convert("5 ' 4\""), "1.63 m");
-        Assert.equals(convert("5 ' 4 \""), "1.63 m");
-        Assert.equals(convert("5 feet 4 inches"), "1.63 m");
-        Assert.equals(convert("5feet 4inches"), "1.63 m");
-        Assert.equals(convert("5feet4inches"), "1.63 m");
-        Assert.equals(convert("5ft 4in"), "1.63 m");
-        Assert.equals(convert("5 ft 4 in"), "1.63 m");
-    }
-    
-    @Test private static void testImperialWeightConversion() {
-        Assert.equals(convert("5.0 pound"), "2.27 kg");
-        Assert.equals(convert("5.0pound"), "2.27 kg");
-        Assert.equals(convert("5.0 pounds"), "2.27 kg");
-        Assert.equals(convert("5.0pounds"), "2.27 kg");
-        Assert.equals(convert("5 lb"), "2.27 kg");
-        Assert.equals(convert("5lb"), "2.27 kg");
-        Assert.equals(convert("5 lbs"), "2.27 kg");
-        Assert.equals(convert("5lbs"), "2.27 kg");
-        
-        Assert.equals(convert("1.3 ounces"), "0.04 kg");
-        Assert.equals(convert("1.3 oz"), "0.04 kg");
     }
 }

@@ -20,7 +20,6 @@ package org.jessies.calc;
 
 import java.math.*;
 //import org.jessies.calc.bigint.*;
-import org.jessies.test.*;
 
 public class RationalNode implements Comparable<RationalNode>, NumberNode {
     private final IntegerNode p;
@@ -211,18 +210,5 @@ public class RationalNode implements Comparable<RationalNode>, NumberNode {
     
     @Override public String toString() {
         return "(" + p.toString() + "/" + q.toString() + ")";
-    }
-    
-    @Test private static void testRationalArithmetic() {
-        // A rational that can represented as an integer will be.
-        Assert.equals(makeRational(2, 1), IntegerNode.valueOf(2));
-        // Rationals are stored in their simplest form, so 6/8 will be 3/4.
-        RationalNode r = (RationalNode) makeRational(6, 8);
-        Assert.equals(r.numerator(), IntegerNode.valueOf(3));
-        Assert.equals(r.denominator(), IntegerNode.valueOf(4));
-    }
-    
-    @TestHelper private static NumberNode makeRational(long numerator, long denominator) {
-        return RationalNode.valueOf(IntegerNode.valueOf(numerator), IntegerNode.valueOf(denominator));
     }
 }

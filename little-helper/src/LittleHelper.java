@@ -30,7 +30,6 @@ import java.util.regex.*;
 import javax.imageio.*;
 import javax.swing.*;
 import org.jessies.calc.*;
-import org.jessies.test.*;
 
 /**
  * Yet another attempt at the whole Google onebox/Mac OS Spotlight/GNOME Deskbar genre.
