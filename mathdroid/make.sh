@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash #-x
 
 if [ "$(uname)" == "Darwin" ]; then
   os=mac_x86
@@ -52,7 +52,7 @@ JAVAC_FLAGS="${JAVAC_FLAGS} -encoding UTF-8"
 
 
 function usage() {
-    echo "usage: $0 [clean|debug|release]" > /dev/stderr
+    echo "usage: $0 [clean|debug|release|test]" > /dev/stderr
     exit 1
 }
 
@@ -61,7 +61,7 @@ if [ $# -eq "0" ]; then
     target=debug
 elif [ $# -eq "1" ]; then
     target=$1
-    if [[ "$target" != "clean" && "$target" != "debug" && "$target" != "release" ]]; then
+    if [[ "$target" != "clean" && "$target" != "debug" && "$target" != "release" && "$target" != "test" ]]; then
         usage
     fi
 else
@@ -82,10 +82,17 @@ ${AAPT} package -m -J gen -M AndroidManifest.xml -S res -I ${ANDROID_RESOURCES_J
 # FIXME: add aidl support
 
 echo "-- Compiling Java source..."
-JAVA_SOURCE_FILES=`find src gen -type f -name "*.java"`
+JAVA_SOURCE_FILES=`find -L src gen -type f -name "*.java"`
 rm -rf .generated/classes && \
   mkdir -p .generated/classes && \
   ${JAVAC} ${JAVAC_FLAGS} ${JAVA_SOURCE_FILES} || exit 1
+
+if [ "$target" == "test" ]; then
+  echo "-- Running tests..."
+  tests=`find -L src -name "*Test.java" | sed 's/\//./g' | sed 's/^src.//' | sed 's/\.java$//'`
+  vogar --no-ansi --no-stream --mode jvm --classpath .generated/classes $tests || exit 1
+  exit 0
+fi
 
 echo "-- Building classes.dex..."
 dex_out=.generated/classes.dex
