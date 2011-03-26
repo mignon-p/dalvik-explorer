@@ -11,9 +11,11 @@ import java.util.*;
 public class TimeZonesActivity extends BetterListActivity {
     private static class TimeZoneListItem {
         private final TimeZone timeZone;
+        
         private TimeZoneListItem(TimeZone timeZone) {
             this.timeZone = timeZone;
         }
+        
         @Override public String toString() {
             String result = timeZone.getID();
             if (timeZone.equals(TimeZone.getDefault())) {
@@ -21,12 +23,22 @@ public class TimeZonesActivity extends BetterListActivity {
             }
             return result;
         }
+        
+        public String toSubtitle() {
+            int rawOffsetMinutes = timeZone.getRawOffset()/1000/60;
+            String result = String.format(Locale.US, "UTC%+03d:%02d", rawOffsetMinutes / 60, Math.abs(rawOffsetMinutes % 60));
+            if (timeZone.useDaylightTime()) {
+                result += String.format(Locale.US, " (DST %+d minutes)", timeZone.getDSTSavings()/1000/60);
+            }
+            return result;
+        }
     }
+    
     private static final List<TimeZoneListItem> TIME_ZONES = gatherTimeZones();
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, TIME_ZONES));
+        setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, TIME_ZONES, TimeZoneListItem.class, "toSubtitle"));
         setTitle("Time Zones (" + TIME_ZONES.size() + ")");
     }
     

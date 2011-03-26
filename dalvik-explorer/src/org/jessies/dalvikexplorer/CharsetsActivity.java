@@ -9,24 +9,40 @@ import java.nio.charset.*;
 import java.util.*;
 
 public class CharsetsActivity extends BetterListActivity {
-    private static class CharsetListItem {
+    private static class CharsetListItem implements Comparable<CharsetListItem> {
+        private final String alias;
         private final Charset charset;
-        private CharsetListItem(Charset charset) {
+        
+        private CharsetListItem(String alias, Charset charset) {
+            this.alias = alias;
             this.charset = charset;
         }
+        
+        public int compareTo(CharsetListItem o) {
+            return String.CASE_INSENSITIVE_ORDER.compare(alias, o.alias);
+        }
+        
         @Override public String toString() {
-            String result = charset.displayName();
-            if (charset.equals(Charset.defaultCharset())) {
+            String result = alias;
+            if (alias.equals(Charset.defaultCharset().name())) {
                 result += " (default)";
             }
             return result;
+        }
+        
+        public String toSubtitle() {
+            String canonicalName = charset.name();
+            if (alias.equals(canonicalName)) {
+                return "";
+            }
+            return "Alias for " + canonicalName;
         }
     }
     private static final List<CharsetListItem> CHARSETS = gatherCharsets();
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new BetterArrayAdapter<CharsetListItem>(this, CHARSETS));
+        setListAdapter(new BetterArrayAdapter<CharsetListItem>(this, CHARSETS, CharsetListItem.class, "toSubtitle"));
         setTitle("Charsets (" + CHARSETS.size() + ")");
     }
     
@@ -38,18 +54,30 @@ public class CharsetsActivity extends BetterListActivity {
     }
     
     private static List<CharsetListItem> gatherCharsets() {
-        final SortedMap<String, Charset> charsets = Charset.availableCharsets();
-        final Charset defaultCharset = Charset.defaultCharset();
-        // Put the default charset at the top of the list...
-        final List<CharsetListItem> result = new ArrayList<CharsetListItem>(charsets.size());
-        result.add(new CharsetListItem(defaultCharset));
-        // ...followed by all the others.
-        for (String name : charsets.keySet()) {
-            final Charset charset = charsets.get(name);
-            if (!charset.equals(defaultCharset)) {
-                result.add(new CharsetListItem(charset));
+        // Collect the canonical charsets...
+        final List<CharsetListItem> canonicalCharsets = new ArrayList<CharsetListItem>();
+        for (Charset charset : Charset.availableCharsets().values()) {
+            canonicalCharsets.add(new CharsetListItem(charset.name(), charset));
+        }
+        Collections.sort(canonicalCharsets);
+        
+        // ...and their aliases.
+        final List<CharsetListItem> aliases = new ArrayList<CharsetListItem>();
+        for (Charset charset : Charset.availableCharsets().values()) {
+            for (String alias : charset.aliases()) {
+                if (!Charset.forName(alias).name().equals(alias)) {
+                    aliases.add(new CharsetListItem(alias, charset));
+                }
             }
         }
+        Collections.sort(aliases);
+        
+        // Stitch everything together. Default first, then canonical, then the rest.
+        final List<CharsetListItem> result = new ArrayList<CharsetListItem>();
+        final Charset defaultCharset = Charset.defaultCharset();
+        result.add(0, new CharsetListItem(defaultCharset.name(), defaultCharset));
+        result.addAll(canonicalCharsets);
+        result.addAll(aliases);
         return result;
     }
     
