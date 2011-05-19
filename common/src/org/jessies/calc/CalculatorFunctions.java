@@ -75,6 +75,14 @@ public class CalculatorFunctions {
         return BooleanNode.TRUE;
     }
     
+    private static IntegerNode toInteger(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof IntegerNode) {
+            return (IntegerNode) node;
+        }
+        throw expected(function, "integer");
+    }
+    
     private static ListNode toList(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof ListNode) {
@@ -103,11 +111,15 @@ public class CalculatorFunctions {
         throw new CalculatorError("'" + function + "' expected " + type + " argument");
     }
     
-    private static int toBase(IntegerNode base) {
-        if (base.compareTo(IntegerNode.valueOf(2)) < 0 || base.compareTo(IntegerNode.valueOf(36)) > 0) {
-            throw new CalculatorError("base must be between 2 and 36");
+    private static int toBase(Node baseNode) {
+        if (!(baseNode instanceof IntegerNode)) {
+            throw new CalculatorError("base must be an integer between 2 and 36");
         }
-        return base.intValue();
+        int base = ((IntegerNode) baseNode).intValue();
+        if (base < 2 || base > 36) {
+            throw new CalculatorError("base must be an integer between 2 and 36");
+        }
+        return base;
     }
     
     // Returns [rowCount, columnCount], or null if 'node' is not a matrix.
@@ -435,13 +447,15 @@ public class CalculatorFunctions {
     
     // DigitCount(n, base) - returns the number of instances of each digit in the given base representation of 'n'.
     // base defaults to 10
-    public static class DigitCount extends CalculatorFunctionII {
+    public static class DigitCount extends CalculatorFunction {
         public DigitCount() {
-            super("DigitCount", IntegerNode.valueOf(10));
+            super("DigitCount", 1, 2);
         }
         
-        public Node apply(Calculator environment, IntegerNode n, IntegerNode bigBase) {
-            final int base = toBase(bigBase);
+        public Node apply(Calculator environment) {
+            final IntegerNode n = toInteger(name(), environment, arg(environment, 0));
+            final int base = toBase(args.size() == 2 ? arg(environment, 1) : IntegerNode.valueOf(10));
+            
             final String rep = n.toString(base);
             int[] counts = new int[base];
             for (int i = 0; i < rep.length(); ++i) {
@@ -599,14 +613,16 @@ public class CalculatorFunctions {
         }
     }
     
-    // Returns the number of decimal digits in the given integer.
-    public static class IntegerLength extends CalculatorFunctionII {
+    // Returns the number of decimal digits in the given integer. (n, base=10)
+    public static class IntegerLength extends CalculatorFunction {
         public IntegerLength() {
-            super("IntegerLength", IntegerNode.valueOf(10));
+            super("IntegerLength", 1, 2);
         }
         
-        public Node apply(Calculator environment, IntegerNode n, IntegerNode base) {
-            return IntegerNode.valueOf(n.abs().toString(toBase(base)).length());
+        public Node apply(Calculator environment) {
+            final IntegerNode n = toInteger(name(), environment, arg(environment, 0));
+            final int base = toBase(args.size() == 2 ? arg(environment, 1) : IntegerNode.valueOf(10));
+            return IntegerNode.valueOf(n.abs().toString(base).length());
         }
     }
     

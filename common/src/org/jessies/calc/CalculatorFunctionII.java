@@ -22,26 +22,18 @@ package org.jessies.calc;
  * Superclass of all functions taking two integer arguments.
  */
 public abstract class CalculatorFunctionII extends CalculatorFunction {
-    private final IntegerNode defaultRhs;
-    
     public CalculatorFunctionII(String name) {
         super(name, 2);
-        this.defaultRhs = null;
-    }
-    
-    public CalculatorFunctionII(String name, IntegerNode defaultRhs) {
-        super(name, 1, 2);
-        this.defaultRhs = defaultRhs;
     }
     
     public Node apply(Calculator environment) {
         Node lhs = arg(environment, 0);
-        Node rhs = args.size() == 2 ? arg(environment, 1) : defaultRhs;
+        Node rhs = arg(environment, 1);
         if (!(lhs instanceof IntegerNode) || !(rhs instanceof IntegerNode)) {
             if (isUnacceptable(lhs) || isUnacceptable(rhs)) {
                 throw new CalculatorError("'" + name() + "' requires two integer arguments");
             }
-            return args.size() == 2 ? bind(lhs, rhs) : bind(lhs);
+            return bind(lhs, rhs);
         }
         return apply(environment, (IntegerNode) lhs, (IntegerNode) rhs);
     }
