@@ -49,9 +49,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         
         // Hide the title bar if we're on a small screen and don't want to waste space.
         // We can't do this in the manifest because we want it conditional on screen size.
-        final int SCREENLAYOUT_SIZE_XLARGE = 4; // Not available until API 9.
-        boolean isTablet = (getResources().getConfiguration().screenLayout & SCREENLAYOUT_SIZE_XLARGE) != 0;
-        if (!isTablet) {
+        if (!Compatibility.get().isTablet(this)) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
             // On a small screeen, we want the system keyboard to overlap ours, not cause resizing.
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
