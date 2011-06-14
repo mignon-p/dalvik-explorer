@@ -236,7 +236,9 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public NumberNode divide(NumberNode rhs) {
-        if (rhs instanceof RealNode) {
+        if (rhs instanceof BigRealNode) {
+            return toBigReal().divide(rhs);
+        } else if (rhs instanceof RealNode) {
             return toReal().divide(rhs);
         }
         
@@ -276,8 +278,8 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         return factorialHelper(n, twoM).multiply(factorialHelper(n.subtract(m), twoM));
     }
     
-    public RealNode fractionalPart() {
-        return RealNode.ZERO;
+    public NumberNode fractionalPart() {
+        return IntegerNode.ZERO;
     }
     
     public IntegerNode increment() {
@@ -326,7 +328,9 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public NumberNode plus(NumberNode rhs) {
-        if (rhs instanceof RealNode) {
+        if (rhs instanceof BigRealNode) {
+            return toBigReal().plus(rhs);
+        } else if (rhs instanceof RealNode) {
             return toReal().plus(rhs);
         }
         
@@ -347,7 +351,7 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public NumberNode power(NumberNode rhs) {
-        if (rhs instanceof RealNode || rhs.sign().compareTo(MINUS_ONE) == 0) {
+        if (rhs instanceof BigRealNode || rhs instanceof RealNode || rhs.sign().compareTo(MINUS_ONE) == 0) {
             return toReal().power(rhs);
         }
         // FIXME: special-case small enough fixnums?
@@ -377,7 +381,9 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public NumberNode subtract(NumberNode rhs) {
-        if (rhs instanceof RealNode) {
+        if (rhs instanceof BigRealNode) {
+            return toBigReal().subtract(rhs);
+        } else if (rhs instanceof RealNode) {
             return toReal().subtract(rhs);
         }
         
@@ -397,7 +403,9 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
     }
     
     public NumberNode times(NumberNode rhs) {
-        if (rhs instanceof RealNode) {
+        if (rhs instanceof BigRealNode) {
+            return toBigReal().times(rhs);
+        } else if (rhs instanceof RealNode) {
             return toReal().times(rhs);
         }
         
@@ -420,6 +428,10 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
                 return IntegerNode.valueOf(a*b);
             }
         }
+    }
+    
+    public BigRealNode toBigReal() {
+        return new BigRealNode(new BigDecimal(big()));
     }
     
     public RealNode toReal() {

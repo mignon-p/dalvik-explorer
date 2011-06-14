@@ -37,8 +37,8 @@ public class CalculatorFunctions {
     }
     
     private static int cmp(Calculator environment, List<Node> args) {
-        final NumberNode lhs = toNumber("cmp", environment, args.get(0));
-        final NumberNode rhs = toNumber("cmp", environment, args.get(1));
+        final NumberNode lhs = CalculatorFunction.toNumber("cmp", environment, args.get(0));
+        final NumberNode rhs = CalculatorFunction.toNumber("cmp", environment, args.get(1));
         return cmp(lhs, rhs);
     }
     
@@ -73,53 +73,6 @@ public class CalculatorFunctions {
             }
         }
         return BooleanNode.TRUE;
-    }
-    
-    private static IntegerNode toInteger(String function, Calculator environment, Node node) {
-        node = node.evaluate(environment);
-        if (node instanceof IntegerNode) {
-            return (IntegerNode) node;
-        }
-        throw expected(function, "integer");
-    }
-    
-    private static ListNode toList(String function, Calculator environment, Node node) {
-        node = node.evaluate(environment);
-        if (node instanceof ListNode) {
-            return (ListNode) node;
-        }
-        throw expected(function, "list");
-    }
-    
-    private static NumberNode toNumber(String function, Calculator environment, Node node) {
-        node = node.evaluate(environment);
-        if (node instanceof NumberNode) {
-            return (NumberNode) node;
-        }
-        throw expected(function, "numeric");
-    }
-    
-    private static CalculatorVariableNode toVariable(String function, Node node) {
-        // We don't evaluate 'node' because we don't want its value; we want it as a variable, and it may be bound.
-        if (node instanceof CalculatorVariableNode) {
-            return (CalculatorVariableNode) node;
-        }
-        throw expected(function, "variable name");
-    }
-    
-    public static CalculatorError expected(String function, String type) {
-        throw new CalculatorError("'" + function + "' expected " + type + " argument");
-    }
-    
-    private static int toBase(Node baseNode) {
-        if (!(baseNode instanceof IntegerNode)) {
-            throw new CalculatorError("base must be an integer between 2 and 36");
-        }
-        int base = ((IntegerNode) baseNode).intValue();
-        if (base < 2 || base > 36) {
-            throw new CalculatorError("base must be an integer between 2 and 36");
-        }
-        return base;
     }
     
     // Returns [rowCount, columnCount], or null if 'node' is not a matrix.
@@ -1092,8 +1045,8 @@ public class CalculatorFunctions {
     
     private static NumberNode series(Calculator environment, List<Node> args, IntegerNode initial, boolean isSum) {
         final Node expr = args.get(0);
-        NumberNode iMin = toNumber("series", environment, args.get(1));
-        NumberNode iMax = toNumber("series", environment, args.get(2));
+        NumberNode iMin = CalculatorFunction.toNumber("series", environment, args.get(1));
+        NumberNode iMax = CalculatorFunction.toNumber("series", environment, args.get(2));
         
         // Ensure we have two integers or two reals.
         if (iMin instanceof RealNode || iMax instanceof RealNode) {

@@ -27,20 +27,20 @@ public abstract class CalculatorFunctionII extends CalculatorFunction {
     }
     
     public Node apply(Calculator environment) {
-        Node lhs = arg(environment, 0);
-        Node rhs = arg(environment, 1);
-        if (!(lhs instanceof IntegerNode) || !(rhs instanceof IntegerNode)) {
-            if (isUnacceptable(lhs) || isUnacceptable(rhs)) {
-                throw new CalculatorError("'" + name() + "' requires two integer arguments");
-            }
-            return bind(lhs, rhs);
-        }
-        return apply(environment, (IntegerNode) lhs, (IntegerNode) rhs);
+        final IntegerNode lhs = toInteger(name(), environment, arg(environment, 0));
+        final IntegerNode rhs = toInteger(name(), environment, arg(environment, 1));
+//        if (!(lhs instanceof IntegerNode) || !(rhs instanceof IntegerNode)) {
+//            if (isUnacceptable(lhs) || isUnacceptable(rhs)) {
+//                throw new CalculatorError("'" + name() + "' requires two integer arguments");
+//            }
+//            return bind(lhs, rhs);
+//        }
+        return apply(environment, lhs, rhs);
     }
     
-    private boolean isUnacceptable(Node n) {
-        return (n instanceof BooleanNode) || (n instanceof ListNode) || (n instanceof NumberNode);
-    }
+//    private boolean isUnacceptable(Node n) {
+//        return (n instanceof BooleanNode) || (n instanceof ListNode) || (n instanceof NumberNode);
+//    }
     
     public abstract Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs);
 }

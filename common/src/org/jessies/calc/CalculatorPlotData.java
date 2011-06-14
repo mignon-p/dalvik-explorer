@@ -31,8 +31,8 @@ public class CalculatorPlotData {
     
     public CalculatorPlotData(int pixelWidth, RealNode xMin, RealNode xMax) {
         this.data = new double[pixelWidth];
-        this.xMin = (float) xMin.toDouble();
-        this.xMax = (float) xMax.toDouble();
+        this.xMin = (float) xMin.doubleValue();
+        this.xMax = (float) xMax.doubleValue();
         
         this.xRange = this.xMax - this.xMin;
     }

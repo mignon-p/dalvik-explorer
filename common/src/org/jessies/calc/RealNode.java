@@ -84,8 +84,18 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
         return new RealNode(Math.cosh(value));
     }
     
+    private static double rhsValue(NumberNode rhs) {
+        if (rhs instanceof RealNode) {
+            return ((RealNode) rhs).value;
+        } else if (rhs instanceof BigRealNode) {
+            return ((BigRealNode) rhs).doubleValue();
+        } else {
+            return ((IntegerNode) rhs).fix();
+        }
+    }
+    
     public NumberNode divide(NumberNode rhs) {
-        if (rhs instanceof IntegerNode) {
+        if (!(rhs instanceof RealNode)) {
             rhs = rhs.toReal();
         }
         return new RealNode(value/ ((RealNode) rhs).value);
@@ -156,14 +166,14 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public NumberNode plus(NumberNode rhs) {
-        if (rhs instanceof IntegerNode) {
+        if (!(rhs instanceof RealNode)) {
             rhs = rhs.toReal();
         }
         return new RealNode(value + ((RealNode) rhs).value);
     }
     
     public NumberNode power(NumberNode rhs) {
-        if (rhs instanceof IntegerNode) {
+        if (!(rhs instanceof RealNode)) {
             rhs = rhs.toReal();
         }
         return new RealNode(Math.pow(value, ((RealNode) rhs).value));
@@ -194,7 +204,7 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public NumberNode subtract(NumberNode rhs) {
-        if (rhs instanceof IntegerNode) {
+        if (!(rhs instanceof RealNode)) {
             rhs = rhs.toReal();
         }
         return new RealNode(value - ((RealNode) rhs).value);
@@ -209,13 +219,13 @@ public class RealNode implements Comparable<RealNode>, NumberNode {
     }
     
     public NumberNode times(NumberNode rhs) {
-        if (rhs instanceof IntegerNode) {
+        if (!(rhs instanceof RealNode)) {
             rhs = rhs.toReal();
         }
         return new RealNode(value * ((RealNode) rhs).value);
     }
     
-    public double toDouble() {
+    public double doubleValue() {
         return value;
     }
     

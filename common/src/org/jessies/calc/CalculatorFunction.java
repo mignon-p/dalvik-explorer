@@ -136,4 +136,59 @@ public abstract class CalculatorFunction implements Cloneable, Node {
     @Override public int hashCode() {
         throw new UnsupportedOperationException("hashing functions/function applications not yet supported");
     }
+    
+    public static CalculatorError expected(String function, String type) {
+        throw new CalculatorError("'" + function + "' expected " + type + " argument");
+    }
+    
+    public static BooleanNode toBoolean(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof BooleanNode) {
+            return (BooleanNode) node;
+        }
+        throw expected(function, "boolean");
+    }
+    
+    public static IntegerNode toInteger(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof IntegerNode) {
+            return (IntegerNode) node;
+        }
+        throw expected(function, "integer");
+    }
+    
+    public static ListNode toList(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof ListNode) {
+            return (ListNode) node;
+        }
+        throw expected(function, "list");
+    }
+    
+    public static NumberNode toNumber(String function, Calculator environment, Node node) {
+        node = node.evaluate(environment);
+        if (node instanceof NumberNode) {
+            return (NumberNode) node;
+        }
+        throw expected(function, "numeric");
+    }
+    
+    public static CalculatorVariableNode toVariable(String function, Node node) {
+        // We don't evaluate 'node' because we don't want its value; we want it as a variable, and it may be bound.
+        if (node instanceof CalculatorVariableNode) {
+            return (CalculatorVariableNode) node;
+        }
+        throw expected(function, "variable name");
+    }
+    
+    public static int toBase(Node baseNode) {
+        if (!(baseNode instanceof IntegerNode)) {
+            throw new CalculatorError("base must be an integer between 2 and 36");
+        }
+        int base = ((IntegerNode) baseNode).intValue();
+        if (base < 2 || base > 36) {
+            throw new CalculatorError("base must be an integer between 2 and 36");
+        }
+        return base;
+    }
 }

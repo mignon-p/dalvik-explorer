@@ -27,20 +27,22 @@ public abstract class CalculatorFunctionZZ extends CalculatorFunction {
     }
     
     public Node apply(Calculator environment) {
-        Node lhs = arg(environment, 0);
-        Node rhs = arg(environment, 1);
-        if (!(lhs instanceof BooleanNode) || !(rhs instanceof BooleanNode)) {
-            if (isUnacceptable(lhs) || isUnacceptable(rhs)) {
-                throw new CalculatorError("'" + name() + "' requires two boolean arguments");
-            }
-            return bind(lhs, rhs);
-        }
-        return apply(environment, (BooleanNode) lhs, (BooleanNode) rhs);
+        BooleanNode lhs = toBoolean(name(), environment, arg(environment, 0));
+        BooleanNode rhs = toBoolean(name(), environment, arg(environment, 1));
+//        Node lhs = arg(environment, 0);
+//        Node rhs = arg(environment, 1);
+//        if (!(lhs instanceof BooleanNode) || !(rhs instanceof BooleanNode)) {
+//            if (isUnacceptable(lhs) || isUnacceptable(rhs)) {
+//                throw new CalculatorError("'" + name() + "' requires two boolean arguments");
+//            }
+//            return bind(lhs, rhs);
+//        }
+        return apply(environment, lhs, rhs);
     }
     
-    private boolean isUnacceptable(Node n) {
-        return (n instanceof ListNode) || (n instanceof NumberNode);
-    }
+//    private boolean isUnacceptable(Node n) {
+//        return (n instanceof ListNode) || (n instanceof NumberNode);
+//    }
     
     public abstract Node apply(Calculator environment, BooleanNode lhs, BooleanNode rhs);
 }

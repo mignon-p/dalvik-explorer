@@ -26,15 +26,15 @@ public class CalculatorTest extends TestCase {
         assertEquals("1", new Calculator().evaluate("1"));
         assertEquals("-1", new Calculator().evaluate("-1"));
         assertEquals("1", new Calculator().evaluate("--1"));
-        assertEquals("1.0", new Calculator().evaluate("1.00"));
+        assertEquals("1.00", new Calculator().evaluate("1.00"));
         
         assertEquals("0.2", new Calculator().evaluate(".2"));
         
-        assertEquals("1200.0", new Calculator().evaluate("1.2E3"));
+        assertEquals("1200", new Calculator().evaluate("1.2E3"));
         assertEquals("1000", new Calculator().evaluate("1E3"));
         assertEquals("0.001", new Calculator().evaluate("1E-3"));
-        assertEquals("1000.0", new Calculator().evaluate("1.E3"));
-        assertEquals("100.0", new Calculator().evaluate(".1E3"));
+        assertEquals("1000", new Calculator().evaluate("1.E3"));
+        assertEquals("100", new Calculator().evaluate(".1E3"));
         
         assertEquals(new Calculator().evaluate("1.2E3"), new Calculator().evaluate("1.2e3"));
         
@@ -45,6 +45,10 @@ public class CalculatorTest extends TestCase {
         assertEquals("10000.001", new Calculator().evaluate("0.001+10000"));
         assertEquals("9999.999", new Calculator().evaluate("10000-0.001"));
         assertEquals("-9999.999", new Calculator().evaluate("0.001-10000"));
+        
+        // Check that we're doing decimal rather than binary arithmetic.
+        assertEquals("0.1587", new Calculator().evaluate("1-0.8413"));
+        assertEquals("131.2", new Calculator().evaluate("328*0.4"));
         
         assertEquals("12", new Calculator().evaluate("3*4"));
         assertEquals("-12", new Calculator().evaluate("-3*4"));
@@ -328,9 +332,9 @@ public class CalculatorTest extends TestCase {
         assertEquals("-2", new Calculator().evaluate("IntegerPart(-2)"));
         
         assertEquals("0.2", new Calculator().evaluate("FractionalPart(1.2)"));
-        assertEquals("0.0", new Calculator().evaluate("FractionalPart(1)"));
+        assertEquals("0", new Calculator().evaluate("FractionalPart(1)"));
         assertEquals("0.4", new Calculator().evaluate("FractionalPart(-2.4)"));
-        assertEquals("0.0", new Calculator().evaluate("FractionalPart(-2)"));
+        assertEquals("0", new Calculator().evaluate("FractionalPart(-2)"));
         
         assertEquals("1.2", new Calculator().evaluate("IntegerPart(1.2) + FractionalPart(1.2)"));
     }
@@ -366,7 +370,7 @@ public class CalculatorTest extends TestCase {
     
     public void testSum() {
         assertEquals("55", new Calculator().evaluate("Sum(i, 0, 10)"));
-        assertEquals("55.0", new Calculator().evaluate("Sum(i, 0, 10.2)"));
+        assertEquals("55", new Calculator().evaluate("Sum(i, 0, 10.2)"));
         assertEquals("385", new Calculator().evaluate("Sum(i^2, 0, 10)"));
         assertEquals(0.0, Double.valueOf(new Calculator().evaluate("Sum(1/i!, 0, 30)-e")), 0.000001);
         // FIXME: failure test for min > max.
@@ -383,7 +387,7 @@ public class CalculatorTest extends TestCase {
     
     public void testProduct() {
         assertEquals("3628800", new Calculator().evaluate("Product(i, 1, 10)"));
-        assertEquals("3628800.0", new Calculator().evaluate("Product(i, 1, 10.2)"));
+        assertEquals("3628800", new Calculator().evaluate("Product(i, 1, 10.2)"));
         assertEquals("518400", new Calculator().evaluate("Product(i^2, 1, 6)"));
         // FIXME: failure test for min > max.
     }

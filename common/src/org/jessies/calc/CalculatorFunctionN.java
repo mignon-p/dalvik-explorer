@@ -27,19 +27,20 @@ public abstract class CalculatorFunctionN extends CalculatorFunction {
     }
     
     public Node apply(Calculator environment) {
-        Node arg = arg(environment, 0);
-        if (!(arg instanceof NumberNode)) {
-            if (isUnacceptable(arg)) {
-                throw new CalculatorError("'" + name() + "' requires one numeric argument");
-            }
-            return bind(arg);
-        }
-        return apply(environment, (NumberNode) arg);
+        NumberNode arg = toNumber(name(), environment, arg(environment, 0));
+//        Node arg = arg(environment, 0);
+//        if (!(arg instanceof NumberNode)) {
+//            if (isUnacceptable(arg)) {
+//                throw new CalculatorError("'" + name() + "' requires one numeric argument");
+//            }
+//            return bind(arg);
+//        }
+        return apply(environment, arg);
     }
     
-    private boolean isUnacceptable(Node n) {
-        return (n instanceof BooleanNode) || (n instanceof ListNode);
-    }
+//    private boolean isUnacceptable(Node n) {
+//        return (n instanceof BooleanNode) || (n instanceof ListNode);
+//    }
     
     public abstract Node apply(Calculator environment, NumberNode arg);
 }

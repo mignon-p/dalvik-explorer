@@ -277,7 +277,7 @@ public class Calculator {
     public RealNode angleArgument(NumberNode n) {
         RealNode value = n.toReal();
         if (degreesMode) {
-            value = new RealNode(Math.toRadians(value.toDouble()));
+            value = new RealNode(Math.toRadians(value.doubleValue()));
         }
         return value;
     }
@@ -285,7 +285,7 @@ public class Calculator {
     public RealNode angleResult(NumberNode n) {
         RealNode value = n.toReal();
         if (degreesMode) {
-            value = new RealNode(Math.toDegrees(value.toDouble()));
+            value = new RealNode(Math.toDegrees(value.doubleValue()));
         }
         return value;
     }

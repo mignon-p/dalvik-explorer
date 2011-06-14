@@ -125,7 +125,7 @@ public class RationalNode implements Comparable<RationalNode>, NumberNode {
         return this;
     }
     
-    public RealNode fractionalPart() {
+    public NumberNode fractionalPart() {
         // FIXME: we could do better.
         return toReal().fractionalPart();
     }

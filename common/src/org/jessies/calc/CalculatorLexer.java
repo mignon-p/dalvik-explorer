@@ -157,7 +157,8 @@ public class CalculatorLexer {
                 }
                 
                 boolean engineering = (ch == 'E' || ch == 'e');
-                if (engineering && isReal) {
+                if (engineering) {
+                    isReal = true; // Because BigDecimal supports 'E' but BigInteger doesn't.
                     text.append('E');
                     ch = reader.read();
                     if (ch == '-' || ch == '+') {
@@ -169,32 +170,23 @@ public class CalculatorLexer {
                         ch = reader.read();
                     }
                 }
+                reader.unread(ch);
                 
                 if (isReal) {
-                    number = new RealNode(text.toString());
+                    BigDecimal bigDecimal = new BigDecimal(text.toString());
+                    if (engineering) {
+                        // Try to return numbers like 1.2E3 as integers.
+                        try {
+                            number = IntegerNode.valueOf(bigDecimal.toBigIntegerExact());
+                            return CalculatorToken.NUMBER;
+                        } catch (ArithmeticException ignored) {
+                            // Not an integer, so fall through to the real case...
+                        }
+                    }
+                    number = new BigRealNode(bigDecimal);
                 } else {
                     number = new IntegerNode(text.toString(), base);
                 }
-                
-                if (engineering && !isReal) {
-                    ch = reader.read(); // The 'E' we left hanging.
-                    final StringBuilder scaleText = new StringBuilder();
-                    if (ch == '-' || ch == '+') {
-                        scaleText.append((char) ch);
-                        ch = reader.read();
-                    }
-                    while (ch != EOF && (isValidDigit((char) ch, 10))) {
-                        scaleText.append((char) ch);
-                        ch = reader.read();
-                    }
-                    // FIXME: this gives poor results for negative scales.
-                    final IntegerNode scale = new IntegerNode(scaleText.toString(), 10);
-                    final NumberNode multiplier = IntegerNode.valueOf(10).power(scale);
-                    number = number.times(multiplier);
-                }
-                
-                reader.unread(ch);
-                
                 return CalculatorToken.NUMBER;
             } else if (isIdentifierStartCharacter(ch)) {
                 // Identifier.
