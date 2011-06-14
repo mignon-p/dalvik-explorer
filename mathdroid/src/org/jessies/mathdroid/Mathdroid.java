@@ -51,7 +51,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         // We can't do this in the manifest because we want it conditional on screen size.
         if (!Compatibility.get().isTablet(this)) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
-            // On a small screeen, we want the system keyboard to overlap ours, not cause resizing.
+            // On a small screen, we want the system keyboard to overlap ours, not cause resizing.
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         }
 
