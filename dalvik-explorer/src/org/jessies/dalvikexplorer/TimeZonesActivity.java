@@ -33,13 +33,22 @@ public class TimeZonesActivity extends BetterListActivity {
             return result;
         }
     }
-    
-    private static final List<TimeZoneListItem> TIME_ZONES = gatherTimeZones();
-    
+        
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, TIME_ZONES, TimeZoneListItem.class, "toSubtitle"));
-        setTitle("Time Zones (" + TIME_ZONES.size() + ")");
+        updateTimeZones();
+    }
+    
+    private void updateTimeZones() {
+        final List<TimeZoneListItem> timeZones = gatherTimeZones();
+        setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, timeZones, TimeZoneListItem.class, "toSubtitle"));
+        setTitle("Time Zones (" + timeZones.size() + ")");
+    }
+    
+    // The system's default time zone might have changed while we slept.
+    @Override protected void onResume() {
+        super.onResume();
+        updateTimeZones();
     }
     
     @Override protected void onListItemClick(ListView l, View v, int position, long id) {
