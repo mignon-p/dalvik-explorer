@@ -36,4 +36,16 @@ public class Utils {
         }
         return result.toString();
     }
+    
+    public static String offsetString(int ms, boolean showHours, boolean showMinutes) {
+        int minutes = ms/1000/60;
+        String result = "";
+        if (showHours) {
+            result += String.format(Locale.US, "%+03d:%02d", minutes / 60, Math.abs(minutes % 60));
+        }
+        if (showMinutes) {
+            result += String.format(Locale.US, "%s%+d minutes%s", showHours ? " (" : "", minutes, showHours ? ")" : "");
+        }
+        return result;
+    }
 }

@@ -25,10 +25,10 @@ public class TimeZonesActivity extends BetterListActivity {
         }
         
         public String toSubtitle() {
-            int rawOffsetMinutes = timeZone.getRawOffset()/1000/60;
-            String result = String.format(Locale.US, "UTC%+03d:%02d", rawOffsetMinutes / 60, Math.abs(rawOffsetMinutes % 60));
+            String result = "UTC" + Utils.offsetString(timeZone.getRawOffset(), true, false);
             if (timeZone.useDaylightTime()) {
-                result += String.format(Locale.US, " (DST %+d minutes)", timeZone.getDSTSavings()/1000/60);
+                result += " / DST " + Utils.offsetString(timeZone.getDSTSavings(), false, true);
+                //String.format(Locale.US, " / DST %+d minutes", timeZone.getDSTSavings()/1000/60);
             }
             return result;
         }

@@ -6,6 +6,7 @@ import android.os.*;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
+import java.text.*;
 import java.util.*;
 
 public class TimeZoneActivity extends TextViewActivity {
@@ -25,6 +26,8 @@ public class TimeZoneActivity extends TextViewActivity {
         final StringBuilder result = new StringBuilder();
         
         final TimeZone timeZone = TimeZone.getTimeZone(id);
+        final Date now = new Date();
+        final DateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss Z (EEEE)");
         
         result.append("Long Display Name: " + timeZone.getDisplayName(false, TimeZone.LONG) + "\n");
         if (timeZone.useDaylightTime()) {
@@ -38,14 +41,20 @@ public class TimeZoneActivity extends TextViewActivity {
         }
         result.append('\n');
         
-        result.append("Raw Offset: " + timeZone.getRawOffset()/1000/60 + " minutes\n");
-        result.append("Current Offset: " + timeZone.getOffset(System.currentTimeMillis())/1000/60 + " minutes\n");
+        iso8601.setTimeZone(TimeZone.getDefault());
+        result.append("Time Here: " + iso8601.format(now) + "\n");
+        iso8601.setTimeZone(timeZone);
+        result.append("Time There: " + iso8601.format(now) + "\n");
+        result.append('\n');
+        
+        result.append("Raw Offset: UTC" + Utils.offsetString(timeZone.getRawOffset(), true, true) + "\n");
+        result.append("Current Offset: UTC" + Utils.offsetString(timeZone.getOffset(System.currentTimeMillis()), true, true) + "\n");
         result.append('\n');
         
         result.append("Uses DST: " + timeZone.useDaylightTime() + "\n");
         if (timeZone.useDaylightTime()) {
-            result.append("DST Savings: " + timeZone.getDSTSavings()/1000/60 + " minutes\n");
-            result.append("In DST Now: " + timeZone.inDaylightTime(new Date()) + "\n");
+            result.append("DST Savings: " + Utils.offsetString(timeZone.getDSTSavings(), false, true) + "\n");
+            result.append("In DST Now: " + timeZone.inDaylightTime(now) + "\n");
         }
         result.append('\n');
         
