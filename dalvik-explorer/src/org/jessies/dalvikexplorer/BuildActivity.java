@@ -1,6 +1,7 @@
 package org.jessies.dalvikexplorer;
 
 import android.app.*;
+import android.content.pm.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -14,10 +15,10 @@ public class BuildActivity extends TextViewActivity {
     }
     
     protected CharSequence content(String unused) {
-        return getBuildDetailsAsString(getWindowManager());
+        return getBuildDetailsAsString(this, getWindowManager());
     }
     
-    static String getBuildDetailsAsString(WindowManager wm) {
+    static String getBuildDetailsAsString(Activity context, WindowManager wm) {
         final Build build = new Build();
         
         // These two fields were added to Build at API level 4 (Android 1.6).
@@ -51,6 +52,40 @@ public class BuildActivity extends TextViewActivity {
         double heightInches = metrics.heightPixels/metrics.ydpi;
         double diagonalInches = Math.sqrt(widthInches*widthInches + heightInches*heightInches);
         result.append(String.format("Approximate Dimensions: %.1f\" x %.1f\" (%.1f\" diagonal)\n", widthInches, heightInches, diagonalInches));
+        result.append('\n');
+        
+        result.append("Features:\n");
+        String openGlEsVersion = null;
+        for (FeatureInfo feature : context.getPackageManager().getSystemAvailableFeatures()) {
+            if (feature.name != null) {
+                result.append("  " + feature.name + "\n");
+            } else {
+                openGlEsVersion = feature.getGlEsVersion();
+            }
+        }
+        result.append('\n');
+        
+        if (openGlEsVersion != null) {
+            result.append("OpenGL ES version: " + openGlEsVersion + "\n");
+            result.append('\n');
+        }
+        
+        try {
+            Class<?> vmDebugClass = Class.forName("dalvik.system.VMDebug");
+            Method getVmFeatureListMethod = vmDebugClass.getDeclaredMethod("getVmFeatureList");
+            String[] features = (String[]) getVmFeatureListMethod.invoke(null);
+            result.append("DalvikVM features:\n");
+            for (String feature : features) {
+                result.append("  " + feature + "\n");
+            }
+            result.append('\n');
+        } catch (Throwable ignored) {
+        }
+        
+        result.append("Shared Java libraries:\n");
+        for (String library : context.getPackageManager().getSystemSharedLibraryNames()) {
+            result.append("  " + library + "\n");
+        }
         
         return result.toString();
     }
