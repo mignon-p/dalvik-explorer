@@ -6,6 +6,7 @@ import android.os.*;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
+import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -16,6 +17,34 @@ public class BuildActivity extends TextViewActivity {
     
     protected CharSequence content(String unused) {
         return getBuildDetailsAsString(this, getWindowManager());
+    }
+    
+    // sysconf _SC_PROCESSOR_CONF and _SC_PROCESSOR_ONLN were broken in bionic
+    // until mid-2010 (probably Honeycomb?), which broke Runtime.availableProcessors.
+    private static int countCores(boolean active) {
+        int count = 0;
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new FileReader(active ? "/proc/stat" : "/proc/cpuinfo"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (!active && line.startsWith("processor")) {
+                    ++count;
+                } else if (active && line.startsWith("cpu") && !line.startsWith("cpu ")) {
+                    ++count;
+                }
+            }
+            return count;
+        } catch (IOException ex) {
+            return -1;
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
     
     static String getBuildDetailsAsString(Activity context, WindowManager wm) {
@@ -32,7 +61,13 @@ public class BuildActivity extends TextViewActivity {
         result.append("Model: " + build.MODEL + "\n"); // "Droid"
         result.append('\n');
         result.append("CPU ABI: " + cpuAbi + "\n"); // "armeabi-v7a"
-        result.append("Cores: " + Runtime.getRuntime().availableProcessors() + "\n"); // 1
+        int hardwareCoreCount = countCores(false);
+        int enabledCoreCount = countCores(true);
+        String cores = Integer.toString(hardwareCoreCount);
+        if (enabledCoreCount != hardwareCoreCount) {
+            cores += " (enabled: " + enabledCoreCount + ")";
+        }
+        result.append("Cores: " +  cores + "\n"); // 1
         result.append('\n');
         result.append("Brand: " + build.BRAND + "\n"); // "verizon"
         result.append("Board: " + build.BOARD + "\n"); // "sholes"
