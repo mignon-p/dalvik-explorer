@@ -11,77 +11,17 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".BuildActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".CharsetsActivity" android:label="@string/charsets_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".CharsetActivity" android:label="@string/charset_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".EnvironmentVariablesActivity" android:label="@string/environment_variables_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".FileSystemActivity" android:label="@string/file_system_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".FileViewerActivity" android:label="@string/file_viewer_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".LocalesActivity" android:label="@string/locales_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".LocaleCountriesActivity" android:label="@string/locales_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".LocaleActivity" android:label="@string/locale_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".SystemPropertiesActivity" android:label="@string/system_properties_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".TimeZonesActivity" android:label="@string/time_zones_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".TimeZoneActivity" android:label="@string/time_zone_activity_title">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".BuildActivity" />
+        <activity android:name=".CharsetsActivity" />
+        <activity android:name=".CharsetActivity" />
+        <activity android:name=".EnvironmentVariablesActivity" />
+        <activity android:name=".FileSystemActivity" />
+        <activity android:name=".FileViewerActivity" />
+        <activity android:name=".LocalesActivity" />
+        <activity android:name=".LocaleCountriesActivity" />
+        <activity android:name=".LocaleActivity" />
+        <activity android:name=".SystemPropertiesActivity" />
+        <activity android:name=".TimeZonesActivity" />
+        <activity android:name=".TimeZoneActivity" />
     </application>
 </manifest> 
