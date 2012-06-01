@@ -2,6 +2,7 @@ package org.jessies.dalvikexplorer;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
+import java.io.*;
 import java.util.*;
 
 public class Utils {
@@ -59,5 +60,28 @@ public class Utils {
         } catch (NameNotFoundException ignored) {
         }
         return version;
+    }
+    
+    public static String readFile(String path) {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new FileReader(path));
+            String line;
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+                sb.append('\n');
+            }
+            return sb.toString();
+        } catch (IOException ex) {
+            return null;
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 }

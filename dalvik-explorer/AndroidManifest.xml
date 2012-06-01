@@ -14,6 +14,7 @@
         <activity android:name=".BuildActivity" />
         <activity android:name=".CharsetsActivity" />
         <activity android:name=".CharsetActivity" />
+        <activity android:name=".DeviceActivity" />
         <activity android:name=".EnvironmentVariablesActivity" />
         <activity android:name=".FileSystemActivity" />
         <activity android:name=".FileViewerActivity" />
