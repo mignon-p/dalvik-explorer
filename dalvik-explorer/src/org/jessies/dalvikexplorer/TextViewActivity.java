@@ -100,7 +100,7 @@ public abstract class TextViewActivity extends Activity {
     private boolean mail(CharSequence title, CharSequence content) {
         final Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Dalvik Explorer: " + title);
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Dalvik Explorer " + Utils.appVersion(this) + ": " + title);
         intent.putExtra(Intent.EXTRA_TEXT, content);
         startActivity(intent);
         return true;

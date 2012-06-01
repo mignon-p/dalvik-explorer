@@ -1,5 +1,7 @@
 package org.jessies.dalvikexplorer;
 
+import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import java.util.*;
 
 public class Utils {
@@ -47,5 +49,15 @@ public class Utils {
             result += String.format(Locale.US, "%s%+d minutes%s", showHours ? " (" : "", minutes, showHours ? ")" : "");
         }
         return result;
+    }
+    
+    public static String appVersion(Context context) {
+        String version = "unknown";
+        try {
+            String packageName = context.getPackageName();
+            version = context.getPackageManager().getPackageInfo(packageName, 0).versionName;
+        } catch (NameNotFoundException ignored) {
+        }
+        return version;
     }
 }

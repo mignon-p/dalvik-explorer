@@ -22,11 +22,11 @@ public class MailReportTask extends AsyncTask<Void, Void, String> implements Dia
         if (isCancelled()) {
             return;
         }
-        
+                
         final Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Dalvik Explorer report");
-        intent.putExtra(Intent.EXTRA_TEXT, report);
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Dalvik Explorer " + Utils.appVersion(activity) + " report");
+        intent.putExtra(Intent.EXTRA_TEXT, report); 
         activity.startActivity(intent);
     }
     
