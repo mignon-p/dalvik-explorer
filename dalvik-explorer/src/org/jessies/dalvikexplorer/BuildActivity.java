@@ -19,18 +19,30 @@ public class BuildActivity extends TextViewActivity {
         return getBuildDetailsAsString(this, getWindowManager());
     }
     
-    // sysconf _SC_PROCESSOR_CONF and _SC_PROCESSOR_ONLN were broken in bionic
-    // until mid-2010 (probably Honeycomb?), which broke Runtime.availableProcessors.
-    private static int countCores(boolean active) {
+    // sysconf _SC_NPROCESSORS_CONF and _SC_NPROCESSORS_ONLN have been broken
+    // in bionic for various different reasons. /proc parsing was broken until
+    // Gingerbread, and even then _SC_NPROCESSORS_CONF was broken because ARM
+    // kernels remove offline processors from both /proc/stat and /proc/cpuinfo
+    // unlike x86 ones; you need to look in /sys/devices/system/cpu to see all
+    // the processors. This should be fixed some time post-JB.
+    private static int countHardwareCores() {
+        int result = 0;
+        for (String file : new File("/sys/devices/system/cpu").list()) {
+            if (file.matches("cpu[0-9]+")) {
+                ++result;
+            }
+        }
+        return result;
+    }
+    
+    private static int countEnabledCores() {
         int count = 0;
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new FileReader(active ? "/proc/stat" : "/proc/cpuinfo"));
+            in = new BufferedReader(new FileReader("/proc/stat"));
             String line;
             while ((line = in.readLine()) != null) {
-                if (!active && line.startsWith("processor")) {
-                    ++count;
-                } else if (active && line.startsWith("cpu") && !line.startsWith("cpu ")) {
+                if (line.startsWith("cpu") && !line.startsWith("cpu ")) {
                     ++count;
                 }
             }
@@ -61,8 +73,8 @@ public class BuildActivity extends TextViewActivity {
         result.append("Model: " + build.MODEL + "\n"); // "Droid"
         result.append('\n');
         result.append("CPU ABI: " + cpuAbi + "\n"); // "armeabi-v7a"
-        int hardwareCoreCount = countCores(false);
-        int enabledCoreCount = countCores(true);
+        int hardwareCoreCount = countHardwareCores();
+        int enabledCoreCount = countEnabledCores();
         String cores = Integer.toString(hardwareCoreCount);
         if (enabledCoreCount != hardwareCoreCount) {
             cores += " (enabled: " + enabledCoreCount + ")";
