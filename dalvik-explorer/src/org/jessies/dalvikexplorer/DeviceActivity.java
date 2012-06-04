@@ -156,7 +156,7 @@ public class DeviceActivity extends TextViewActivity {
         String[] procCpuLines = Utils.readFile("/proc/cpuinfo").split("\n");
         String processor = valueForKey(procCpuLines, "Processor");
         if (processor == null) {
-            processor = valueForKey(procCpuLines, "model_name");
+            processor = valueForKey(procCpuLines, "model name");
         }
         result.append("Processor: " + processor + "\n");
         
@@ -170,11 +170,12 @@ public class DeviceActivity extends TextViewActivity {
         result.append('\n');
         String features = valueForKey(procCpuLines, "Features");
         if (features == null) {
-            features = valueForKey(procCpuLines, "flags");
+            features = valueForKey(procCpuLines, "flags\t");
         }
         result.append("Features: " + features + "\n");
         result.append('\n');
         
+        // ARM-specific.
         int implementer = numericValueForKey(procCpuLines, "CPU implementer");
         if (implementer != -1) {
             result.append("CPU Implementer: " + decodeImplementer(implementer) + "\n");
@@ -187,6 +188,15 @@ public class DeviceActivity extends TextViewActivity {
             result.append("Hardware: " + valueForKey(procCpuLines, "Hardware") + "\n");
             result.append("Revision: " + valueForKey(procCpuLines, "Revision") + "\n");
             result.append("Serial: " + valueForKey(procCpuLines, "Serial\t") + "\n");
+            result.append('\n');
+        }
+        
+        // Intel-specific.
+        String cacheSize = valueForKey(procCpuLines, "cache size");
+        String addressSizes = valueForKey(procCpuLines, "address sizes");
+        if (cache_size != null) {
+            result.append("Cache: " + cacheSize + "\n");
+            result.append("Address Sizes: " + addressSizes + "\n");
             result.append('\n');
         }
         
