@@ -1,4 +1,4 @@
-#!/bin/bash #-x
+#!/bin/bash
 
 if [ "$(uname)" == "Darwin" ]; then
   os=mac_x86
