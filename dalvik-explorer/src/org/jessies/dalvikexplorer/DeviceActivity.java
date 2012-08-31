@@ -194,7 +194,7 @@ public class DeviceActivity extends TextViewActivity {
         // Intel-specific.
         String cacheSize = valueForKey(procCpuLines, "cache size");
         String addressSizes = valueForKey(procCpuLines, "address sizes");
-        if (cache_size != null) {
+        if (cacheSize != null) {
             result.append("Cache: " + cacheSize + "\n");
             result.append("Address Sizes: " + addressSizes + "\n");
             result.append('\n');
