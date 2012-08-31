@@ -39,6 +39,18 @@ public class Utils {
         }
         return result.toString();
     }
+
+    // Original in salma-hayek "StringUtilities.java".
+    public static String join(CharSequence[] strings, CharSequence separator) {
+        StringBuilder result = new StringBuilder();
+        for (CharSequence string : strings) {
+            if (result.length() > 0) {
+                result.append(separator);
+            }
+            result.append(string);
+        }
+        return result.toString();
+    }
     
     public static String offsetString(int ms, boolean showHours, boolean showMinutes) {
         int minutes = ms/1000/60;

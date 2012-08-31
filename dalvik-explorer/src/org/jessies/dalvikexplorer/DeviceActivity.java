@@ -167,13 +167,16 @@ public class DeviceActivity extends TextViewActivity {
             cores += " (enabled: " + enabledCoreCount + ")";
         }
         result.append("Cores: " +  cores + "\n");
-        result.append('\n');
+
         String features = valueForKey(procCpuLines, "Features");
         if (features == null) {
             features = valueForKey(procCpuLines, "flags\t");
         }
-        result.append("Features: " + features + "\n");
+        String[] sortedFeatures = features.split(" ");
+        Arrays.sort(sortedFeatures, String.CASE_INSENSITIVE_ORDER);
+        result.append("Features: " + Utils.join(sortedFeatures, " ") + "\n");
         result.append('\n');
+
         
         // ARM-specific.
         int implementer = numericValueForKey(procCpuLines, "CPU implementer");
