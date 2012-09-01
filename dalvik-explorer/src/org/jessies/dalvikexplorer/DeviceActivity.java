@@ -9,6 +9,7 @@ import android.widget.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.*;
 
 public class DeviceActivity extends TextViewActivity {
     protected CharSequence title(String unused) {
@@ -60,13 +61,12 @@ public class DeviceActivity extends TextViewActivity {
     }
     
     private static String valueForKey(String[] lines, String key) {
-        String key1 = key + "\t: ";
-        String key2 = key + ": ";
+        // If you touch this, test on ARM, MIPS, and x86.
+        Pattern p = Pattern.compile("(?i)" + key + "\t*: (.*)");
         for (String line : lines) {
-            if (line.startsWith(key1)) {
-                return line.substring(key1.length());
-            } else if (line.startsWith(key2)) {
-                return line.substring(key2.length());
+            Matcher m = p.matcher(line);
+            if (m.matches()) {
+                return m.group(1);
             }
         }
         return null;
@@ -170,13 +170,12 @@ public class DeviceActivity extends TextViewActivity {
 
         String features = valueForKey(procCpuLines, "Features");
         if (features == null) {
-            features = valueForKey(procCpuLines, "flags\t");
+            features = valueForKey(procCpuLines, "flags");
         }
         String[] sortedFeatures = features.split(" ");
         Arrays.sort(sortedFeatures, String.CASE_INSENSITIVE_ORDER);
         result.append("Features: " + Utils.join(sortedFeatures, " ") + "\n");
         result.append('\n');
-
         
         // ARM-specific.
         int implementer = numericValueForKey(procCpuLines, "CPU implementer");
@@ -190,10 +189,22 @@ public class DeviceActivity extends TextViewActivity {
             result.append('\n');
             result.append("Hardware: " + valueForKey(procCpuLines, "Hardware") + "\n");
             result.append("Revision: " + valueForKey(procCpuLines, "Revision") + "\n");
-            result.append("Serial: " + valueForKey(procCpuLines, "Serial\t") + "\n");
+            result.append("Serial: " + valueForKey(procCpuLines, "Serial") + "\n");
             result.append('\n');
         }
-        
+
+        // MIPS-specific.
+        // TODO: is "CPU architecture" ever more specific than "MIPS"?
+        if ("MIPS".equals(valueForKey(procCpuLines, "CPU architecture"))) {
+            result.append("CPU Implementer: " + valueForKey(procCpuLines, "CPU implementer") + "\n");
+            result.append("CPU Model: " + valueForKey(procCpuLines, "cpu model") + "\n");
+            result.append('\n');
+            result.append("Hardware: " + valueForKey(procCpuLines, "Hardware") + "\n");
+            result.append("Revision: " + valueForKey(procCpuLines, "Revision") + "\n");
+            result.append("Serial: " + valueForKey(procCpuLines, "Serial") + "\n");
+            result.append('\n');
+        }
+
         // Intel-specific.
         String cacheSize = valueForKey(procCpuLines, "cache size");
         String addressSizes = valueForKey(procCpuLines, "address sizes");
