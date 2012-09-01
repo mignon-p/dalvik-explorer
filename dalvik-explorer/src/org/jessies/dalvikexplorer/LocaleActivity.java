@@ -138,6 +138,18 @@ public class LocaleActivity extends TextViewActivity {
         result.append("Minimal Days in First Week: " + c.getMinimalDaysInFirstWeek() + "\n");
         result.append('\n');
         result.append('\n');
+
+        // If this locale specifies a country, check out the currency.
+        // Languages don't have currencies; countries do.
+        if (!locale.getCountry().equals("")) {
+            result.append("Currency\n\n");
+            Currency currency = Currency.getInstance(locale);
+            result.append("ISO 4217 Currency Code: " + currency.getCurrencyCode() + "\n");
+            result.append("Currency Symbol: " + currency.getSymbol(locale) + " (" + currency.getSymbol(Locale.US) + ")\n");
+            result.append("Default Fraction Digits: " + currency.getDefaultFractionDigits() + "\n");
+            result.append('\n');
+            result.append('\n');
+        }
         
         result.append("Data Availability\n\n");
         appendAvailability(result, locale, "BreakIterator", BreakIterator.class);
