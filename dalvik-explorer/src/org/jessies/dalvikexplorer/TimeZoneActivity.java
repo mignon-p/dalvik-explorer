@@ -6,6 +6,7 @@ import android.os.*;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
+import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class TimeZoneActivity extends TextViewActivity {
         return describeTimeZone(timeZoneId);
     }
     
-    static String describeTimeZone(String id) {
+    private String describeTimeZone(String id) {
         final StringBuilder result = new StringBuilder();
         
         final TimeZone timeZone = TimeZone.getTimeZone(id);
@@ -59,6 +60,53 @@ public class TimeZoneActivity extends TextViewActivity {
         result.append('\n');
         
         result.append("Source: tzdata" + TimeUtils.getTimeZoneDatabaseVersion() + "\n");
+        result.append('\n');
+
+        // TODO: extract and show transition data.
+
+        // TODO: make this available in Android, and get it from there (falling back to our hard-coded copy).
+        InputStream is = getResources().openRawResource(R.raw.zone_tab);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            boolean found = false;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains(id)) {
+                    String[] fields = line.split("\t");
+                    // 0: country code
+                    // 1: coordinates
+                    // 2: id
+                    // 3: comments
+                    if (!fields[2].equals(id)) {
+                        continue;
+                    }
+                    String countryCode = fields[0];
+                    String country = new Locale("", countryCode).getDisplayCountry(Locale.getDefault());
+                    result.append("Country: " + countryCode + " (" + country + ")\n");
+                    String iso6709Coordinates = fields[1];
+                    String dmsCoordinates;
+                    if (iso6709Coordinates.length() == 11) {
+                        dmsCoordinates = iso6709Coordinates.replaceAll("([+-])(\\d{2})(\\d{2})([+-])(\\d{3})(\\d{2})", "$1$2\u00b0$3', $4$5\u00b0$6'");
+                    } else {
+                        dmsCoordinates = iso6709Coordinates.replaceAll("([+-])(\\d{2})(\\d{2})(\\d{2})([+-])(\\d{3})(\\d{2})(\\d{2})", "$1$2\u00b0$3'$4\", $5$6\u00b0$7'$8\"");
+                    }
+                    result.append("Coordinates: " + dmsCoordinates + "\n");
+                    String notes = (fields.length > 3) ? fields[3] : "(no notes)";
+                    result.append("Notes: " + notes + "\n");
+                    found = true;
+                }
+            }
+            if (!found) {
+                result.append("(Not found in zone.tab.)\n");
+            }
+        } catch (IOException ex) {
+           result.append("(Failed to read zone.tab.)\n");
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ignored) {
+            }
+        }
         
         return result.toString();
     }

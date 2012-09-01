@@ -6,8 +6,11 @@ import android.os.*;
 import android.text.ClipboardManager;
 import android.text.*;
 import android.text.style.*;
+import android.text.util.*;
 import android.view.*;
 import android.widget.*;
+import java.math.*;
+import java.util.regex.*;
 
 /**
  * An abstract superclass for our TextView-based activities.
@@ -15,7 +18,28 @@ import android.widget.*;
 public abstract class TextViewActivity extends Activity {
     private static final int CONTEXT_MENU_COPY = 0;
     private static final int CONTEXT_MENU_MAIL = 1;
-    
+
+    static public class GeoFilter implements Linkify.MatchFilter, Linkify.TransformFilter {
+        private static final Pattern GEO_PATTERN = Pattern.compile("\\+?(-?\\d+)\u00b0(\\d+)'(\\d+)?\"?, \\+?(-?\\d+)\u00b0(\\d+)'(\\d+)?\"?");
+
+        private static final String GEO_SCHEME = "geo:";
+
+        public String transformUrl(Matcher m, String url) {
+            return fromDms(m, 1, 2, 3) + "," + fromDms(m, 4, 5, 6) + "?z=7";
+        }
+
+        public boolean acceptMatch(CharSequence s, int start, int end) {
+            return true;
+        }
+
+        private static double fromDms(Matcher matcher, int d, int m, int s) {
+            int dd = Integer.parseInt(matcher.group(d), 10);
+            int mm = Integer.parseInt(matcher.group(m), 10);
+            int ss = (matcher.group(s) == null) ? 0 : Integer.parseInt(matcher.group(s), 10);
+            return Math.signum(dd) * (Math.abs(dd) + mm/60.0 + ss/3600.0);
+        }
+    }
+
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -26,6 +50,8 @@ public abstract class TextViewActivity extends Activity {
         final String extraValue = getExtraValue();
         textView.setText(content(extraValue), TextView.BufferType.SPANNABLE);
         setTitle(title(extraValue));
+
+        Linkify.addLinks(textView, GeoFilter.GEO_PATTERN, GeoFilter.GEO_SCHEME, new GeoFilter(), new GeoFilter());
         
         final EditText searchView = (EditText) findViewById(R.id.search);
         searchView.addTextChangedListener(new TextWatcher() {

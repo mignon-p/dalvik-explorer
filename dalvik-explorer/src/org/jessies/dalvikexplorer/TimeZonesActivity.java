@@ -74,14 +74,4 @@ public class TimeZonesActivity extends BetterListActivity {
         }
         return result;
     }
-    
-    static String describeTimeZones() {
-        StringBuilder result = new StringBuilder();
-        for (TimeZoneListItem item : gatherTimeZones()) {
-            if (Thread.currentThread().isInterrupted()) return null;
-            result.append(TimeZoneActivity.describeTimeZone(item.timeZone.getID()));
-            result.append('\n');
-        }
-        return result.toString();
-    }
 }
