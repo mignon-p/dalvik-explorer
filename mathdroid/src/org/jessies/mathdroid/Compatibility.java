@@ -3,6 +3,7 @@ package org.jessies.mathdroid;
 import android.app.*;
 import android.content.*;
 import android.os.*;
+import android.text.*;
 import android.view.*;
 import android.widget.*;
 
@@ -26,11 +27,17 @@ public abstract class Compatibility {
     }
     
     public abstract boolean isTablet(Activity activity);
+    public abstract void fixEditText(EditText editText);
     
     public static class PreHoneycombCompatibility extends Compatibility {
         public boolean isTablet(Activity activity) {
             // TODO: try to support crappy Froyo tablets?
             return false;
+        }
+
+        public void fixEditText(EditText editText) {
+            editText.setFocusableInTouchMode(true);
+            editText.setInputType(InputType.TYPE_NULL);
         }
     }
     
@@ -38,6 +45,11 @@ public abstract class Compatibility {
         public boolean isTablet(Activity activity) {
             final int SCREENLAYOUT_SIZE_XLARGE = 4; // Not available until API 9.
             return (activity.getResources().getConfiguration().screenLayout & SCREENLAYOUT_SIZE_XLARGE) != 0;
+        }
+
+        public void fixEditText(EditText editText) {
+            editText.setFocusableInTouchMode(false);
+            editText.setTextIsSelectable(true);
         }
     }
 }

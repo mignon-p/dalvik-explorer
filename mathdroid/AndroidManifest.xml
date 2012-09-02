@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.jessies.mathdroid" android:versionCode="25" android:versionName="2.5">
-    <!-- API 3 == 1.5 cupcake, API 11 == 3.0 honeycomb -->
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11" />
+    <!-- API 3 == 1.5 cupcake, API 16 == 4.1 jelly bean -->
+    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="16" />
     <application android:label="@string/app_name" android:icon="@drawable/icon">
         <activity android:name=".Mathdroid" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden">
             <intent-filter>

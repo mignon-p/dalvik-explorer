@@ -73,8 +73,8 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
 
         final View onScreenKeyboard = findViewById(R.id.on_screen_keyboard);
         if (onScreenKeyboard != null) {
-            // Prevent the soft keyboard from appearing until the user presses our keyboard button.
-            queryView.setInputType(InputType.TYPE_NULL);
+            // Prevent the soft keyboard from appearing unless the user presses our keyboard button.
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         } else {
             // We don't have our own keyboard, so bring up the system one right away.
             showSoftKeyboard(queryView);
@@ -305,6 +305,9 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         
         this.continuationMode = settings.getBoolean("continuationMode", false);
         this.hapticFeedback = settings.getBoolean("hapticFeedback", false);
+
+        final EditText queryView = (EditText) findViewById(R.id.q);
+        queryView.selectAll();
     }
     
     private void performHapticFeedback(View view) {
@@ -503,6 +506,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         final EditText queryView = (EditText) findViewById(R.id.q);
         final String oldQuery = state.getString("query", "");
         queryView.setText(oldQuery);
+        queryView.selectAll();
         
         final String serializedHistory = state.getString("transcript", "");
         history.fromString(serializedHistory);
