@@ -26,6 +26,10 @@ public abstract class Compatibility {
         }
     }
     
+    public boolean hasActionBar() {
+        return SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+    }
+    
     public abstract boolean isTablet(Activity activity);
     public abstract void fixEditText(EditText editText);
     
@@ -43,6 +47,7 @@ public abstract class Compatibility {
     
     public static class HoneycombCompatibility extends Compatibility {
         public boolean isTablet(Activity activity) {
+            // Note: this doesn't count a Nexus 7 as a tablet.
             final int SCREENLAYOUT_SIZE_XLARGE = 4; // Not available until API 9.
             return (activity.getResources().getConfiguration().screenLayout & SCREENLAYOUT_SIZE_XLARGE) != 0;
         }
