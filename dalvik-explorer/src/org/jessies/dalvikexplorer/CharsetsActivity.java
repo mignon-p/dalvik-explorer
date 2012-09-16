@@ -33,7 +33,7 @@ public class CharsetsActivity extends BetterListActivity {
         public String toSubtitle() {
             String canonicalName = charset.name();
             if (alias.equals(canonicalName)) {
-                return "";
+                return "Canonical";
             }
             return "Alias for " + canonicalName;
         }
