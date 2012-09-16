@@ -8,17 +8,23 @@ import android.widget.*;
 
 public abstract class Compatibility {
     public static Compatibility get() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            return new IceCreamSandwichCompatibility();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             return new HoneycombCompatibility();
         } else {
             return new PreHoneycombCompatibility();
         }
     }
     
+    public abstract void configureActionBar(Activity activity);
     public abstract void configureSearchView(ListActivity listActivity, Menu menu);
     public abstract void configureSearchView(TextViewActivity textViewActivity, Menu menu);
     
     public static class PreHoneycombCompatibility extends Compatibility {
+        public void configureActionBar(Activity activity) {
+            // Nothing to do, since there was no ActionBar pre-honeycomb.
+        }
         public void configureSearchView(ListActivity listActivity, Menu menu) {
             // Nothing to do, since a SearchView couldn't possibly exist pre-honeycomb.
         }
@@ -27,8 +33,8 @@ public abstract class Compatibility {
         }
     }
     
-    public static class HoneycombCompatibility extends Compatibility {
-        public void configureSearchView(final ListActivity listActivity, Menu menu) {
+    public static class HoneycombCompatibility extends PreHoneycombCompatibility {
+        @Override public void configureSearchView(final ListActivity listActivity, Menu menu) {
             SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
             searchView.setSubmitButtonEnabled(false);
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -49,7 +55,7 @@ public abstract class Compatibility {
             });
         }
         
-        public void configureSearchView(final TextViewActivity textViewActivity, Menu menu) {
+        @Override public void configureSearchView(final TextViewActivity textViewActivity, Menu menu) {
             SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
             searchView.setSubmitButtonEnabled(false);
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -68,6 +74,12 @@ public abstract class Compatibility {
                     return false;
                 }
             });
+        }
+    }
+    
+    public static class IceCreamSandwichCompatibility extends HoneycombCompatibility {
+        @Override public void configureActionBar(Activity activity) {
+            activity.getActionBar().setHomeButtonEnabled(true);
         }
     }
 }

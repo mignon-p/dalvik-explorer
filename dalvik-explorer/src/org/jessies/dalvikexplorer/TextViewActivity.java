@@ -65,12 +65,19 @@ public abstract class TextViewActivity extends Activity {
     
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options, menu);
-        Compatibility.get().configureSearchView(this, menu);
+        Compatibility compatibility = Compatibility.get();
+        compatibility.configureActionBar(this);
+        compatibility.configureSearchView(this, menu);
         return true;
     }
     
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+        case android.R.id.home:
+            Intent intent = new Intent(this, DalvikExplorerActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            return true;
         case R.id.menu_search:
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
                 final EditText searchView = (EditText) findViewById(R.id.search);
