@@ -32,7 +32,8 @@ public abstract class Compatibility {
     
     public abstract boolean isTablet(Activity activity);
     public abstract void fixEditText(EditText editText);
-    
+    public abstract void configureActionBar(Activity activity);
+      
     public static class PreHoneycombCompatibility extends Compatibility {
         public boolean isTablet(Activity activity) {
             // TODO: try to support crappy Froyo tablets?
@@ -42,6 +43,9 @@ public abstract class Compatibility {
         public void fixEditText(EditText editText) {
             editText.setFocusableInTouchMode(true);
             editText.setInputType(InputType.TYPE_NULL);
+        }
+        
+        public void configureActionBar(Activity activity) {
         }
     }
     
@@ -55,6 +59,12 @@ public abstract class Compatibility {
         public void fixEditText(EditText editText) {
             editText.setFocusableInTouchMode(false);
             editText.setTextIsSelectable(true);
+        }
+        
+        public void configureActionBar(Activity activity) {
+          ActionBar actionBar = activity.getActionBar();
+          actionBar.setDisplayShowHomeEnabled(false);
+          actionBar.setDisplayShowTitleEnabled(false);
         }
     }
 }

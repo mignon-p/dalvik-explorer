@@ -47,19 +47,21 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Hide the title bar if we're on a small screen and don't want to waste space.
-        // We can't do this in the manifest because we want it conditional on screen size.
         Compatibility compatibility = Compatibility.get();
+        compatibility.configureActionBar(this);
         if (!compatibility.isTablet(this)) {
             // If we hide the title bar on modern releases, that hides the ActionBar,
             // and then the user has no way to get to the settings or help.
             if (!compatibility.hasActionBar()) {
+                // Hide the title bar if we're on a small screen and don't want to waste space.
+                // We can't do this in the manifest because we want it conditional on screen size
+                // and OS version.
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
             }
             // On a small screen, we want the system keyboard to overlap ours, not cause resizing.
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         }
-
+          
         calculator = new Calculator();
         calculator.setPlotter(this);
         
