@@ -17,6 +17,16 @@ public class Utils {
         return builder.toString();
     }
     
+    public static String sortedStringOfStrings(String[] strings) {
+        String[] sortedStrings = strings.clone();
+        Arrays.sort(sortedStrings, String.CASE_INSENSITIVE_ORDER);
+        StringBuilder result = new StringBuilder();
+        for (String s : sortedStrings) {
+            result.append("  ").append(s).append("\n");
+        }
+        return result.toString();
+    }
+    
     // Original in salma-hayek "StringUtilities.java".
     public static String escapeForJava(CharSequence s) {
         final int sLength = s.length();

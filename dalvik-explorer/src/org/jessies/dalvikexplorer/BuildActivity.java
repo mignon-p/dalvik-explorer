@@ -48,35 +48,34 @@ public class BuildActivity extends TextViewActivity {
         try {
             Class<?> vmDebugClass = Class.forName("dalvik.system.VMDebug");
             Method getVmFeatureListMethod = vmDebugClass.getDeclaredMethod("getVmFeatureList");
-            String[] features = (String[]) getVmFeatureListMethod.invoke(null);
+            String[] vmFeatures = (String[]) getVmFeatureListMethod.invoke(null);
             result.append("DalvikVM features:\n");
-            for (String feature : features) {
-                result.append("  " + feature + "\n");
-            }
+            result.append(Utils.sortedStringOfStrings(vmFeatures));
             result.append('\n');
         } catch (Throwable ignored) {
         }
         
-        result.append("Features:\n");
         String openGlEsVersion = null;
+        ArrayList<String> features = new ArrayList<String>();
         for (FeatureInfo feature : context.getPackageManager().getSystemAvailableFeatures()) {
             if (feature.name != null) {
-                result.append("  " + feature.name + "\n");
+                features.add(feature.name);
             } else {
                 openGlEsVersion = feature.getGlEsVersion();
             }
         }
-        result.append('\n');
         
         if (openGlEsVersion != null) {
             result.append("OpenGL ES version: " + openGlEsVersion + "\n");
             result.append('\n');
         }
         
+        result.append("Features:\n");
+        result.append(Utils.sortedStringOfStrings(features.toArray(new String[0])));
+        result.append('\n');
+        
         result.append("Shared Java libraries:\n");
-        for (String library : context.getPackageManager().getSystemSharedLibraryNames()) {
-            result.append("  " + library + "\n");
-        }
+        result.append(Utils.sortedStringOfStrings(context.getPackageManager().getSystemSharedLibraryNames()));
         
         return result.toString();
     }

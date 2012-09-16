@@ -167,14 +167,6 @@ public class DeviceActivity extends TextViewActivity {
             cores += " (enabled: " + enabledCoreCount + ")";
         }
         result.append("Cores: " +  cores + "\n");
-
-        String features = valueForKey(procCpuLines, "Features");
-        if (features == null) {
-            features = valueForKey(procCpuLines, "flags");
-        }
-        String[] sortedFeatures = features.split(" ");
-        Arrays.sort(sortedFeatures, String.CASE_INSENSITIVE_ORDER);
-        result.append("Features: " + Utils.join(sortedFeatures, " ") + "\n");
         result.append('\n');
         
         // ARM-specific.
@@ -213,6 +205,14 @@ public class DeviceActivity extends TextViewActivity {
             result.append("Address Sizes: " + addressSizes + "\n");
             result.append('\n');
         }
+        
+        String features = valueForKey(procCpuLines, "Features");
+        if (features == null) {
+          features = valueForKey(procCpuLines, "flags");
+        }
+        result.append("CPU Features:\n");
+        result.append(Utils.sortedStringOfStrings(features.split(" ")));
+        result.append('\n');
         
         DisplayMetrics metrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(metrics);
