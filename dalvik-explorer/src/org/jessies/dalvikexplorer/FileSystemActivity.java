@@ -12,19 +12,27 @@ public class FileSystemActivity extends BetterListActivity {
     private static class FileListItem {
         private final File file;
         private final String label;
+        
         private FileListItem(File file, String label) {
             this.file = file;
             this.label = label;
         }
+        
         private FileListItem(File file) {
             this(file, makeLabel(file));
         }
+        
         private static String makeLabel(File file) {
             String result = file.getName();
             return file.isDirectory() ? result + "/" : result;
         }
+        
         @Override public String toString() {
             return label;
+        }
+        
+        public String toSubtitle() {
+            return Utils.prettySize(file.length());
         }
     }
     
@@ -36,7 +44,7 @@ public class FileSystemActivity extends BetterListActivity {
             path = "/";
         }
         
-        setListAdapter(new BetterArrayAdapter<FileListItem>(this, directoryItems(path)));
+        setListAdapter(new BetterArrayAdapter<FileListItem>(this, directoryItems(path), FileListItem.class, "toSubtitle"));
         setTitle(path + " (" + getListAdapter().getCount() + ")");
     }
     

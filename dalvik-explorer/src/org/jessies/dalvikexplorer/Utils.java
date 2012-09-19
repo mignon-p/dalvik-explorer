@@ -84,33 +84,50 @@ public class Utils {
         return version;
     }
     
-    public static String readFile(String path) {
-      StringBuilder sb = new StringBuilder();
-      for (String line : readLines(path)) {
-        sb.append(line).append('\n');
-      }
-      return sb.toString();
+  public static String readFile(String path) {
+    StringBuilder sb = new StringBuilder();
+    for (String line : readLines(path)) {
+      sb.append(line).append('\n');
     }
-    
-    public static String[] readLines(String path) {
-      ArrayList<String> lines = new ArrayList<String>();
-      BufferedReader in = null;
-      try {
-        in = new BufferedReader(new FileReader(path));
-        String line;
-        while ((line = in.readLine()) != null) {
-          lines.add(line);
-        }
-        return lines.toArray(new String[0]);
-      } catch (IOException ex) {
-        return null;
-      } finally {
-        if (in != null) {
-          try {
-            in.close();
-          } catch (IOException ignored) {
-          }
+    return sb.toString();
+  }
+  
+  public static String[] readLines(String path) {
+    ArrayList<String> lines = new ArrayList<String>();
+    BufferedReader in = null;
+    try {
+      in = new BufferedReader(new FileReader(path));
+      String line;
+      while ((line = in.readLine()) != null) {
+        lines.add(line);
+      }
+      return lines.toArray(new String[0]);
+    } catch (IOException ex) {
+      return null;
+    } finally {
+      if (in != null) {
+        try {
+          in.close();
+        } catch (IOException ignored) {
         }
       }
     }
+  }
+  
+  public static String prettySize(long n) {
+    String unit = "";
+    if (n > 1024) {
+      n /= 1024;
+      unit = "Ki";
+    }
+    if (n > 1024) {
+      n /= 1024;
+      unit = "Mi";
+    }
+    if (n > 1024) {
+      n /= 1024;
+      unit = "Gi";
+    }
+    return n + " " + unit + "B";
+  }
 }
