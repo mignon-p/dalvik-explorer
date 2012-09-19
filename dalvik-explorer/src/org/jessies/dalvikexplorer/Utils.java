@@ -85,25 +85,32 @@ public class Utils {
     }
     
     public static String readFile(String path) {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(path));
-            String line;
-            while ((line = in.readLine()) != null) {
-                sb.append(line);
-                sb.append('\n');
-            }
-            return sb.toString();
-        } catch (IOException ex) {
-            return null;
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ignored) {
-                }
-            }
+      StringBuilder sb = new StringBuilder();
+      for (String line : readLines(path)) {
+        sb.append(line).append('\n');
+      }
+      return sb.toString();
+    }
+    
+    public static String[] readLines(String path) {
+      ArrayList<String> lines = new ArrayList<String>();
+      BufferedReader in = null;
+      try {
+        in = new BufferedReader(new FileReader(path));
+        String line;
+        while ((line = in.readLine()) != null) {
+          lines.add(line);
         }
+        return lines.toArray(new String[0]);
+      } catch (IOException ex) {
+        return null;
+      } finally {
+        if (in != null) {
+          try {
+            in.close();
+          } catch (IOException ignored) {
+          }
+        }
+      }
     }
 }
