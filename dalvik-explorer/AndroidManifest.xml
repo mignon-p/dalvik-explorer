@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.jessies.dalvikexplorer" android:versionCode="29" android:versionName="2.9">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.jessies.dalvikexplorer" android:versionCode="30" android:versionName="3.0">
     <!-- API 4 == 1.6 donut, API 16 == 4.1 jelly bean http://developer.android.com/guide/appendix/api-levels.html -->
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="16" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" /> <!-- for GoogleTV -->
