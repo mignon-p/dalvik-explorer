@@ -230,10 +230,10 @@ public class DeviceActivity extends TextViewActivity {
     
     MemInfo memInfo = readMemInfo();
     result.append("Memory:\n");
-    result.append("  Total: " + memInfo.total + " KiB\n");
-    result.append("  Used: " + memInfo.used + " KiB\n");
-    result.append("  Free: " + memInfo.free + " KiB\n");
-    result.append("  Buffers: " + memInfo.buffers + " KiB\n");
+    result.append("  Total: " + Utils.prettySize(memInfo.total) + "\n");
+    result.append("  Used: " + Utils.prettySize(memInfo.used) + "\n");
+    result.append("  Free: " + Utils.prettySize(memInfo.free) + "\n");
+    result.append("  Buffers: " + Utils.prettySize(memInfo.buffers) + "\n");
     result.append('\n');
     
     DisplayMetrics metrics = new DisplayMetrics();
@@ -272,11 +272,11 @@ public class DeviceActivity extends TextViewActivity {
     for (String line : lines) {
       String[] fields = line.split(" +");
       if (fields[0].equals("MemTotal:")) {
-        result.total = Long.parseLong(fields[1]);
+        result.total = Long.parseLong(fields[1]) * 1024;
       } else if (fields[0].equals("MemFree:")) {
-        result.free = Long.parseLong(fields[1]);
+        result.free = Long.parseLong(fields[1]) * 1024;
       } else if (fields[0].equals("Buffers:")) {
-        result.buffers = Long.parseLong(fields[1]);
+        result.buffers = Long.parseLong(fields[1]) * 1024;
       } else {
         break;
       }
