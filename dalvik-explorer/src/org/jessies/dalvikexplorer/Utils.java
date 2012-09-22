@@ -114,8 +114,9 @@ public class Utils {
     }
   }
   
-  public static String prettySize(long n) {
+  public static String prettySize(long bytes) {
     String unit = "";
+    double n = bytes;
     if (n > 1024) {
       n /= 1024;
       unit = "Ki";
@@ -128,6 +129,24 @@ public class Utils {
       n /= 1024;
       unit = "Gi";
     }
-    return n + " " + unit + "B";
+    return String.format("%.1f %sB", n, unit);
+  }
+  
+  public static String prettyHz(int hz) {
+    String unit = "";
+    double n = hz;
+    if (n > 1000) {
+      n /= 1000;
+      unit = "K";
+    }
+    if (n > 1000) {
+      n /= 1000;
+      unit = "M";
+    }
+    if (n > 1000) {
+      n /= 1000;
+      unit = "G";
+    }
+    return String.format("%.1f %sHz", n, unit);
   }
 }

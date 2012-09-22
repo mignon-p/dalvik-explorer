@@ -154,9 +154,12 @@ public class DeviceActivity extends TextViewActivity {
     final StringBuilder result = new StringBuilder();
     
     String[] procCpuLines = Utils.readFile("/proc/cpuinfo").split("\n");
-    String processor = valueForKey(procCpuLines, "Processor");
+    // x86 kernels use "processor" as an integer to number sockets.
+    // They use "model name" to describe the processor.
+    // ARM kernels use "Processor" to describe the processor.
+    String processor = valueForKey(procCpuLines, "model name");
     if (processor == null) {
-      processor = valueForKey(procCpuLines, "model name");
+      processor = valueForKey(procCpuLines, "Processor");
     }
     result.append("Processor: " + processor + "\n");
     
@@ -167,6 +170,17 @@ public class DeviceActivity extends TextViewActivity {
       cores += " (enabled: " + enabledCoreCount + ")";
     }
     result.append("Cores: " +  cores + "\n");
+    result.append('\n');
+    
+    try {
+      String minFrequency = Utils.readFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq").trim();
+      String maxFrequency = Utils.readFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq").trim();
+      int minFrequencyHz = Integer.parseInt(minFrequency);
+      int maxFrequencyHz = Integer.parseInt(maxFrequency);
+      result.append("CPU Speed: " + Utils.prettyHz(maxFrequencyHz) + " (idles at " + Utils.prettyHz(minFrequencyHz) + ")\n");
+    } catch (Exception unexpected) {
+      result.append("(Unable to determine CPU frequencies.)\n");
+    }
     result.append('\n');
     
     // ARM-specific.
