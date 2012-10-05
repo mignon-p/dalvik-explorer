@@ -175,8 +175,8 @@ public class DeviceActivity extends TextViewActivity {
     try {
       String minFrequency = Utils.readFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq").trim();
       String maxFrequency = Utils.readFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq").trim();
-      int minFrequencyHz = Integer.parseInt(minFrequency);
-      int maxFrequencyHz = Integer.parseInt(maxFrequency);
+      int minFrequencyHz = Integer.parseInt(minFrequency) * 1000;
+      int maxFrequencyHz = Integer.parseInt(maxFrequency) * 1000;
       result.append("CPU Speed: " + Utils.prettyHz(maxFrequencyHz) + " (idles at " + Utils.prettyHz(minFrequencyHz) + ")\n");
     } catch (Exception unexpected) {
       result.append("(Unable to determine CPU frequencies.)\n");
