@@ -27,14 +27,9 @@ public class FileSystemsActivity extends BetterListActivity {
     }
     
     public String toSubtitle() {
-      File f = new File(mountPoint);
-      long totalBytes = f.getTotalSpace();
-      long freeBytes = f.getFreeSpace();
-      long usedBytes = totalBytes - freeBytes;
-      
       return fs + "\n" +
           options + "\n" +
-          Utils.prettySize(usedBytes) + " of " + Utils.prettySize(totalBytes) + " used (" + type + ")";
+          Compatibility.get().describeFs(mountPoint, type);
     }
         
     @Override public int compareTo(FsListItem other) {
