@@ -22,7 +22,7 @@ public class LocaleActivity extends TextViewActivity {
   }
 
   private static Locale localeByName(String name) {
-    if (name.isEmpty()) {
+    if (name.length() == 0) {
       return new Locale("", "", "");
     }
 
@@ -232,7 +232,7 @@ public class LocaleActivity extends TextViewActivity {
       String[] enUsValues = (String[]) localeData.getClass().getField(fieldName).get(enUsData);
       sb.append(fieldName).append(":\n");
       for (int i = 0; i < values.length; ++i) {
-        if (enUsValues[i].isEmpty()) {
+        if (enUsValues[i].length() == 0) {
           continue; // Java's weekday names array has an empty first element.
         }
         sb.append("    ").append(values[i]);
