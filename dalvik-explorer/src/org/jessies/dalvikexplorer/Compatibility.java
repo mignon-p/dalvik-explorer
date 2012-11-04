@@ -19,12 +19,13 @@ public abstract class Compatibility {
       return new PreGingerbreadCompatibility();
     }
   }
-  
+
   public abstract void configureActionBar(Activity activity);
   public abstract void configureSearchView(ListActivity listActivity, Menu menu);
   public abstract void configureSearchView(TextViewActivity textViewActivity, Menu menu);
   public abstract String describeFs(String mountPoint, String type);
-  
+  public abstract boolean isInterestingFileSystem(String mountPoint);
+
   public static class PreGingerbreadCompatibility extends Compatibility {
     public void configureActionBar(Activity activity) {
       // Nothing to do, since there was no ActionBar pre-honeycomb.
@@ -39,8 +40,11 @@ public abstract class Compatibility {
       // Pre-Gingerbread we couldn't statfs(3) in a portable way.
       return "(" + type + ")";
     }
+    public boolean isInterestingFileSystem(String mountPoint) {
+      return true;
+    }
   }
-  
+
   public static class GingerbreadCompatibility extends PreGingerbreadCompatibility {
     public String describeFs(String mountPoint, String type) {
       File f = new File(mountPoint);
@@ -49,8 +53,12 @@ public abstract class Compatibility {
       long usedBytes = totalBytes - freeBytes;
       return Utils.prettySize(usedBytes) + " of " + Utils.prettySize(totalBytes) + " used (" + type + ")";
     }
+    public boolean isInterestingFileSystem(String mountPoint) {
+      File f = new File(mountPoint);
+      return (f.getTotalSpace() > 0 || mountPoint.equals("/"));
+    }
   }
-  
+
   public static class HoneycombCompatibility extends GingerbreadCompatibility {
     @Override public void configureSearchView(final ListActivity listActivity, Menu menu) {
       SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
@@ -72,7 +80,7 @@ public abstract class Compatibility {
         }
       });
     }
-    
+
     @Override public void configureSearchView(final TextViewActivity textViewActivity, Menu menu) {
       SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
       searchView.setSubmitButtonEnabled(false);
@@ -94,7 +102,7 @@ public abstract class Compatibility {
       });
     }
   }
-  
+
   public static class IceCreamSandwichCompatibility extends HoneycombCompatibility {
     @Override public void configureActionBar(Activity activity) {
       activity.getActionBar().setHomeButtonEnabled(true);

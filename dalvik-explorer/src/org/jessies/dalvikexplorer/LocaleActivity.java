@@ -149,10 +149,14 @@ public class LocaleActivity extends TextViewActivity {
     // Languages don't have currencies; countries do.
     if (!locale.getCountry().equals("")) {
       result.append("Currency\n\n");
-      Currency currency = Currency.getInstance(locale);
-      result.append("ISO 4217 Currency Code: " + currency.getCurrencyCode() + "\n");
-      result.append("Currency Symbol: " + currency.getSymbol(locale) + " (" + currency.getSymbol(Locale.US) + ")\n");
-      result.append("Default Fraction Digits: " + currency.getDefaultFractionDigits() + "\n");
+      try {
+        Currency currency = Currency.getInstance(locale);
+        result.append("ISO 4217 Currency Code: " + currency.getCurrencyCode() + "\n");
+        result.append("Currency Symbol: " + currency.getSymbol(locale) + " (" + currency.getSymbol(Locale.US) + ")\n");
+        result.append("Default Fraction Digits: " + currency.getDefaultFractionDigits() + "\n");
+      } catch (IllegalArgumentException ex) {
+        result.append("(This version of Android is unable to return a Currency for this Locale.)\n");
+      }
       result.append('\n');
       result.append('\n');
     }
