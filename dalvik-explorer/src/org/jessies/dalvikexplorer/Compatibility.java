@@ -41,6 +41,7 @@ public abstract class Compatibility {
       return "(" + type + ")";
     }
     public boolean isInterestingFileSystem(String mountPoint) {
+      // Pre-Gingerbread we couldn't statfs(3) in a portable way.
       return true;
     }
   }
