@@ -90,7 +90,8 @@ public class DeviceActivity extends TextViewActivity {
   }
   
   private static String decodeImplementer(int implementer) {
-    // From http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ihi0014q/Bcfihfdj.html
+    // From "ETMIDR bit assignments".
+    // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ihi0014q/Bcfihfdj.html
     if (implementer == 0x41) {
       return "ARM";
     } else if (implementer == 0x44) {
@@ -109,6 +110,8 @@ public class DeviceActivity extends TextViewActivity {
   }
   
   private static String decodePartNumber(int part) {
+    // TODO: if different implementers don't get discrete ranges,
+    // we might need to test implementer here too.
     if (part == 0x920) {
       return "ARM920";
     } else if (part == 0x926) {
@@ -145,6 +148,14 @@ public class DeviceActivity extends TextViewActivity {
       return "Cortex-M3";
     } else if (part == 0xc24) {
       return "Cortex-M4";
+    } else if (part == 0x00f) {
+      return "Snapdragon S1 (Scorpion)";
+    } else if (part == 0x02d) {
+      return "Snapdragon S3 (Scorpion)";
+    } else if (part == 0x04d) {
+      return "Snapdragon S4 Plus (Krait)";
+    } else if (part == 0x06f) {
+      return "Snapdragon S4 Pro (Krait)";
     } else {
       return "unknown (0x" + Integer.toHexString(part) + ")";
     }
