@@ -21,32 +21,32 @@ import org.jessies.calc.UnitsConverter;
 
 public class Mathdroid extends Activity implements AdapterView.OnItemClickListener, CalculatorPlotter, TextView.OnEditorActionListener, View.OnClickListener {
     private static final String TAG = "Mathdroid";
-    
+
     // Constants for the transcript context menu items.
     private static final int CONTEXT_MENU_RETYPE_SELECTED = 0;
     private static final int CONTEXT_MENU_COPY_SELECTED = 1;
     private static final int CONTEXT_MENU_COPY_ALL  = 2;
     private static final int CONTEXT_MENU_FORGET_SELECTED = 3;
     private static final int CONTEXT_MENU_FORGET_ALL  = 4;
-    
+
     // Constants identifying dialogs.
     private static final int DIALOG_PLOT = 0;
-    
+
     private Calculator calculator;
-    
+
     private CalculatorPlotData plotData;
-    
+
     private final HashMap<Integer, String> buttonMap = new HashMap<Integer, String>();
-    
+
     private HistoryAdapter history;
-    
+
     private boolean continuationMode;
     private boolean hapticFeedback;
-    
+
     // Called when the activity is first created or recreated.
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         Compatibility compatibility = Compatibility.get();
         compatibility.configureActionBar(this);
         if (!compatibility.isTablet(this)) {
@@ -61,12 +61,12 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             // On a small screen, we want the system keyboard to overlap ours, not cause resizing.
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         }
-          
+
         calculator = new Calculator();
         calculator.setPlotter(this);
-        
+
         setContentView(R.layout.main);
-        
+
         final EditText queryView = (EditText) findViewById(R.id.q);
         queryView.setOnEditorActionListener(this);
         queryView.addTextChangedListener(new TextWatcher() {
@@ -86,9 +86,9 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             // We don't have our own keyboard, so bring up the system one right away.
             showSoftKeyboard(queryView);
         }
-        
+
         initButtonMap();
-        
+
         initButtonClickListener(R.id.del);
         initButtonClickListener(R.id.exe);
         initButtonClickListener(R.id.kbd);
@@ -96,28 +96,28 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         initButtonClickListener(R.id.less);
         initButtonClickListener(R.id.more);
         initButtonClickListener(R.id.right);
-        
+
         for (int id : buttonMap.keySet()) {
             initButtonClickListener(id);
         }
-        
+
         this.history = new HistoryAdapter(this);
-        
+
         ListView transcriptView = transcriptView();
         registerForContextMenu(transcriptView);
         transcriptView.setAdapter(history);
         transcriptView.setOnItemClickListener(this);
-        
+
         try {
             loadState();
         } catch (Exception ex) {
             // Without code like this, it's impossible to recover from bad state: Mathdroid will just crash every time you start it.
             ex.printStackTrace();
         }
-        
+
         onConfigurationChanged(getResources().getConfiguration());
     }
-    
+
     // Called when one of the "configChanges" declared in our manifest occurs.
     @Override public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -128,7 +128,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             onScreenKeyboard.setVisibility(keyboardHidden ? View.VISIBLE : View.GONE);
         }
     }
-    
+
     private void initButtonClickListener(int id) {
         // Not all buttons will be present in all layouts.
         final View button = findViewById(id);
@@ -136,7 +136,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             button.setOnClickListener(this);
         }
     }
-    
+
     private void initButtonMap() {
         buttonMap.put(R.id.acos,   "acos()");
         buttonMap.put(R.id.ans,    "Ans");
@@ -176,12 +176,12 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         buttonMap.put(R.id.times,  "\u00d7");
         buttonMap.put(R.id.x,      "x");
     }
-    
+
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options, menu);
         return true;
     }
-    
+
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_clear:
@@ -197,7 +197,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             return super.onOptionsItemSelected(item);
         }
     }
-    
+
     @Override protected Dialog onCreateDialog(int id) {
         switch (id) {
         case DIALOG_PLOT:
@@ -206,7 +206,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             return null;
         }
     }
-    
+
     @Override protected void onPrepareDialog(int id, Dialog dialog) {
         switch (id) {
         case DIALOG_PLOT:
@@ -218,19 +218,19 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             return;
         }
     }
-    
+
     private Dialog createPlotDialog() {
         final LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         final View layout = inflater.inflate(R.layout.plot, (ViewGroup) findViewById(R.id.plot));
-        
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(layout);
         builder.setCancelable(true);
-        
+
         final Dialog dialog = builder.create();
         return dialog;
     }
-    
+
     private HistoryItem selectedHistoryItem(ContextMenu.ContextMenuInfo menuInfo) {
         if (!(menuInfo instanceof AdapterView.AdapterContextMenuInfo)) {
             return null;
@@ -238,13 +238,13 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         final int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
         return history.getItem(position);
     }
-    
+
     @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         if (history.getCount() == 0) {
             // If there's no transcript, there's nothing to copy, so no reason to show a menu.
             return;
         }
-        
+
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("History");
         final HistoryItem historyItem = selectedHistoryItem(menuInfo);
@@ -258,7 +258,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         }
         menu.add(0, CONTEXT_MENU_FORGET_ALL,  0, "Forget all");
     }
-    
+
     @Override public boolean onContextItemSelected(MenuItem item) {
         final int id = item.getItemId();
         final ContextMenu.ContextMenuInfo menuInfo = item.getMenuInfo();
@@ -283,40 +283,40 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             return super.onContextItemSelected(item);
         }
     }
-    
+
     @SuppressWarnings("deprecation") // Honeycomb replaces the text-only ClipboardManager.
     private boolean copyToClipboard(String text) {
         final android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         clipboard.setText(text);
         return true;
     }
-    
+
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final EditText queryView = (EditText) findViewById(R.id.q);
         final HistoryItem historyItem = history.getItem(position);
         queryView.setText(historyItem.question);
         queryView.setSelection(queryView.length());
     }
-    
+
     @Override protected void onPause() {
         super.onPause();
         saveState();
     }
-    
+
     @Override public void onResume() {
         super.onResume();
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        
+
         String angleMode = settings.getString("angleMode", "Radians");
         calculator.setDegreesMode(angleMode.equals("Degrees"));
-        
+
         this.continuationMode = settings.getBoolean("continuationMode", false);
         this.hapticFeedback = settings.getBoolean("hapticFeedback", false);
 
         final EditText queryView = (EditText) findViewById(R.id.q);
         queryView.selectAll();
     }
-    
+
     private void performHapticFeedback(View view) {
         if (!hapticFeedback) {
             return;
@@ -326,7 +326,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         int type = SDK_INT >= 5 ? HapticFeedbackConstants.LONG_PRESS : HapticFeedbackConstants_VIRTUAL_KEY;
         view.performHapticFeedback(type, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
     }
-    
+
     @Override public void onClick(View view) {
         performHapticFeedback(view);
         final EditText queryView = (EditText) findViewById(R.id.q);
@@ -357,7 +357,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             buttonPressed(queryView, id);
         }
     }
-    
+
     // Invoked if the user hits the physical "return" key while the EditText has focus.
     public boolean onEditorAction(TextView queryView, int actionId, KeyEvent event) {
         if (event != null && event.getAction() == KeyEvent.ACTION_UP) {
@@ -367,7 +367,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         exe((EditText) queryView);
         return true;
     }
-    
+
     private void buttonPressed(EditText queryView, int id) {
         // Insert the new text (by replacing the entire content, which is our only option).
         // If there's a selection, we overwrite it.
@@ -386,17 +386,17 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         }
         queryView.setSelection(newCaretOffset, newCaretOffset);
     }
-    
+
     private void clear(EditText queryView) {
         queryView.setText("");
         history.clear();
     }
-    
+
     private void showSoftKeyboard(EditText queryView) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(queryView, 0);
     }
-    
+
     private void del(EditText queryView) {
         int startOffset = queryView.getSelectionStart();
         int endOffset = queryView.getSelectionEnd();
@@ -418,14 +418,14 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         }
         queryView.setSelection(startOffset, startOffset);
     }
-    
+
     private void moveCaret(EditText queryView, int delta) {
         int offset = (delta > 0) ? queryView.getSelectionEnd() : queryView.getSelectionStart();
         offset += delta;
         offset = Math.max(Math.min(offset, queryView.length()), 0);
         queryView.setSelection(offset);
     }
-    
+
     private void onQueryTextChanged(final EditText queryView) {
         if (!continuationMode) {
             return;
@@ -448,11 +448,11 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             });
         }
     }
-    
+
     private static boolean isContinuationOperator(String s) {
         return s.length() == 1 && "-=+*\u00d7^/\u00f7%<>&|".indexOf(s.charAt(0)) != -1;
     }
-    
+
     private void exe(EditText queryView) {
         final String queryText = queryView.getText().toString().trim();
         if (queryText.length() == 0) {
@@ -469,7 +469,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         // Adding to the history automatically updates the display.
         history.add(new HistoryItem(queryText, computeAnswer(queryText)));
     }
-    
+
     private String computeAnswer(String query) {
         try {
             String answer = null;
@@ -498,10 +498,10 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             return "Error: " + ex.getMessage();
         } catch (Exception ex) {
             ex.printStackTrace();
-            return "What do you mean?";
+            return "What do you mean? (" + ex.getMessage() + ")";
         }
     }
-    
+
     private void loadState() {
         final SharedPreferences state = getPreferences(MODE_PRIVATE);
         final int version = state.getInt("version", 0);
@@ -509,26 +509,26 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             // We've never been run before, or the last run was an incompatible version.
             return;
         }
-        
+
         final EditText queryView = (EditText) findViewById(R.id.q);
         final String oldQuery = state.getString("query", "");
         queryView.setText(oldQuery);
         queryView.selectAll();
-        
+
         final String serializedHistory = state.getString("transcript", "");
         history.fromString(serializedHistory);
-        
+
         final String serializedPlotData = state.getString("plotData", "");
         if (serializedPlotData.length() > 0) {
             plotData = CalculatorPlotData.fromString(serializedPlotData);
         }
     }
-    
+
     private void saveState() {
         final String serializedHistory = history.toString();
-        
+
         final EditText queryView = (EditText) findViewById(R.id.q);
-        
+
         final SharedPreferences.Editor state = getPreferences(MODE_PRIVATE).edit();
         state.putInt("version", 3);
         state.putString("query", queryView.getText().toString());
@@ -536,19 +536,19 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         state.putString("plotData", (plotData != null) ? plotData.toString() : "");
         state.commit();
     }
-    
+
     private ListView transcriptView() {
         return (ListView) findViewById(R.id.transcript);
     }
-    
+
     private void showHelp() {
         startActivity(new Intent(this, MathdroidHelp.class));
     }
-    
+
     private void showSettings() {
         startActivity(new Intent(this, MathdroidSettings.class));
     }
-    
+
     public void showPlot(CalculatorPlotData plotData) {
         this.plotData = plotData;
         showDialog(DIALOG_PLOT);
