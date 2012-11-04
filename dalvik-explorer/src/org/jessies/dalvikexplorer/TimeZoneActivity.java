@@ -133,22 +133,27 @@ public class TimeZoneActivity extends TextViewActivity {
     DateFormat weekdayFormat = new SimpleDateFormat("EEEE", Locale.US);
     weekdayFormat.setTimeZone(tz);
     
-    Formatter f = new Formatter(result);
-    f.format("Transitions:\n");
-    for (int i = 0; i < mTransitions.length; ++i) {
-      if (!shownNow && mTransitions[i] > unixNow) {
-        f.format("\n  -- now (%d) --\n\n", unixNow);
-        shownNow = true;
+    if (mTransitions.length == 0) {
+      // Some rare zones such as Africa/Bujumbura have never had a transition.
+      result.append("(This zone has never had a transition.)\n");
+    } else {
+      Formatter f = new Formatter(result);
+      f.format("Transitions:\n");
+      for (int i = 0; i < mTransitions.length; ++i) {
+        if (!shownNow && mTransitions[i] > unixNow) {
+          f.format("\n  -- now (%d) --\n\n", unixNow);
+          shownNow = true;
+        }
+        String fromTime = formatTime(df, mTransitions[i] - 1);
+        String toTime = formatTime(df, mTransitions[i]);
+        f.format("  %s ... %s (%d)", fromTime, toTime, mTransitions[i]);
+        
+        String weekday = weekdayFormat.format(new Date(1000L * mTransitions[i]));
+        if (!weekday.equals("Sunday")) {
+          f.format(" -- %s", weekday);
+        }
+        result.append('\n');
       }
-      String fromTime = formatTime(df, mTransitions[i] - 1);
-      String toTime = formatTime(df, mTransitions[i]);
-      f.format("  %s ... %s (%d)", fromTime, toTime, mTransitions[i]);
-      
-      String weekday = weekdayFormat.format(new Date(1000L * mTransitions[i]));
-      if (!weekday.equals("Sunday")) {
-        f.format(" -- %s", weekday);
-      }
-      result.append('\n');
     }
   }
   
