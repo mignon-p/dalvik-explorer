@@ -24,43 +24,74 @@ import android.view.inputmethod.*;
 import android.widget.*;
 
 /**
- * A ListActivity that automatically enables filtering, and automatically
- * offers a search view in the action bar (>= honeycomb).
+ * A ListActivity that:
+ *   Automatically enables filtering.
+ *   Automatically offers a search view in the action bar (>= honeycomb).
+ *   Automatically saves/restores the filter text and scroll position.
  */
 public class BetterListActivity extends ListActivity {
-    public BetterListActivity() {
+  private static final String LIST_STATE = "BetterListActivity.listState";
+  private Parcelable mListState = null;
+  
+  public BetterListActivity() {
+  }
+  
+  @Override public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    getListView().setTextFilterEnabled(true);
+  }
+  
+  @Override public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.options, menu);
+    Compatibility compatibility = Compatibility.get();
+    compatibility.configureActionBar(this);
+    compatibility.configureSearchView(this, menu);
+    return true;
+  }
+  
+  @Override public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+    case android.R.id.home:
+      Intent intent = new Intent(this, DalvikExplorerActivity.class);
+      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+      startActivity(intent);
+      return true;
+    case R.id.menu_search:
+      showSoftKeyboard();
+      return true;
+    default:
+      return super.onOptionsItemSelected(item);
     }
-    
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getListView().setTextFilterEnabled(true);
-    }
-    
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.options, menu);
-        Compatibility compatibility = Compatibility.get();
-        compatibility.configureActionBar(this);
-        compatibility.configureSearchView(this, menu);
-        return true;
-    }
-    
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
-            Intent intent = new Intent(this, DalvikExplorerActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            return true;
-        case R.id.menu_search:
-            showSoftKeyboard();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+  }
+  
+  @Override protected void onResume() {
+    super.onResume();
+    // If we have a remembered ListView filter text and scroll position, use it. 
+    if (mListState != null) {
+      getListView().post(new Runnable() {
+        public void run() {
+          getListView().onRestoreInstanceState(mListState);
+          mListState = null;
         }
+      });
     }
-    
-    private void showSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(getListView(), 0);
-    }
+  }
+  
+  // Unpack the ListView's filter text and scroll position.
+  @Override protected void onRestoreInstanceState(Bundle state) {
+    super.onRestoreInstanceState(state);
+    mListState = state.getParcelable(LIST_STATE);
+  }
+  
+  // Pack the ListView's filter text and scroll position.
+  @Override protected void onSaveInstanceState(Bundle state) {
+    super.onSaveInstanceState(state);
+    mListState = getListView().onSaveInstanceState();
+    state.putParcelable(LIST_STATE, mListState);
+  }
+  
+  private void showSoftKeyboard() {
+    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+    imm.showSoftInput(getListView(), 0);
+  }
 }
