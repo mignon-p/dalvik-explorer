@@ -25,6 +25,7 @@ public class MathdroidTests extends Activity implements TestListener {
 
   private long mCurrentTestStartMs;
 
+  private int mTestSuiteSize;
   private int mTestCount;
   private ArrayList<Test> mFailedTests = new ArrayList<Test>();
   private ArrayList<Throwable> mFailures = new ArrayList<Throwable>();
@@ -50,13 +51,8 @@ public class MathdroidTests extends Activity implements TestListener {
 
   private void performLevel3Diagnostic() {
     // TODO: pass the classes in as an Intent extra.
-    final TestSuite suite = new TestSuite(org.jessies.calc.CalculatorTest.class, org.jessies.calc.UnitsConverterTest.class);
-
-    mProgressBar.post(new Runnable() {
-      public void run() {
-        mProgressBar.setMax(suite.countTestCases());
-      }
-    });
+    TestSuite suite = new TestSuite(org.jessies.calc.CalculatorTest.class, org.jessies.calc.UnitsConverterTest.class);
+    mTestSuiteSize = suite.countTestCases();
 
     TestResult result = new TestResult();
     result.addListener(this);
@@ -96,6 +92,8 @@ public class MathdroidTests extends Activity implements TestListener {
 
     mProgressBar.post(new Runnable() {
       public void run() {
+        // For some reason, calling setMax from onCreate didn't always work. (On JB.)
+        mProgressBar.setMax(mTestSuiteSize);
         mProgressBar.setProgress(mTestCount);
       }
     });
