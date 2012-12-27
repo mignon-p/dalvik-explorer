@@ -17,6 +17,9 @@ public class MathdroidSettings extends PreferenceActivity implements SharedPrefe
         return true;
       }
     });
+    if (!Compatibility.get().hasJUnitRunner()) {
+      getPreferenceScreen().removePreference(runTestsButton);
+    }
   }
 
   @Override protected void onResume() {
