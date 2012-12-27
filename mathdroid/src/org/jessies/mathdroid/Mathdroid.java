@@ -473,15 +473,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
     private String computeAnswer(String query) {
         try {
             String answer = null;
-            /*
-             * // Convert bases.
-             * NumberDecoder numberDecoder = new NumberDecoder(query);
-             * if (numberDecoder.isValid()) {
-             * for (String item : numberDecoder.toStrings()) {
-             * model.addElement(item);
-             * }
-             * }
-             */
+            // TODO: integrate units conversion with calculation.
             if (answer == null) {
                 // Convert units.
                 answer = UnitsConverter.convert(query);
@@ -490,15 +482,12 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
                 // Evaluate mathematical expressions.
                 answer = calculator.evaluate(query);
             }
-            if (answer == null) {
-                answer = "Dunno, mate.";
-            }
             return answer;
         } catch (CalculatorError ex) {
             return "Error: " + ex.getMessage();
         } catch (Exception ex) {
             ex.printStackTrace();
-            return "What do you mean? (" + ex.getMessage() + ")";
+            return "Internal error: " + ex.getMessage();
         }
     }
 
