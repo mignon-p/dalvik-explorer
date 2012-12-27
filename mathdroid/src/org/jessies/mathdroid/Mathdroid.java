@@ -17,6 +17,8 @@ import org.jessies.calc.Calculator;
 import org.jessies.calc.CalculatorError;
 import org.jessies.calc.CalculatorPlotData;
 import org.jessies.calc.CalculatorPlotter;
+import org.jessies.calc.Node;
+import org.jessies.calc.StringNode;
 import org.jessies.calc.UnitsConverter;
 
 public class Mathdroid extends Activity implements AdapterView.OnItemClickListener, CalculatorPlotter, TextView.OnEditorActionListener, View.OnClickListener {
@@ -470,13 +472,14 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         history.add(new HistoryItem(queryText, computeAnswer(queryText)));
     }
 
-    private String computeAnswer(String query) {
+    private Node computeAnswer(String query) {
         try {
-            String answer = null;
+            Node answer = null;
             // TODO: integrate units conversion with calculation.
-            if (answer == null) {
-                // Convert units.
-                answer = UnitsConverter.convert(query);
+            // Convert units.
+            String conversion = UnitsConverter.convert(query);
+            if (conversion != null) {
+              answer = new StringNode(conversion);
             }
             if (answer == null) {
                 // Evaluate mathematical expressions.
@@ -484,10 +487,10 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
             }
             return answer;
         } catch (CalculatorError ex) {
-            return "Error: " + ex.getMessage();
+            return new StringNode("Error: " + ex.getMessage());
         } catch (Exception ex) {
             ex.printStackTrace();
-            return "Internal error: " + ex.getMessage();
+            return new StringNode("Internal error: " + ex.getMessage());
         }
     }
 

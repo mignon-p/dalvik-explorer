@@ -3,17 +3,17 @@ package org.jessies.calc;
 /*
  * This file is part of org.jessies.calc.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
- * 
+ *
  * LittleHelper is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,7 +31,7 @@ public class Calculator {
     private final Variable ans;
     private boolean degreesMode = false;
     private CalculatorPlotter plotter;
-    
+
     // Variable names are case-insensitive but case-preserving.
     // We implement case-insensitivity by using name.toLowerCase() as the key.
     // We preserve case by using a pair of the first-encountered name and the variable's value as the map's value type.
@@ -40,7 +40,7 @@ public class Calculator {
         Node value;
         boolean isAssignable = true;
     }
-    
+
     public Calculator() {
         this.functions = new HashMap<String, CalculatorFunction>();
         this.operators = new EnumMap<CalculatorToken, CalculatorFunction>(CalculatorToken.class);
@@ -49,15 +49,15 @@ public class Calculator {
         initBuiltInConstants();
         initBuiltInFunctions();
     }
-    
+
     public void setPlotter(CalculatorPlotter plotter) {
         this.plotter = plotter;
     }
-    
+
     public CalculatorPlotter getPlotter() {
         return plotter;
     }
-    
+
     private Variable initAns() {
         final Variable result = new Variable();
         result.name = "Ans";
@@ -66,19 +66,19 @@ public class Calculator {
         variables.put(result.name.toLowerCase(), result);
         return result;
     }
-    
+
     private void initBuiltInConstants() {
         // FIXME: use higher-precision string forms?
         initConstant("e", new RealNode(Math.E));
-        
+
         final Node pi = new RealNode(Math.PI);
         initConstant("pi", pi);
         initConstant("\u03c0", pi);
-        
+
         initConstant("false", BooleanNode.FALSE);
         initConstant("true", BooleanNode.TRUE);
     }
-    
+
     private void initConstant(String name, Node value) {
         final Variable constant = new Variable();
         constant.name = name;
@@ -87,7 +87,7 @@ public class Calculator {
         final String key = name.toLowerCase();
         variables.put(key, constant);
     }
-    
+
     private void initBuiltInFunctions() {
         // FIXME: acosh, asinh, atanh, chop, clip.
         addFunction(new CalculatorFunctions.Abs(),            "Abs");
@@ -167,7 +167,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Total(),          "Total");
         addFunction(new CalculatorFunctions.Transpose(),      "Transpose");
         addFunction(new CalculatorFunctions.Unequal(),        "Unequal");
-        
+
         operators.put(CalculatorToken.B_AND, functions.get("BitAnd"));
         operators.put(CalculatorToken.B_NOT, functions.get("BitNot"));
         operators.put(CalculatorToken.B_OR,  functions.get("BitOr"));
@@ -188,7 +188,7 @@ public class Calculator {
         operators.put(CalculatorToken.SHL,   functions.get("BitShiftLeft"));
         operators.put(CalculatorToken.SHR,   functions.get("BitShiftRight"));
     }
-    
+
     private void addFunction(CalculatorFunction function, String... names) {
         for (String name : names) {
             addUniqueFunction(function, name);
@@ -202,7 +202,7 @@ public class Calculator {
             }
         }
     }
-    
+
     private void addUniqueFunction(CalculatorFunction function, String name) {
         // The checks in addFunction ensure no duplication for a single function.
         // This check is to avoid accidental duplication between functions.
@@ -211,17 +211,17 @@ public class Calculator {
         }
         functions.put(name, function);
     }
-    
+
     private Node parse(String stringExpression) throws CalculatorError {
         final CalculatorParser parser = new CalculatorParser(this, stringExpression);
         return parser.parse();
     }
-    
+
     private Node simplify(Node expression) {
         return expression.simplify(this);
     }
-    
-    public String evaluate(String stringExpression) throws CalculatorError {
+
+    public Node evaluate(String stringExpression) throws CalculatorError {
         final Node expression = parse(stringExpression);
         final Node simplifiedExpression = simplify(expression);
         if (false) {
@@ -229,27 +229,24 @@ public class Calculator {
             final String simplifiedString = simplifiedExpression.toInputString();
             System.err.println(expressionString + (expressionString.equals(simplifiedString) ? "" : (" --- " + simplifiedString)));
         }
-        final long t0 = System.nanoTime();
         final Node result = expression.evaluate(this);
-        final long t1 = System.nanoTime();
-        // System.err.println((t1-t0) + " ns");
         ans.value = result;
-        return result.toString();
+        return result;
     }
-    
+
     public CalculatorFunction getFunction(String name) {
         return functions.get(name);
     }
-    
+
     public CalculatorFunction getFunction(CalculatorToken token) {
         return operators.get(token);
     }
-    
+
     public Node getVariable(String name) {
         final Variable v = variables.get(name.toLowerCase());
         return (v != null) ? v.value : null;
     }
-    
+
     public void setVariable(String name, Node newValue) {
         final String key = name.toLowerCase();
         Variable v = variables.get(key);
@@ -266,14 +263,14 @@ public class Calculator {
         }
         v.value = newValue;
     }
-    
+
     /**
      * Tells all trigonometric functions to take/return degrees rather than radians.
      */
     public void setDegreesMode(boolean degreesMode) {
         this.degreesMode = degreesMode;
     }
-    
+
     public RealNode angleArgument(NumberNode n) {
         RealNode value = n.toReal();
         if (degreesMode) {
@@ -281,7 +278,7 @@ public class Calculator {
         }
         return value;
     }
-    
+
     public RealNode angleResult(NumberNode n) {
         RealNode value = n.toReal();
         if (degreesMode) {
