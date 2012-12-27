@@ -111,7 +111,7 @@ public class MathdroidTests extends Activity implements TestListener {
 
     String text = (failed ? "[FAIL]" : "[PASS]") + " " + testName;
     if (durationMs > 1000) {
-      text += " ( " + prettyDurationMs(durationMs) + ")";
+      text += " (" + prettyDurationMs(durationMs) + ")";
     }
     text += "\n";
 
