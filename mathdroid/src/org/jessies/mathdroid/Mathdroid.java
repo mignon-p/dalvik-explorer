@@ -312,6 +312,9 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         String angleMode = settings.getString("angleMode", "Radians");
         calculator.setDegreesMode(angleMode.equals("Degrees"));
 
+        String outputBase = settings.getString("outputBase", "10");
+        calculator.setOutputBase(Integer.parseInt(outputBase));
+
         this.continuationMode = settings.getBoolean("continuationMode", false);
         this.hapticFeedback = settings.getBoolean("hapticFeedback", false);
 

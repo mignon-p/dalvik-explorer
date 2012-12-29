@@ -3,17 +3,17 @@ package org.jessies.calc;
 /*
  * This file is part of org.jessies.calc.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
- * 
+ *
  * LittleHelper is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,31 +28,31 @@ public abstract class CalculatorFunction implements Cloneable, Node {
     private final String name;
     private final int minArity;
     private final int maxArity;
-    
+
     // Only valid in a bound function.
     protected List<Node> args;
-    
+
     // A fixed-arity function.
     public CalculatorFunction(String name, int arity) {
         this(name, arity, arity);
     }
-    
+
     // A variable-arity function.
     public CalculatorFunction(String name, int minArity, int maxArity) {
         this.name = name;
         this.minArity = minArity;
         this.maxArity = maxArity;
     }
-    
+
     // For use in subclass implementations of evaluate.
     protected Node arg(Calculator environment, int i) {
         return args.get(i).evaluate(environment);
     }
-    
+
     public CalculatorFunction bind(Node... args) {
         return bind(Arrays.asList(args));
     }
-    
+
     public CalculatorFunction bind(List<Node> args) {
         if (args.size() < minArity || args.size() > maxArity) {
             String message = "wrong number of arguments to function \"" + name + "\"; need ";
@@ -66,7 +66,7 @@ public abstract class CalculatorFunction implements Cloneable, Node {
             message += " but got " + args.size();
             throw new CalculatorError(message);
         }
-        
+
         try {
             CalculatorFunction result = (CalculatorFunction) this.clone();
             result.args = args;
@@ -75,15 +75,15 @@ public abstract class CalculatorFunction implements Cloneable, Node {
             throw new CalculatorError("internal error: couldn't clone '" + name + "'");
         }
     }
-    
+
     public Node evaluate(Calculator environment) {
         return apply(environment);
     }
-    
+
     public Node simplify(Calculator environment) {
         return bind(simplifyArgs(environment));
     }
-    
+
     protected ArrayList<Node> simplifyArgs(Calculator environment) {
         ArrayList<Node> simplifiedArgs = new ArrayList<Node>();
         for (int i = 0; i < args.size(); ++i) {
@@ -91,13 +91,13 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         return simplifiedArgs;
     }
-    
+
     public abstract Node apply(Calculator environment);
-    
+
     public String name() {
         return name;
     }
-    
+
     @Override public String toInputString() {
         StringBuilder result = new StringBuilder();
         result.append(name);
@@ -114,11 +114,11 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         return result.toString();
     }
-    
+
     @Override public String toString() {
         return toInputString();
     }
-    
+
     @Override public boolean equals(Object other) {
         if (this == other) {
             return true;
@@ -132,15 +132,11 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         return (args != null) ? args.equals(rhs.args) : rhs.args == null;
     }
-    
-    @Override public int hashCode() {
-        throw new UnsupportedOperationException("hashing functions/function applications not yet supported");
-    }
-    
+
     public static CalculatorError expected(String function, String type) {
         throw new CalculatorError("'" + function + "' expected " + type + " argument");
     }
-    
+
     public static BooleanNode toBoolean(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof BooleanNode) {
@@ -148,7 +144,7 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         throw expected(function, "boolean");
     }
-    
+
     public static IntegerNode toInteger(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof IntegerNode) {
@@ -156,7 +152,7 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         throw expected(function, "integer");
     }
-    
+
     public static ListNode toList(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof ListNode) {
@@ -164,7 +160,7 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         throw expected(function, "list");
     }
-    
+
     public static NumberNode toNumber(String function, Calculator environment, Node node) {
         node = node.evaluate(environment);
         if (node instanceof NumberNode) {
@@ -172,7 +168,7 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         throw expected(function, "numeric");
     }
-    
+
     public static CalculatorVariableNode toVariable(String function, Node node) {
         // We don't evaluate 'node' because we don't want its value; we want it as a variable, and it may be bound.
         if (node instanceof CalculatorVariableNode) {
@@ -180,7 +176,7 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         }
         throw expected(function, "variable name");
     }
-    
+
     public static int toBase(Node baseNode) {
         if (!(baseNode instanceof IntegerNode)) {
             throw new CalculatorError("base must be an integer between 2 and 36");

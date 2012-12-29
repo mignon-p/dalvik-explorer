@@ -29,7 +29,15 @@ public class Calculator {
     private final Map<CalculatorToken, CalculatorFunction> operators;
     private final Map<String, Variable> variables;
     private final Variable ans;
+
+    // We keep track of the "basic" names (like "ArcCos", as distinct from the
+    // derived names like "arccos" and "arc_cos") so we can automatically
+    // generate the on-line help.
+    private final TreeSet<String> basicFunctionNames = new TreeSet<String>();
+
     private boolean degreesMode = false;
+    private static int outputBase = 10; // TODO: pass this around instead of using static.
+
     private CalculatorPlotter plotter;
 
     // Variable names are case-insensitive but case-preserving.
@@ -152,7 +160,7 @@ public class Calculator {
         addFunction(new CalculatorFunctions.Power(),          "Power");
         addFunction(new CalculatorFunctions.Product(),        "Product", /* Unicode Greek capital letter pi */ "\u03a0", /* Unicode product sign */ "\u220f");
         addFunction(new CalculatorFunctions.Range(),          "Range");
-        addFunction(new CalculatorFunctions.Random(),         "Random", "rand");
+        addFunction(new CalculatorFunctions.Random(),         "Random", "Rand");
         addFunction(new CalculatorFunctions.Reverse(),        "Reverse");
         addFunction(new CalculatorFunctions.Round(),          "Round");
         addFunction(new CalculatorFunctions.Sign(),           "Sign");
@@ -189,9 +197,18 @@ public class Calculator {
         operators.put(CalculatorToken.SHR,   functions.get("BitShiftRight"));
     }
 
+    public Iterable<String> getFunctionNames() {
+      return basicFunctionNames;
+    }
+
+    public Iterable<CalculatorToken> getOperators() {
+      return operators.keySet();
+    }
+
     private void addFunction(CalculatorFunction function, String... names) {
         for (String name : names) {
             addUniqueFunction(function, name);
+            basicFunctionNames.add(name);
             final String lowerCaseName = name.toLowerCase();
             if (!lowerCaseName.equals(name)) {
                 addUniqueFunction(function, lowerCaseName);
@@ -285,5 +302,13 @@ public class Calculator {
             value = new RealNode(Math.toDegrees(value.doubleValue()));
         }
         return value;
+    }
+
+    public void setOutputBase(int outputBase) {
+        this.outputBase = outputBase;
+    }
+
+    public static int getOutputBase() {
+        return outputBase;
     }
 }

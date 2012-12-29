@@ -450,19 +450,56 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         return new RealNode(result);
     }
 
-    public String toInputString() {
-        return toString();
-    }
+  public String toInputString() {
+    return toInputString(10);
+  }
 
-    public String toString(int base) {
-        if (isBig()) {
-            return big().toString(base);
-        } else {
-            return Long.toString(fixnum, base);
-        }
+  public String toInputString(int base) {
+    String result;
+    if (isBig()) {
+      result = big().toString(base);
+    } else {
+      result = Long.toString(fixnum, base);
     }
+    if (base != 10) {
+      result = prefix(base) + result;
+    }
+    return result;
+  }
 
-    @Override public String toString() {
-        return toString(10);
+  public String toString(int base) {
+    String result = toInputString(base);
+    if (base == 10) {
+      result = insertCharEveryNDigits(result, ',', 3);
     }
+    return result;
+  }
+
+  private static String insertCharEveryNDigits(String s, char ch, int n) {
+    StringBuilder result = new StringBuilder(s);
+    for (int i = 1; i < s.length(); ++i) {
+      if ((i % n) == 0) {
+        result.insert(s.length() - i, ch);
+      }
+    }
+    return result.toString();
+  }
+
+  private static String prefix(int base) {
+    if (base == 2) {
+      return "0b";
+    } else if (base == 8) {
+      return "0o";
+    } else if (base == 10) {
+      return "";
+    } else if (base == 16) {
+      return "0x";
+    } else {
+      throw new CalculatorError("Unsupported base " + base);
+    }
+  }
+
+  @Override public String toString() {
+    return toString(Calculator.getOutputBase());
+  }
 }

@@ -38,7 +38,11 @@ public class MathdroidSettings extends PreferenceActivity implements SharedPrefe
 
   private void updateSummaries() {
     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+
     String angleMode = settings.getString("angleMode", "Radians");
     findPreference("angleMode").setSummary(angleMode);
+
+    String outputBase = settings.getString("outputBase", "10");
+    findPreference("outputBase").setSummary(outputBase);
   }
 }

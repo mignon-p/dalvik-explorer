@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mathdroid</string>
-    
+
     <string name="default_angle_mode">Radians</string>
     <string-array name="angle_modes">
     <item>Degrees</item>
     <item>Radians</item>
+    </string-array>
+
+    <string name="default_output_base">10</string>
+    <string-array name="output_bases">
+    <item>2</item>
+    <item>8</item>
+    <item>10</item>
+    <item>16</item>
     </string-array>
 
 </resources>

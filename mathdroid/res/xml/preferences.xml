@@ -2,6 +2,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
  <ListPreference android:key="angleMode" android:title="Angle mode" android:entries="@array/angle_modes" android:entryValues="@array/angle_modes" android:dialogTitle="Angle mode" android:defaultValue="@string/default_angle_mode" />
+
+ <ListPreference android:key="outputBase" android:title="Output base" android:entries="@array/output_bases" android:entryValues="@array/output_bases" android:dialogTitle="Output base" android:defaultValue="@string/default_output_base" />
+
  <CheckBoxPreference android:key="hapticFeedback" android:title="Haptic feedback" android:summary="Vibrate when on-screen keys are pressed" android:defaultValue="false" />
  <CheckBoxPreference android:key="continuationMode" android:title="Continuation mode" android:summary="Auto-insert 'Ans' when an operator is used at the start of an expression" android:defaultValue="false" />
 
