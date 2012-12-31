@@ -21,15 +21,24 @@ package org.jessies.calc;
 import junit.framework.*;
 
 public class CalculatorTest extends TestCase {
-  private void check(Calculator c, String s, String input) {
+  private void check(Calculator c, boolean formattedString, String expected, String input) {
     Node result = c.evaluate(input);
-    if (!result.toString().equals(s)) {
-      throw new AssertionFailedError(input + " should be " + s + " but was " + result);
+    String actual = (formattedString ? result.toString() : result.toInputString());
+    if (!actual.equals(expected)) {
+      throw new AssertionFailedError(input + " should be " + expected + " but was " + actual);
     }
   }
 
-  private void check(String s, String input) {
-    check(new Calculator(), s, input);
+  private void check(Calculator c, String expected, String input) {
+    check(c, false, expected, input);
+  }
+
+  private void check(String expected, String input) {
+    check(new Calculator(), expected, input);
+  }
+
+  private void checkFormatted(String expected, String input) {
+    check(new Calculator(), true, expected, input);
   }
 
   private void check(double d, String input, double tolerance) {
@@ -38,6 +47,19 @@ public class CalculatorTest extends TestCase {
     if (Math.abs(actual - d) > tolerance) {
       throw new AssertionFailedError(input + " should be " + d + " but was " + result);
     }
+  }
+
+  public void testFormattedOutput() {
+    checkFormatted("1", "1");
+    checkFormatted("-1", "-1");
+    checkFormatted("12", "12");
+    checkFormatted("-12", "-12");
+    checkFormatted("123", "123");
+    checkFormatted("-123", "-123");
+    checkFormatted("1,234", "1234");
+    checkFormatted("-1,234", "-1234");
+    checkFormatted("12,345", "12345");
+    checkFormatted("-12,345", "-12345");
   }
 
   public void testArithmetic() {
@@ -372,10 +394,15 @@ public class CalculatorTest extends TestCase {
     check("[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]", "DigitCount(1234567890)");
     check("[1, 2, 2, 2, 2, 2, 2, 2, 2, 2]", "DigitCount(9876543210123456789)");
     check("[30, 15, 19, 10, 10, 14, 19, 7, 14, 20]", "DigitCount(100!)");
+    // Binary.
     check("[1, 0]", "DigitCount(0, 2)");
     check("[0, 1]", "DigitCount(1, 2)");
     check("[1, 1]", "DigitCount(2, 2)");
     check("[0, 2]", "DigitCount(3, 2)");
+    // Octal.
+    check("[0, 0, 3, 1, 0, 0, 0, 0]", "DigitCount(1234, 8)");
+    // Hex.
+    check("[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 3, 1]", "DigitCount(0xdeadbeef, 16)");
   }
 
   public void testDivideByZero() {
@@ -458,6 +485,7 @@ public class CalculatorTest extends TestCase {
     check("3", "IntegerLength(-100)");
     check("307", "IntegerLength(170!)");
     check("525", "IntegerLength(100!, 2)");
+    check("2", "IntegerLength(9, 8)");
     check("2", "IntegerLength(255, 16)");
     check("3", "IntegerLength(256, 16)");
   }

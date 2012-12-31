@@ -477,7 +477,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
 
   private static String insertCharEveryNDigits(String s, char ch, int n) {
     StringBuilder result = new StringBuilder(s);
-    for (int i = 1; i < s.length(); ++i) {
+    int end = s.length();
+    if (s.charAt(0) == '-') {
+      --end;
+    }
+    for (int i = 1; i < end; ++i) {
       if ((i % n) == 0) {
         result.insert(s.length() - i, ch);
       }
