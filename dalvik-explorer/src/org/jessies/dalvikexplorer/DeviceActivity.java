@@ -2,6 +2,7 @@ package org.jessies.dalvikexplorer;
 
 import android.app.*;
 import android.content.pm.*;
+import android.graphics.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -247,13 +248,28 @@ public class DeviceActivity extends TextViewActivity {
     result.append("  Buffers: " + Utils.prettySize(memInfo.buffers) + "\n");
     result.append('\n');
     
+    Display display = wm.getDefaultDisplay();
     DisplayMetrics metrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(metrics);
+    display.getMetrics(metrics);
     result.append("Screen Density: " + metrics.densityDpi + "dpi (" + metrics.density + "x DIP)\n");
-    result.append("Screen Size: " + metrics.widthPixels + " x " + metrics.heightPixels + " pixels\n");
     result.append("Exact DPI: " + metrics.xdpi + " x " + metrics.ydpi + "\n");
-    double widthInches = metrics.widthPixels/metrics.xdpi;
-    double heightInches = metrics.heightPixels/metrics.ydpi;
+    int widthPixels = metrics.widthPixels;
+    int heightPixels = metrics.heightPixels;
+    try {
+      widthPixels = (Integer) Display.class.getMethod("getRawWidth").invoke(display);
+      heightPixels = (Integer) Display.class.getMethod("getRawHeight").invoke(display);
+    } catch (Exception ignored) {
+    }
+    try {
+      Point realSize = new Point();
+      Display.class.getMethod("getRealSize", Point.class).invoke(display, realSize);
+      widthPixels = realSize.x;
+      heightPixels = realSize.y;
+    } catch (Exception ignored) {
+    }
+    result.append("Screen Size: " + widthPixels + " x " + heightPixels + " pixels\n");
+    double widthInches = widthPixels/metrics.xdpi;
+    double heightInches = heightPixels/metrics.ydpi;
     double diagonalInches = Math.sqrt(widthInches*widthInches + heightInches*heightInches);
     result.append(String.format("Approximate Dimensions: %.1f\" x %.1f\" (%.1f\" diagonal)\n", widthInches, heightInches, diagonalInches));
     result.append('\n');
