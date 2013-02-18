@@ -1144,15 +1144,15 @@ public class CalculatorFunctions {
 
     public static class Product extends CalculatorFunction { // FIXME: CAS support.
         public Product() {
-            super("product", 3);
+            super("product", 4);
         }
 
         public Node apply(Calculator environment) {
-            return series(environment, args, IntegerNode.ONE, false);
+            return series(name(), environment, args, IntegerNode.ONE, false);
         }
 
-        public String syntax() { return "(Expression, min:Number, max:Number)"; }
-        public String description() { return "Returns the product of the results of evaluating the given expression with the free variable <i>i</i> bound to each value from min to max."; }
+        public String syntax() { return "(Expression, Variable, min:Number, max:Number)"; }
+        public String description() { return "Returns the product of the results of evaluating the given expression with the given variable bound to each value from min to max."; }
     }
 
     public static class Random extends CalculatorFunction {
@@ -1246,10 +1246,11 @@ public class CalculatorFunctions {
         public String description() { return "Returns its argument rounded to the nearest integer, away from zero."; }
     }
 
-    private static NumberNode series(Calculator environment, List<Node> args, IntegerNode initial, boolean isSum) {
+    private static NumberNode series(String name, Calculator environment, List<Node> args, IntegerNode initial, boolean isSum) {
         final Node expr = args.get(0);
-        NumberNode iMin = CalculatorFunction.toNumber("series", environment, args.get(1));
-        NumberNode iMax = CalculatorFunction.toNumber("series", environment, args.get(2));
+        final CalculatorVariableNode var = CalculatorFunction.toVariable(name, args.get(1));
+        NumberNode iMin = CalculatorFunction.toNumber(name, environment, args.get(2));
+        NumberNode iMax = CalculatorFunction.toNumber(name, environment, args.get(3));
 
         // Ensure we have two integers or two reals.
         if (iMin instanceof RealNode || iMax instanceof RealNode) {
@@ -1264,11 +1265,11 @@ public class CalculatorFunctions {
         // FIXME: support infinite sums/products, adding convergence testing.
 
         // FIXME: let the user specify the sum variable.
-        final Node originalI = environment.getVariable("i");
+        final Node originalVarValue = environment.getVariable(var.name());
         try {
             NumberNode result = initial;
             for (NumberNode i = iMin; cmp(i, iMax) <= 0; i = i.increment()) {
-                environment.setVariable("i", i);
+                environment.setVariable(var.name(), i);
                 // FIXME: handle undefined and non-numeric terms.
                 final NumberNode term = (NumberNode) expr.evaluate(environment);
                 if (isSum) {
@@ -1279,7 +1280,7 @@ public class CalculatorFunctions {
             }
             return result;
         } finally {
-            environment.setVariable("i", originalI);
+            environment.setVariable(var.name(), originalVarValue);
         }
     }
 
@@ -1369,15 +1370,15 @@ public class CalculatorFunctions {
 
     public static class Sum extends CalculatorFunction { // FIXME: CAS support.
         public Sum() {
-            super("sum", 3);
+            super("sum", 4);
         }
 
         public Node apply(Calculator environment) {
-            return series(environment, args, IntegerNode.ZERO, true);
+            return series(name(), environment, args, IntegerNode.ZERO, true);
         }
 
-        public String syntax() { return "(Expression, min:Number, max:Number)"; }
-        public String description() { return "Returns the sum of the results of evaluating the given expression with the free variable <i>i</i> bound to each value from min to max."; }
+        public String syntax() { return "(Expression, Variable, min:Number, max:Number)"; }
+        public String description() { return "Returns the sum of the results of evaluating the given expression with the given variable bound to each value from min to max."; }
     }
 
     public static class Tan extends CalculatorFunctionN {

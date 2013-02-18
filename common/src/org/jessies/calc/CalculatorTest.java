@@ -539,10 +539,10 @@ public class CalculatorTest extends TestCase {
   }
 
   public void testSum() {
-    check("55", "Sum(i, 0, 10)");
-    check("55", "Sum(i, 0, 10.2)");
-    check("385", "Sum(i^2, 0, 10)");
-    check(0.0, "Sum(1/i!, 0, 30)-e", 0.000001);
+    check("55", "Sum(x, x, 0, 10)");
+    check("55", "Sum(x, x, 0, 10.2)");
+    check("385", "Sum(i^2, i, 0, 10)");
+    check(0.0, "Sum(1/i!, i, 0, 30)-e", 0.000001);
     // FIXME: failure test for min > max.
   }
 
@@ -556,9 +556,9 @@ public class CalculatorTest extends TestCase {
   }
 
   public void testProduct() {
-    check("3628800", "Product(i, 1, 10)");
-    check("3628800", "Product(i, 1, 10.2)");
-    check("518400", "Product(i^2, 1, 6)");
+    check("3628800", "Product(x, x, 1, 10)");
+    check("3628800", "Product(x, x, 1, 10.2)");
+    check("518400", "Product(i^2, i, 1, 6)");
     // FIXME: failure test for min > max.
   }
 
