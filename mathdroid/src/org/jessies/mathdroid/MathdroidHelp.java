@@ -17,7 +17,20 @@ public class MathdroidHelp extends Activity {
     super.onCreate(savedInstanceState);
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.help);
-    ((WebView) findViewById(R.id.help_webview)).loadData(readAssetFile("help.html"), "text/html; charset=UTF-8", null);
+    getWebView().loadData(readAssetFile("help.html"), "text/html; charset=UTF-8", null);
+  }
+
+  @Override public void onBackPressed() {
+    WebView webView = getWebView();
+    if (webView.canGoBack()) {
+      webView.goBack();
+    } else {
+      super.onBackPressed();
+    }
+  }
+
+  private WebView getWebView() {
+    return ((WebView) findViewById(R.id.help_webview));
   }
 
   private String readAssetFile(String filename) {
