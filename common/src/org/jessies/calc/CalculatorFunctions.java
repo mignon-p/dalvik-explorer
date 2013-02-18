@@ -182,6 +182,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.abs();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the absolute value of its argument."; }
     }
 
     public static class Acos extends CalculatorFunctionN {
@@ -192,6 +195,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return environment.angleResult(n.toReal().acos());
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the arc cosine (cos<sup>-1</sup>) of its argument."; }
     }
 
     public static class And extends CalculatorFunctionZZ {
@@ -202,6 +208,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, BooleanNode lhs, BooleanNode rhs) {
             return lhs.and(rhs);
         }
+
+        public String syntax() { return "(Boolean, Boolean)"; }
+        public String description() { return "Returns the logical and of its arguments."; }
     }
 
     public static class Asin extends CalculatorFunctionN {
@@ -212,6 +221,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return environment.angleResult(n.toReal().asin());
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the arc sine (sin<sup>-1</sup>) of its argument."; }
     }
 
     public static class Atan extends CalculatorFunctionN {
@@ -222,6 +234,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return environment.angleResult(n.toReal().atan());
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the arc tangent (tan<sup>-1</sup>) of its argument."; }
     }
 
     public static class Atan2 extends CalculatorFunctionNN {
@@ -232,6 +247,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode arg1, NumberNode arg2) {
             return environment.angleResult(arg1.toReal().atan2(arg2.toReal()));
         }
+
+        public String syntax() { return "(y:Number, x:Number)"; }
+        public String description() { return "Returns the principle value of <i>y/x</i>. That is, the angle when converting the cartesian coordinates (x,y) to polar form."; }
     }
 
     public static class BitAnd extends CalculatorFunctionII {
@@ -242,6 +260,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitAnd(rhs);
         }
+
+        public String syntax() { return "(Integer, Integer)"; }
+        public String description() { return "Returns the bitwise and of its arguments."; }
     }
 
     public static class BitClear extends CalculatorFunctionII {
@@ -252,6 +273,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitClear(rhs);
         }
+
+        public String syntax() { return "(n: Integer, k: Integer)"; }
+        public String description() { return "Returns n (treated as a two's complement integer) with its k'th bit cleared."; }
     }
 
     public static class BitGet extends CalculatorFunctionII {
@@ -262,6 +286,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitGet(rhs);
         }
+
+        public String syntax() { return "(n: Integer, k: Integer)"; }
+        public String description() { return "Returns 1 if the k'th bit of n (treated as a two's complement integer) is set, 0 otherwise."; }
     }
 
     public static class BitLength extends CalculatorFunctionI {
@@ -272,6 +299,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode arg) {
             return arg.bitLength();
         }
+
+        public String syntax() { return "(Integer)"; }
+        public String description() { return "Returns the number of bits needed to represent n (treated as a two's complement integer)."; }
     }
 
     public static class BitNot extends CalculatorFunctionI {
@@ -282,6 +312,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode arg) {
             return arg.bitNot();
         }
+
+        public String syntax() { return "(Integer)"; }
+        public String description() { return "Returns the bitwise negation of n (treated as a two's complement integer)."; }
     }
 
     public static class BitOr extends CalculatorFunctionII {
@@ -292,6 +325,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitOr(rhs);
         }
+
+        public String syntax() { return "(Integer, Integer)"; }
+        public String description() { return "Returns the bitwise and of its arguments."; }
     }
 
     public static class BitSet extends CalculatorFunctionII {
@@ -302,6 +338,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitSet(rhs);
         }
+
+        public String syntax() { return "(n: Integer, k: Integer)"; }
+        public String description() { return "Sets the k'th bit of n (treated as a two's complement integer)."; }
     }
 
     public static class BitShiftLeft extends CalculatorFunctionII {
@@ -312,6 +351,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitShiftLeft(rhs);
         }
+
+        public String syntax() { return "(n: Integer, k: Integer)"; }
+        public String description() { return "Shifts n (treated as a two's complement integer) k bit positions left."; }
     }
 
     public static class BitShiftRight extends CalculatorFunctionII {
@@ -322,6 +364,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitShiftRight(rhs);
         }
+
+        public String syntax() { return "(n: Integer, k: Integer)"; }
+        public String description() { return "Shifts n (treated as a two's complement integer) k bit positions right."; }
     }
 
     public static class BitXor extends CalculatorFunctionII {
@@ -332,6 +377,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.bitXor(rhs);
         }
+
+        public String syntax() { return "(Integer, Integer)"; }
+        public String description() { return "Returns the bitwise exclusive or of its arguments."; }
     }
 
     // Converts true and false into 1 and 0, respectively.
@@ -343,6 +391,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, BooleanNode arg) {
             return arg == BooleanNode.TRUE ? IntegerNode.ONE : IntegerNode.ZERO;
         }
+
+        public String syntax() { return "(Boolean)"; }
+        public String description() { return "Returns 1 if the argument is true, 0 otherwise."; }
     }
 
     public static class Cbrt extends CalculatorFunctionN {
@@ -353,6 +404,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().cbrt();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the cube root of its argument."; }
     }
 
     public static class Ceiling extends CalculatorFunctionN {
@@ -363,6 +417,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().ceiling();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the ceiling of its argument; the smallest integer value not less than the argument."; }
     }
 
     public static class Cos extends CalculatorFunctionN {
@@ -373,6 +430,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return environment.angleArgument(n).cos();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the cosine of its argument."; }
     }
 
     public static class Cosh extends CalculatorFunctionN {
@@ -383,6 +443,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().cosh();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the hyperbolic cosine of its argument."; }
     }
 
     public static class Define extends CalculatorFunction {
@@ -396,6 +459,9 @@ public class CalculatorFunctions {
             environment.setVariable(variable.name(), value);
             return value;
         }
+
+        public String syntax() { return "(Name, Expression)"; }
+        public String description() { return "Binds the given expression to the given name."; }
     }
 
     // DigitCount(n, base) - returns the number of instances of each digit in the given base representation of 'n'.
@@ -404,6 +470,9 @@ public class CalculatorFunctions {
         public DigitCount() {
             super("DigitCount", 1, 2);
         }
+
+        public String syntax() { return "(n:Integer, base:Integer = 10)"; }
+        public String description() { return "Returns a list containing the number of instances of each digit in the representation of n in the given base."; }
 
         public Node apply(Calculator environment) {
             final IntegerNode n = toInteger(name(), environment, arg(environment, 0));
@@ -443,6 +512,9 @@ public class CalculatorFunctions {
             }
             return dimensions;
         }
+
+        public String syntax() { return "(Matrix)"; }
+        public String description() { return "Returns the dimensions of its argument."; }
     }
 
     public static class Divide extends CalculatorFunctionNN {
@@ -453,6 +525,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return lhs.divide(rhs);
         }
+
+        public String syntax() { return "(Number, Number)"; }
+        public String description() { return "Returns the quotient of its arguments."; }
     }
 
     public static class Equal extends CalculatorFunction { // FIXME: CAS support.
@@ -463,6 +538,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return equal(arg(environment, 0), arg(environment, 1));
         }
+
+        public String syntax() { return "(Value, Value)"; }
+        public String description() { return "Returns true if its arguments are equal, false otherwise."; }
     }
 
     public static class Exp extends CalculatorFunctionN {
@@ -473,6 +551,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().exp();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns <i>e<sup>n</sup></i>."; }
     }
 
     public static class Factorial extends CalculatorFunctionI {
@@ -483,6 +564,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode n) {
             return n.factorial();
         }
+
+        public String syntax() { return "(Integer)"; }
+        public String description() { return "Returns <i>n!</i>."; }
     }
 
     // Filter(expr, var, list) - returns a list of the elements of 'list' for which evaluating 'expr' with 'var' bound to that value gives True.
@@ -490,6 +574,9 @@ public class CalculatorFunctions {
         public Filter() {
             super("Filter", false);
         }
+
+        public String syntax() { return "(Expression, Variable, List)"; }
+        public String description() { return "Returns a list containing those elements of the given list for which evaluating the given expression with the given variable bound the value returns true."; }
     }
 
     public static class Floor extends CalculatorFunctionN {
@@ -500,6 +587,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().floor();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the floor of its argument; the largest integer value not greater than the argument."; }
     }
 
     public static class FractionalPart extends CalculatorFunctionN {
@@ -510,6 +600,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.fractionalPart();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the fractional part of its argument."; }
     }
 
     public static class GCD extends CalculatorFunctionII {
@@ -520,6 +613,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode a, IntegerNode b) {
             return IntegerNode.gcd(a, b);
         }
+
+        public String syntax() { return "(Number, Number)"; }
+        public String description() { return "Returns the greatest common divisor of its arguments."; }
     }
 
     public static class Greater extends CalculatorFunction { // FIXME: CAS support.
@@ -530,6 +626,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) > 0);
         }
+
+        public String syntax() { return "(lhs:Value, rhs:Value)"; }
+        public String description() { return "Returns true if <i>lhs &gt; rhs</i>, false otherwise."; }
     }
 
     public static class GreaterEqual extends CalculatorFunction { // FIXME: CAS support.
@@ -540,6 +639,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) >= 0);
         }
+
+        public String syntax() { return "(lhs:Value, rhs:Value)"; }
+        public String description() { return "Returns true if <i>lhs &gt;= rhs</i>, false otherwise."; }
     }
 
     public static class Hypot extends CalculatorFunctionNN {
@@ -550,6 +652,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode arg1, NumberNode arg2) {
             return arg1.toReal().hypot(arg2.toReal());
         }
+
+        public String syntax() { return "(x:Number, y:Number)"; }
+        public String description() { return "Returns <i>sqrt(x<sup>2</sup> + y<sup>2</sup>)</i>."; }
     }
 
     public static class IdentityMatrix extends CalculatorFunctionI {
@@ -568,9 +673,12 @@ public class CalculatorFunctions {
             }
             return result;
         }
+
+        public String syntax() { return "(dimension:Integer)"; }
+        public String description() { return "Returns an identity matrix of the given dimension."; }
     }
 
-    // Returns the number of decimal digits in the given integer. (n, base=10)
+    // Returns the number of digits in the given integer. (n, base=10)
     public static class IntegerLength extends CalculatorFunction {
         public IntegerLength() {
             super("IntegerLength", 1, 2);
@@ -585,6 +693,9 @@ public class CalculatorFunctions {
             }
             return IntegerNode.valueOf(rep.length());
         }
+
+        public String syntax() { return "(n:Integer, base:Integer = 10)"; }
+        public String description() { return "Returns the number of digits in n when represented in the given base."; }
     }
 
     public static class IntegerPart extends CalculatorFunctionN {
@@ -595,6 +706,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.integerPart();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the integer part of its argument."; }
     }
 
     public static class IsMatrix extends CalculatorFunction { // FIXME: CAS support.
@@ -605,6 +719,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return BooleanNode.valueOf(matrixDimensions(arg(environment, 0)) != null);
         }
+
+        public String syntax() { return "(Value)"; }
+        public String description() { return "Returns true if its argument is a matrix, false otherwise."; }
     }
 
     public static class IsPrime extends CalculatorFunctionI {
@@ -615,6 +732,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode arg) {
             return arg.isPrime();
         }
+
+        public String syntax() { return "(Integer)"; }
+        public String description() { return "Returns true if its argument is prime, false otherwise."; }
     }
 
     public static class LCM extends CalculatorFunctionII {
@@ -629,6 +749,9 @@ public class CalculatorFunctions {
             // lcm(a,b) = abs(a*b)/gcd(a,b)
             return a.times(b).abs().divide(IntegerNode.gcd(a, b));
         }
+
+        public String syntax() { return "(Integer, Integer)"; }
+        public String description() { return "Returns the least common multiple of its arguments."; }
     }
 
     public static class Length extends CalculatorFunctionL {
@@ -639,6 +762,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, ListNode list) {
             return IntegerNode.valueOf(list.size());
         }
+
+        public String syntax() { return "(List)"; }
+        public String description() { return "Returns the length of its list argument."; }
     }
 
     public static class Less extends CalculatorFunction { // FIXME: CAS support.
@@ -649,6 +775,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) < 0);
         }
+
+        public String syntax() { return "(lhs:Value, rhs:Value)"; }
+        public String description() { return "Returns true if <i>lhs &lt; rhs</i>, false otherwise."; }
     }
 
     public static class LessEqual extends CalculatorFunction { // FIXME: CAS support.
@@ -659,6 +788,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return BooleanNode.valueOf(cmp(environment, args) <= 0);
         }
+
+        public String syntax() { return "(lhs:Value, rhs:Value)"; }
+        public String description() { return "Returns true if <i>lhs &lt;= rhs</i>, false otherwise."; }
     }
 
     // We call this ListBuilder because reusing the name List in Java is just too confusing.
@@ -674,6 +806,9 @@ public class CalculatorFunctions {
             }
             return result;
         }
+
+        public String syntax() { return "(Expression...)"; }
+        public String description() { return "Returns list containing the values resulting from evaluating each argument in order."; }
     }
 
     // log(base, n).
@@ -685,6 +820,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode base, NumberNode n) {
             return n.toReal().log(base.toReal());
         }
+
+        public String syntax() { return "(base:Number, n:Number)"; }
+        public String description() { return "Returns <i>log<sub>base</sub>(n)</i>."; }
     }
 
     public static class Log2 extends CalculatorFunctionN {
@@ -695,6 +833,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().log2();
         }
+
+        public String syntax() { return "(n:Number)"; }
+        public String description() { return "Returns <i>log<sub>2</sub>(n)</i>."; }
     }
 
     public static class LogE extends CalculatorFunctionN {
@@ -705,6 +846,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().logE();
         }
+
+        public String syntax() { return "(n:Number)"; }
+        public String description() { return "Returns <i>log<sub>e</sub>(n)</i>."; }
     }
 
     public static class Log10 extends CalculatorFunctionN {
@@ -715,6 +859,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().log10();
         }
+
+        public String syntax() { return "(n:Number)"; }
+        public String description() { return "Returns <i>log<sub>10</sub>(n)</i>."; }
     }
 
     // Map(expr, var, list) - returns a list of the results of evaluating 'expr' with 'var' bound to each value in 'list' in turn.
@@ -722,9 +869,12 @@ public class CalculatorFunctions {
         public Map() {
             super("Map", true);
         }
+
+        public String syntax() { return "(Expression, Variable, List)"; }
+        public String description() { return "Returns a list containing the results of evaluating expression once for each item in the given list, with the given variable bound to that value."; }
     }
 
-    public static class MapOrFilter extends CalculatorFunction {
+    public abstract static class MapOrFilter extends CalculatorFunction {
         private final boolean isMap;
 
         public MapOrFilter(String name, boolean isMap) {
@@ -772,6 +922,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return cmp(lhs, rhs) >= 0 ? lhs : rhs;
         }
+
+        public String syntax() { return "(Number, Number)"; }
+        public String description() { return "Returns the greater of its arguments."; }
     }
 
     public static class Min extends CalculatorFunctionNN {
@@ -782,6 +935,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return cmp(lhs, rhs) < 0 ? lhs : rhs;
         }
+
+        public String syntax() { return "(Number, Number)"; }
+        public String description() { return "Returns the lesser of its arguments."; }
     }
 
     public static class Mod extends CalculatorFunctionII {
@@ -792,6 +948,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, IntegerNode lhs, IntegerNode rhs) {
             return lhs.mod(rhs);
         }
+
+        public String syntax() { return "(lhs:Integer, rhs:Integer)"; }
+        public String description() { return "Returns <i>lhs % rhs</i>."; }
     }
 
     public static class nCr extends CalculatorFunctionII {
@@ -805,6 +964,9 @@ public class CalculatorFunctions {
             IntegerNode r = rhs;
             return n.factorial().divide(r.factorial().times(((IntegerNode) n.subtract(r)).factorial()));
         }
+
+        public String syntax() { return "(n:Integer, r:Integer)"; }
+        public String description() { return "Returns the number of combinations of n from r, <i>nCr(n, r)</i>, defined as <i>n!/(r! * (n-r)!)</i>."; }
     }
 
     public static class Not extends CalculatorFunctionZ {
@@ -815,6 +977,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, BooleanNode arg) {
             return arg.not();
         }
+
+        public String syntax() { return "(Boolean)"; }
+        public String description() { return "Returns the logical not of its argument."; }
     }
 
     public static class nPr extends CalculatorFunctionII {
@@ -828,6 +993,9 @@ public class CalculatorFunctions {
             IntegerNode r = rhs;
             return n.factorial().divide(((IntegerNode) n.subtract(r)).factorial());
         }
+
+        public String syntax() { return "(n:Integer, r:Integer)"; }
+        public String description() { return "Returns the number of permutations of n from r, <i>nPr(n, r)</i>, defined as <i>n!/(n-r)!</i>."; }
     }
 
     public static class Or extends CalculatorFunctionZZ {
@@ -838,12 +1006,18 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, BooleanNode lhs, BooleanNode rhs) {
             return lhs.or(rhs);
         }
+
+        public String syntax() { return "(Boolean, Boolean)"; }
+        public String description() { return "Returns the logical or of its arguments."; }
     }
 
     public static class Plot extends CalculatorFunction {
         public Plot() {
             super("Plot", 4);
         }
+
+        public String syntax() { return "(Expression, Variable, xMin:Number, xMax:Number)"; }
+        public String description() { return "Plots the given expression."; }
 
         public Node apply(Calculator environment) {
             CalculatorPlotter plotter = environment.getPlotter();
@@ -950,6 +1124,9 @@ public class CalculatorFunctions {
             }
             return bind(args);
         }
+
+        public String syntax() { return "(Value, Value)"; }
+        public String description() { return "Returns the sum of its arguments."; }
     }
 
     public static class Power extends CalculatorFunctionNN {
@@ -960,6 +1137,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode lhs, NumberNode rhs) {
             return lhs.power(rhs);
         }
+
+        public String syntax() { return "(x:Number, y:Number)"; }
+        public String description() { return "Returns <i>x<sup>y</sup></i>."; }
     }
 
     public static class Product extends CalculatorFunction { // FIXME: CAS support.
@@ -970,6 +1150,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return series(environment, args, IntegerNode.ONE, false);
         }
+
+        public String syntax() { return "(Expression, min:Number, max:Number)"; }
+        public String description() { return "Returns the product of the results of evaluating the given expression with the free variable <i>i</i> bound to each value from min to max."; }
     }
 
     public static class Random extends CalculatorFunction {
@@ -980,12 +1163,18 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return new RealNode(Math.random());
         }
+
+        public String syntax() { return "()"; }
+        public String description() { return "Returns a pseudorandom number with uniform distribution from the range [0.0, 1.0)."; }
     }
 
     public static class Range extends CalculatorFunction { // FIXME: CAS support.
         public Range() {
             super("Range", 1, 3);
         }
+
+        public String syntax() { return "(n:Number, m:Number, k:Number = 1)"; }
+        public String description() { return "Returns a list of numbers. Given one argument, n, returns <i>[1, 2, ..., n]</i>. Given two arguments, n and m, returns <i>[n, n+1, ..., m]</i>. Given three arguments, n, m, and k, returns <i>[n, n+k, ..., m]</i>."; }
 
         public Node apply(Calculator environment) {
             final NumberNode start;
@@ -1039,6 +1228,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, ListNode list) {
             return list.reverse();
         }
+
+        public String syntax() { return "(List)"; }
+        public String description() { return "Returns a list containing all the elements of the given list, but in reverse order."; }
     }
 
     public static class Round extends CalculatorFunctionN {
@@ -1049,6 +1241,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().round();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns its argument rounded to the nearest integer, away from zero."; }
     }
 
     private static NumberNode series(Calculator environment, List<Node> args, IntegerNode initial, boolean isSum) {
@@ -1096,6 +1291,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.sign();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns 0 if the argument is zero, 1 if the argument is greater than 0, or -1 if the argument is less than 0."; }
     }
 
     public static class Sin extends CalculatorFunctionN {
@@ -1106,6 +1304,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return environment.angleArgument(n).sin();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the sine of its argument."; }
     }
 
     public static class Sinh extends CalculatorFunctionN {
@@ -1116,6 +1317,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().sinh();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the hyperbolic sine of its argument."; }
     }
 
     public static class Sqrt extends CalculatorFunctionN {
@@ -1126,6 +1330,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().sqrt();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the square root of its argument."; }
     }
 
     public static class Subtract extends CalculatorFunction { // FIXME: CAS support.
@@ -1155,6 +1362,9 @@ public class CalculatorFunctions {
                 throw expected("Subtract", "numeric or matrix");
             }
         }
+
+        public String syntax() { return "(Number, Number)"; }
+        public String description() { return "Returns the difference of its arguments."; }
     }
 
     public static class Sum extends CalculatorFunction { // FIXME: CAS support.
@@ -1165,6 +1375,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return series(environment, args, IntegerNode.ZERO, true);
         }
+
+        public String syntax() { return "(Expression, min:Number, max:Number)"; }
+        public String description() { return "Returns the sum of the results of evaluating the given expression with the free variable <i>i</i> bound to each value from min to max."; }
     }
 
     public static class Tan extends CalculatorFunctionN {
@@ -1175,6 +1388,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return environment.angleArgument(n).tan();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the tangent of its argument."; }
     }
 
     public static class Tanh extends CalculatorFunctionN {
@@ -1185,6 +1401,9 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment, NumberNode n) {
             return n.toReal().tanh();
         }
+
+        public String syntax() { return "(Number)"; }
+        public String description() { return "Returns the hyperbolic tangent of its argument."; }
     }
 
     public static class Times extends CalculatorFunction { // FIXME: CAS support.
@@ -1272,6 +1491,9 @@ public class CalculatorFunctions {
             }
             return bind(args);
         }
+
+        public String syntax() { return "(Number, Number)"; }
+        public String description() { return "Returns the product of its arguments."; }
     }
 
     public static class Total extends CalculatorFunctionL {
@@ -1287,6 +1509,9 @@ public class CalculatorFunctions {
             }
             return result.evaluate(environment);
         }
+
+        public String syntax() { return "(List)"; }
+        public String description() { return "Returns the sum of every element in the given list."; }
     }
 
     public static class Transpose extends CalculatorFunction { // FIXME: CAS support.
@@ -1313,6 +1538,9 @@ public class CalculatorFunctions {
             }
             return result;
         }
+
+        public String syntax() { return "(Matrix)"; }
+        public String description() { return "Returns the transpose of the given matrix."; }
     }
 
     public static class Unequal extends CalculatorFunction { // FIXME: CAS support.
@@ -1323,5 +1551,8 @@ public class CalculatorFunctions {
         public Node apply(Calculator environment) {
             return equal(arg(environment, 0), arg(environment, 1)).not();
         }
+
+        public String syntax() { return "(Value, Value)"; }
+        public String description() { return "Returns true if its arguments are <b>not</b> equal, false otherwise."; }
     }
 }

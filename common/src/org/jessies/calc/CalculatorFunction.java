@@ -98,6 +98,11 @@ public abstract class CalculatorFunction implements Cloneable, Node {
         return name;
     }
 
+    /** Used to generate the documentation. */
+    public abstract String syntax();
+    /** Used to generate the documentation. */
+    public abstract String description();
+
     @Override public String toInputString() {
         StringBuilder result = new StringBuilder();
         result.append(name);
