@@ -203,6 +203,10 @@ public class LocaleActivity extends TextViewActivity {
         describeString(result, "tomorrow", enUsData, localeData);
         result.append('\n');
 
+        describeString(result, "timeFormat12", enUsData, localeData);
+        describeString(result, "timeFormat24", enUsData, localeData);
+        result.append('\n');
+
         describeChar(result, "zeroDigit", enUsData, localeData);
         describeChar(result, "decimalSeparator", enUsData, localeData);
         describeChar(result, "groupingSeparator", enUsData, localeData);
