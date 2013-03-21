@@ -19,6 +19,7 @@
     android:minResizeHeight="20dip"
     android:minWidth="40dip"
     android:minHeight="20dip"
+    android:previewImage="@drawable/build_widget_preview"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/build_widget"
     android:resizeMode="none"
