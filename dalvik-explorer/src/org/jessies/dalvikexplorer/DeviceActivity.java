@@ -16,11 +16,11 @@ public class DeviceActivity extends TextViewActivity {
   protected CharSequence title(String unused) {
     return "Device Details";
   }
-  
-  protected CharSequence content(String unused) {
+
+  protected String content(String unused) {
     return getDeviceDetailsAsString(this, getWindowManager());
   }
-  
+
   // sysconf _SC_NPROCESSORS_CONF and _SC_NPROCESSORS_ONLN have been broken
   // in bionic for various different reasons. /proc parsing was broken until
   // Gingerbread, and even then _SC_NPROCESSORS_CONF was broken because ARM
@@ -36,7 +36,7 @@ public class DeviceActivity extends TextViewActivity {
     }
     return result;
   }
-  
+
   private static int countEnabledCores() {
     int count = 0;
     BufferedReader in = null;
@@ -60,7 +60,7 @@ public class DeviceActivity extends TextViewActivity {
       }
     }
   }
-  
+
   private static String valueForKey(String[] lines, String key) {
     // If you touch this, test on ARM, MIPS, and x86.
     Pattern p = Pattern.compile("(?i)" + key + "\t*: (.*)");
@@ -72,7 +72,7 @@ public class DeviceActivity extends TextViewActivity {
     }
     return null;
   }
-  
+
   private static int numericValueForKey(String[] lines, String key) {
     String value = valueForKey(lines, key);
     if (value == null) {
@@ -89,7 +89,7 @@ public class DeviceActivity extends TextViewActivity {
       return -1;
     }
   }
-  
+
   private static String decodeImplementer(int implementer) {
     // From "ETMIDR bit assignments".
     // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ihi0014q/Bcfihfdj.html
@@ -109,7 +109,7 @@ public class DeviceActivity extends TextViewActivity {
       return "unknown (0x" + Integer.toHexString(implementer) + ")";
     }
   }
-  
+
   private static String decodePartNumber(int part) {
     // TODO: if different implementers don't get discrete ranges,
     // we might need to test implementer here too.
@@ -161,10 +161,11 @@ public class DeviceActivity extends TextViewActivity {
       return "unknown (0x" + Integer.toHexString(part) + ")";
     }
   }
-  
+
   static String getDeviceDetailsAsString(Activity context, WindowManager wm) {
     final StringBuilder result = new StringBuilder();
-    
+    result.append("<html>");
+
     String[] procCpuLines = Utils.readFile("/proc/cpuinfo").split("\n");
     // x86 kernels use "processor" as an integer to number sockets.
     // They use "model name" to describe the processor.
@@ -173,86 +174,84 @@ public class DeviceActivity extends TextViewActivity {
     if (processor == null) {
       processor = valueForKey(procCpuLines, "Processor");
     }
-    result.append("Processor: " + processor + "\n");
-    
+    append(result, "Processor", processor);
+
     int hardwareCoreCount = countHardwareCores();
     int enabledCoreCount = countEnabledCores();
     String cores = Integer.toString(hardwareCoreCount);
     if (enabledCoreCount != hardwareCoreCount) {
       cores += " (enabled: " + enabledCoreCount + ")";
     }
-    result.append("Cores: " +  cores + "\n");
-    result.append('\n');
-    
+    append(result, "Cores", cores);
+
+    result.append("<p>");
     try {
       String minFrequency = Utils.readFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq").trim();
       String maxFrequency = Utils.readFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq").trim();
       int minFrequencyHz = Integer.parseInt(minFrequency) * 1000;
       int maxFrequencyHz = Integer.parseInt(maxFrequency) * 1000;
-      result.append("CPU Speed: " + Utils.prettyHz(maxFrequencyHz) + " (idles at " + Utils.prettyHz(minFrequencyHz) + ")\n");
+      append(result, "CPU Speed", Utils.prettyHz(maxFrequencyHz) + " (idles at " + Utils.prettyHz(minFrequencyHz) + ")");
     } catch (Exception unexpected) {
-      result.append("(Unable to determine CPU frequencies.)\n");
+      result.append("(Unable to determine CPU frequencies.)");
     }
-    result.append('\n');
-    
+
     // ARM-specific.
     int implementer = numericValueForKey(procCpuLines, "CPU implementer");
     if (implementer != -1) {
-      result.append("CPU Implementer: " + decodeImplementer(implementer) + "\n");
-      result.append("CPU Part: " + decodePartNumber(numericValueForKey(procCpuLines, "CPU part")) + "\n");
+      result.append("<p>");
+      append(result, "CPU Implementer", decodeImplementer(implementer));
+      append(result, "CPU Part", decodePartNumber(numericValueForKey(procCpuLines, "CPU part")));
       // These two are included in the kernel's formatting of "Processor".
       //result.append("CPU Architecture: " + numericValueForKey(procCpuLines, "CPU architecture") + "\n");
       //result.append("CPU Revision: " + numericValueForKey(procCpuLines, "CPU revision") + "\n");
-      result.append("CPU Variant: " + numericValueForKey(procCpuLines, "CPU variant") + "\n");
-      result.append('\n');
-      result.append("Hardware: " + valueForKey(procCpuLines, "Hardware") + "\n");
-      result.append("Revision: " + valueForKey(procCpuLines, "Revision") + "\n");
-      result.append("Serial: " + valueForKey(procCpuLines, "Serial") + "\n");
-      result.append('\n');
+      append(result, "CPU Variant", numericValueForKey(procCpuLines, "CPU variant"));
+      result.append("<p>");
+      append(result, "Hardware", valueForKey(procCpuLines, "Hardware"));
+      append(result, "Revision", valueForKey(procCpuLines, "Revision"));
+      append(result, "Serial", valueForKey(procCpuLines, "Serial"));
     }
-    
+
     // MIPS-specific.
     // TODO: is "CPU architecture" ever more specific than "MIPS"?
     if ("MIPS".equals(valueForKey(procCpuLines, "CPU architecture"))) {
-      result.append("CPU Implementer: " + valueForKey(procCpuLines, "CPU implementer") + "\n");
-      result.append("CPU Model: " + valueForKey(procCpuLines, "cpu model") + "\n");
-      result.append('\n');
-      result.append("Hardware: " + valueForKey(procCpuLines, "Hardware") + "\n");
-      result.append("Revision: " + valueForKey(procCpuLines, "Revision") + "\n");
-      result.append("Serial: " + valueForKey(procCpuLines, "Serial") + "\n");
-      result.append('\n');
+      result.append("<p>");
+      append(result, "CPU Implementer", valueForKey(procCpuLines, "CPU implementer"));
+      append(result, "CPU Model", valueForKey(procCpuLines, "cpu model"));
+      result.append("<p>");
+      append(result, "Hardware", valueForKey(procCpuLines, "Hardware"));
+      append(result, "Revision", valueForKey(procCpuLines, "Revision"));
+      append(result, "Serial", valueForKey(procCpuLines, "Serial"));
     }
-    
+
     // Intel-specific.
     String cacheSize = valueForKey(procCpuLines, "cache size");
     String addressSizes = valueForKey(procCpuLines, "address sizes");
     if (cacheSize != null) {
-      result.append("Cache: " + cacheSize + "\n");
-      result.append("Address Sizes: " + addressSizes + "\n");
-      result.append('\n');
+      result.append("<p>");
+      append(result, "Cache", cacheSize);
+      append(result, "Address Sizes", addressSizes);
     }
-    
+
     String features = valueForKey(procCpuLines, "Features");
     if (features == null) {
       features = valueForKey(procCpuLines, "flags");
     }
-    result.append("CPU Features:\n");
-    result.append(Utils.sortedStringOfStrings(features.split(" ")));
-    result.append('\n');
-    
+    result.append("<p><b>CPU Features</b>\n");
+    result.append(Utils.sortedStringOfStrings("<br>&nbsp;&nbsp;", features.split(" ")));
+
     MemInfo memInfo = readMemInfo();
-    result.append("Memory:\n");
-    result.append("  Total: " + Utils.prettySize(memInfo.total) + "\n");
-    result.append("  Used: " + Utils.prettySize(memInfo.used) + "\n");
-    result.append("  Free: " + Utils.prettySize(memInfo.free) + "\n");
-    result.append("  Buffers: " + Utils.prettySize(memInfo.buffers) + "\n");
-    result.append('\n');
-    
+    result.append("<p><b>Memory</b>\n");
+    result.append("<br>&nbsp;&nbsp;Total: " + Utils.prettySize(memInfo.total));
+    result.append("<br>&nbsp;&nbsp;Used: " + Utils.prettySize(memInfo.used));
+    result.append("<br>&nbsp;&nbsp;Free: " + Utils.prettySize(memInfo.free));
+    result.append("<br>&nbsp;&nbsp;Buffers: " + Utils.prettySize(memInfo.buffers));
+
     Display display = wm.getDefaultDisplay();
     DisplayMetrics metrics = new DisplayMetrics();
     display.getMetrics(metrics);
-    result.append("Screen Density: " + metrics.densityDpi + "dpi (" + metrics.density + "x DIP)\n");
-    result.append("Exact DPI: " + metrics.xdpi + " x " + metrics.ydpi + "\n");
+    result.append("<p>");
+    append(result, "Screen Density", metrics.densityDpi + "dpi (" + metrics.density + "x DIP)");
+    append(result, "Exact DPI", metrics.xdpi + " x " + metrics.ydpi);
     int widthPixels = metrics.widthPixels;
     int heightPixels = metrics.heightPixels;
     try {
@@ -267,16 +266,15 @@ public class DeviceActivity extends TextViewActivity {
       heightPixels = realSize.y;
     } catch (Exception ignored) {
     }
-    result.append("Screen Size: " + widthPixels + " x " + heightPixels + " pixels\n");
+    append(result, "Screen Size", widthPixels + " x " + heightPixels + " pixels");
     double widthInches = widthPixels/metrics.xdpi;
     double heightInches = heightPixels/metrics.ydpi;
     double diagonalInches = Math.sqrt(widthInches*widthInches + heightInches*heightInches);
-    result.append(String.format("Approximate Dimensions: %.1f\" x %.1f\" (%.1f\" diagonal)\n", widthInches, heightInches, diagonalInches));
-    result.append('\n');
-    
+    append(result, "Approximate Dimensions", String.format("%.1f\" x %.1f\" (%.1f\" diagonal)", widthInches, heightInches, diagonalInches));
+
     return result.toString();
   }
-  
+
   private static String getFieldReflectively(Build build, String fieldName) {
     try {
       final Field field = Build.class.getField(fieldName);
@@ -285,14 +283,14 @@ public class DeviceActivity extends TextViewActivity {
       return "unknown";
     }
   }
-  
+
   static class MemInfo {
     long total;
     long used;
     long free;
     long buffers;
   }
-  
+
   private static MemInfo readMemInfo() {
     MemInfo result = new MemInfo();
     String[] lines = Utils.readLines("/proc/meminfo");

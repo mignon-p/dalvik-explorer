@@ -9,16 +9,16 @@ public class SystemPropertiesActivity extends TextViewActivity {
     protected CharSequence title(String unused) {
         return "System Properties (" + System.getProperties().size() + ")";
     }
-    
-    protected CharSequence content(String unused) {
+
+    protected String content(String unused) {
         return getSystemPropertiesAsString();
     }
-    
+
     // Original in salma-hayek "DebugMenu.java".
     static String getSystemPropertiesAsString() {
         return Utils.sortedStringOfMap(getSystemProperties());
     }
-    
+
     // Original in salma-hayek "DebugMenu.java".
     private static Map<String, String> getSystemProperties() {
         HashMap<String, String> result = new HashMap<String, String>();

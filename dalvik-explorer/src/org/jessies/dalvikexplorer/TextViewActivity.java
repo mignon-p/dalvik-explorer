@@ -43,16 +43,21 @@ public abstract class TextViewActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
         final TextView textView = (TextView) findViewById(R.id.output);
         registerForContextMenu(textView);
-        
+
         final String extraValue = getExtraValue();
-        textView.setText(content(extraValue), TextView.BufferType.SPANNABLE);
+        String content = content(extraValue);
+        if (content.startsWith("<html>")) {
+          textView.setText(Html.fromHtml(content), TextView.BufferType.SPANNABLE);
+        } else {
+          textView.setText(content, TextView.BufferType.SPANNABLE);
+        }
         setTitle(title(extraValue));
 
         Linkify.addLinks(textView, GeoFilter.GEO_PATTERN, GeoFilter.GEO_SCHEME, new GeoFilter(), new GeoFilter());
-        
+
         final EditText searchView = (EditText) findViewById(R.id.search);
         searchView.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
@@ -62,7 +67,7 @@ public abstract class TextViewActivity extends Activity {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
         });
     }
-    
+
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options, menu);
         Compatibility compatibility = Compatibility.get();
@@ -70,7 +75,7 @@ public abstract class TextViewActivity extends Activity {
         compatibility.configureSearchView(this, menu);
         return true;
     }
-    
+
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case android.R.id.home:
@@ -89,27 +94,35 @@ public abstract class TextViewActivity extends Activity {
             return super.onOptionsItemSelected(item);
         }
     }
-    
+
     protected String extraName() {
         return null;
     }
-    
+
     protected abstract CharSequence title(String extraValue);
-    
-    protected abstract CharSequence content(String extraValue);
-    
+
+    protected abstract String content(String extraValue);
+
+    protected static void append(StringBuilder sb, CharSequence key, Object value) {
+      sb.append("<b>");
+      sb.append(key);
+      sb.append(":</b> ");
+      sb.append(value);
+      sb.append("<br>");
+    }
+
     protected String getExtraValue() {
         final String extraName = extraName();
         return (extraName != null) ? getIntent().getStringExtra(extraName) : null;
     }
-    
+
     @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Details");
         menu.add(0, CONTEXT_MENU_COPY,  0, "Copy to clipboard"); // "Copy" might be ambiguous in FileViewerActivity.
         menu.add(0, CONTEXT_MENU_MAIL,  0, "Send as mail");
     }
-    
+
     @Override public boolean onContextItemSelected(MenuItem item) {
         final TextView textView = (TextView) findViewById(R.id.output);
         final CharSequence title = getTitle();
@@ -123,13 +136,13 @@ public abstract class TextViewActivity extends Activity {
             return super.onContextItemSelected(item);
         }
     }
-    
+
     private boolean copyToClipboard(CharSequence title, CharSequence content) {
         final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         clipboard.setText(title + "\n\n" + content);
         return true;
     }
-    
+
     private boolean mail(CharSequence title, CharSequence content) {
         final Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
@@ -138,7 +151,7 @@ public abstract class TextViewActivity extends Activity {
         startActivity(intent);
         return true;
     }
-    
+
     public void setSearchString(String needle) {
         clearSearch();
         if (needle.length() == 0) {
@@ -155,7 +168,7 @@ public abstract class TextViewActivity extends Activity {
             }
         }
     }
-    
+
     public void clearSearch() {
         final TextView textView = (TextView) findViewById(R.id.output);
         SpannableString spannable = (SpannableString) textView.getText();

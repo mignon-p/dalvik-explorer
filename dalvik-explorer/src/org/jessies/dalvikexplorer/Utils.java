@@ -16,17 +16,21 @@ public class Utils {
         }
         return builder.toString();
     }
-    
-    public static String sortedStringOfStrings(String[] strings) {
+
+    public static String sortedStringOfStrings(String prefix, Set<String> strings) {
+        return sortedStringOfStrings(prefix, strings.toArray(new String[strings.size()]));
+    }
+
+    public static String sortedStringOfStrings(String prefix, String[] strings) {
         String[] sortedStrings = strings.clone();
         Arrays.sort(sortedStrings, String.CASE_INSENSITIVE_ORDER);
         StringBuilder result = new StringBuilder();
         for (String s : sortedStrings) {
-            result.append("  ").append(s).append("\n");
+            result.append(prefix).append(s).append("\n");
         }
         return result.toString();
     }
-    
+
     // Original in salma-hayek "StringUtilities.java".
     public static String escapeForJava(CharSequence s) {
         final int sLength = s.length();
@@ -61,7 +65,7 @@ public class Utils {
         }
         return result.toString();
     }
-    
+
     public static String offsetString(int ms, boolean showHours, boolean showMinutes) {
         int minutes = ms/1000/60;
         String result = "";
@@ -73,7 +77,7 @@ public class Utils {
         }
         return result;
     }
-    
+
     public static String appVersion(Context context) {
         String version = "unknown";
         try {
@@ -83,7 +87,7 @@ public class Utils {
         }
         return version;
     }
-    
+
   public static String readFile(String path) {
     StringBuilder sb = new StringBuilder();
     for (String line : readLines(path)) {
@@ -91,7 +95,7 @@ public class Utils {
     }
     return sb.toString();
   }
-  
+
   public static String[] readLines(String path) {
     ArrayList<String> lines = new ArrayList<String>();
     BufferedReader in = null;
@@ -113,7 +117,7 @@ public class Utils {
       }
     }
   }
-  
+
   public static String prettySize(long bytes) {
     String unit = "";
     double n = bytes;
@@ -131,7 +135,7 @@ public class Utils {
     }
     return String.format("%.1f %sB", n, unit);
   }
-  
+
   public static String prettyHz(int hz) {
     String unit = "";
     double n = hz;

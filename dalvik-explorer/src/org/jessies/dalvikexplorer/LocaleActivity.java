@@ -17,7 +17,7 @@ public class LocaleActivity extends TextViewActivity {
     return "Locale \"" + localeName + "\"";
   }
 
-  protected CharSequence content(String localeName) {
+  protected String content(String localeName) {
     return describeLocale(localeName);
   }
 
@@ -47,46 +47,45 @@ public class LocaleActivity extends TextViewActivity {
 
   static String describeLocale(String name) {
     final StringBuilder result = new StringBuilder();
+    result.append("<html>");
 
     final Locale locale = localeByName(name);
 
-    result.append("Display Name: " + locale.getDisplayName() + "\n");
-    result.append("Localized Display Name: " + locale.getDisplayName(locale) + "\n");
-    result.append('\n');
+    result.append("<p>");
+    append(result, "Display Name", locale.getDisplayName());
+    append(result, "Localized Display Name", locale.getDisplayName(locale));
 
     if (locale.getLanguage().length() > 0) {
-      result.append("Display Language: " + locale.getDisplayLanguage() + "\n");
-      result.append("Localized Display Language: " + locale.getDisplayLanguage(locale) + "\n");
-      result.append("2-Letter Language Code: " + locale.getLanguage() + "\n");
-      result.append("3-Letter Language Code: " + locale.getISO3Language() + "\n");
-      result.append('\n');
+      result.append("<p>");
+      append(result, "Display Language", locale.getDisplayLanguage());
+      append(result, "Localized Display Language", locale.getDisplayLanguage(locale));
+      append(result, "2-Letter Language Code", locale.getLanguage());
+      append(result, "3-Letter Language Code", locale.getISO3Language());
     }
     if (locale.getCountry().length() > 0) {
-      result.append("Display Country: " + locale.getDisplayCountry() + "\n");
-      result.append("Localized Display Country: " + locale.getDisplayCountry(locale) + "\n");
-      result.append("2-Letter Country Code: " + locale.getCountry() + "\n");
-      result.append("3-Letter Country Code: " + locale.getISO3Country() + "\n");
-      result.append('\n');
+      result.append("<p>");
+      append(result, "Display Country", locale.getDisplayCountry());
+      append(result, "Localized Display Country", locale.getDisplayCountry(locale));
+      append(result, "2-Letter Country Code", locale.getCountry());
+      append(result, "3-Letter Country Code", locale.getISO3Country());
     }
     if (locale.getVariant().length() > 0) {
-      result.append("Display Variant: " + locale.getDisplayVariant() + "\n");
-      result.append("Localized Display Variant: " + locale.getDisplayVariant(locale) + "\n");
-      result.append("Variant Code: " + locale.getVariant() + "\n");
+      result.append("<p>");
+      append(result, "Display Variant", locale.getDisplayVariant());
+      append(result, "Localized Display Variant", locale.getDisplayVariant(locale));
+      append(result, "Variant Code", locale.getVariant());
     }
-    result.append('\n');
 
-    result.append("Number Formatting\n\n");
+    result.append("<p><b>Number Formatting</b>");
     describeNumberFormat(result, "Decimal", NumberFormat.getInstance(locale), 1234.5, -1234.5);
     describeNumberFormat(result, "Integer", NumberFormat.getIntegerInstance(locale), 1234, -1234);
     describeNumberFormat(result, "Currency", NumberFormat.getCurrencyInstance(locale), 1234.5, -1234.5);
     describeNumberFormat(result, "Percent", NumberFormat.getPercentInstance(locale), 12.3);
-    result.append('\n');
-    result.append('\n');
 
     boolean hasLocaleData = hasLocaleData();
 
     if (!hasLocaleData) {
-      result.append("Decimal Format Symbols\n\n");
+      result.append("<p><b>Decimal Format Symbols</b>");
       NumberFormat nf = NumberFormat.getInstance(locale);
       if (nf instanceof DecimalFormat) {
         describeDecimalFormatSymbols(result, ((DecimalFormat) nf).getDecimalFormatSymbols());
@@ -96,72 +95,63 @@ public class LocaleActivity extends TextViewActivity {
     }
 
     Date now = new Date(); // FIXME: it might be more useful to always show a time in the afternoon, to make 24-hour patterns more obvious.
-    result.append("Date/Time Formatting\n\n");
+    result.append("<p><b>Date/Time Formatting</b>");
     describeDateFormat(result, "Full Date", DateFormat.getDateInstance(DateFormat.FULL, locale), now);
     describeDateFormat(result, "Long Date", DateFormat.getDateInstance(DateFormat.LONG, locale), now);
     describeDateFormat(result, "Medium Date", DateFormat.getDateInstance(DateFormat.MEDIUM, locale), now);
     describeDateFormat(result, "Short Date", DateFormat.getDateInstance(DateFormat.SHORT, locale), now);
-    result.append('\n');
+    result.append("<p>");
     describeDateFormat(result, "Full Time", DateFormat.getTimeInstance(DateFormat.FULL, locale), now);
     describeDateFormat(result, "Long Time", DateFormat.getTimeInstance(DateFormat.LONG, locale), now);
     describeDateFormat(result, "Medium Time", DateFormat.getTimeInstance(DateFormat.MEDIUM, locale), now);
     describeDateFormat(result, "Short Time", DateFormat.getTimeInstance(DateFormat.SHORT, locale), now);
-    result.append('\n');
+    result.append("<p>");
     describeDateFormat(result, "Full Date/Time", DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, locale), now);
     describeDateFormat(result, "Long Date/Time", DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale), now);
     describeDateFormat(result, "Medium Date/Time", DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, locale), now);
     describeDateFormat(result, "Short Date/Time", DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale), now);
-    result.append('\n');
-    result.append('\n');
 
     if (!hasLocaleData) {
-      result.append("Date Format Symbols\n\n");
+      result.append("<p><b>Date Format Symbols</b><p>");
       DateFormat edf = DateFormat.getDateInstance(DateFormat.FULL, Locale.US);
       DateFormatSymbols edfs = ((SimpleDateFormat) edf).getDateFormatSymbols();
       DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, locale);
       DateFormatSymbols dfs = ((SimpleDateFormat) df).getDateFormatSymbols();
-      result.append("Local Pattern Chars: " + dfs.getLocalPatternChars() + "\n");
-      result.append("Am/pm: " + Arrays.toString(dfs.getAmPmStrings()) + "\n");
-      result.append("Eras: " + Arrays.toString(dfs.getEras()) + "\n");
-      result.append("Months: " + Arrays.toString(dfs.getMonths()) + "\n");
-      result.append("Short Months: " + Arrays.toString(dfs.getShortMonths()) + "\n");
-      result.append("Weekdays: " + Arrays.toString(dfs.getWeekdays()) + "\n");
-      result.append("Short Weekdays: " + Arrays.toString(dfs.getShortWeekdays()) + "\n");
-      result.append('\n');
-      result.append('\n');
+      append(result, "Local Pattern Chars", dfs.getLocalPatternChars());
+      append(result, "Am/pm", Arrays.toString(dfs.getAmPmStrings()));
+      append(result, "Eras", Arrays.toString(dfs.getEras()));
+      append(result, "Months", Arrays.toString(dfs.getMonths()));
+      append(result, "Short Months", Arrays.toString(dfs.getShortMonths()));
+      append(result, "Weekdays", Arrays.toString(dfs.getWeekdays()));
+      append(result, "Short Weekdays", Arrays.toString(dfs.getShortWeekdays()));
     }
 
-    result.append("Calendar\n\n");
+    result.append("<p><b>Calendar</b><p>");
     Calendar c = Calendar.getInstance(locale);
     int firstDayOfWeek = c.getFirstDayOfWeek();
     String firstDayOfWeekString = new DateFormatSymbols(locale).getWeekdays()[firstDayOfWeek];
     String englishFirstDayOfWeekString = new DateFormatSymbols(Locale.US).getWeekdays()[firstDayOfWeek];
-    result.append("First Day of the Week: " + firstDayOfWeek + " '" + firstDayOfWeekString + "'");
+    append(result, "First Day of the Week", firstDayOfWeek + " '" + firstDayOfWeekString + "'");
     if (!englishFirstDayOfWeekString.equals(firstDayOfWeekString)) {
       result.append(" (" + englishFirstDayOfWeekString + ")");
     }
-    result.append('\n');
-    result.append("Minimal Days in First Week: " + c.getMinimalDaysInFirstWeek() + "\n");
-    result.append('\n');
-    result.append('\n');
+    append(result, "Minimal Days in First Week", c.getMinimalDaysInFirstWeek());
 
     // If this locale specifies a country, check out the currency.
     // Languages don't have currencies; countries do.
     if (!locale.getCountry().equals("")) {
-      result.append("Currency\n\n");
+      result.append("<p><b>Currency</b><p>");
       try {
         Currency currency = Currency.getInstance(locale);
-        result.append("ISO 4217 Currency Code: " + currency.getCurrencyCode() + "\n");
-        result.append("Currency Symbol: " + currency.getSymbol(locale) + " (" + currency.getSymbol(Locale.US) + ")\n");
-        result.append("Default Fraction Digits: " + currency.getDefaultFractionDigits() + "\n");
+        append(result, "ISO 4217 Currency Code", currency.getCurrencyCode());
+        append(result, "Currency Symbol", currency.getSymbol(locale) + " (" + currency.getSymbol(Locale.US) + ")");
+        append(result, "Default Fraction Digits", currency.getDefaultFractionDigits());
       } catch (IllegalArgumentException ex) {
-        result.append("(This version of Android is unable to return a Currency for this Locale.)\n");
+        result.append("<p>(This version of Android is unable to return a Currency for this Locale.)");
       }
-      result.append('\n');
-      result.append('\n');
     }
 
-    result.append("Data Availability\n\n");
+    result.append("<p><b>Data Availability</b><p>");
     appendAvailability(result, locale, "BreakIterator", BreakIterator.class);
     appendAvailability(result, locale, "Calendar", NumberFormat.class);
     appendAvailability(result, locale, "Collator", Collator.class);
@@ -171,42 +161,42 @@ public class LocaleActivity extends TextViewActivity {
     appendAvailability(result, locale, "NumberFormat", NumberFormat.class);
 
     if (hasLocaleData) {
-      result.append("\n\n");
-      result.append("libcore.icu.LocaleData\n\n");
+      result.append("<p><b>libcore.icu.LocaleData</b>");
       try {
         Object enUsData = getLocaleDataInstance(Locale.US);
         Object localeData = getLocaleDataInstance(locale);
+        String[] previous;
 
+        result.append("<p>");
         describeStringArray(result, "amPm", enUsData, localeData, null);
         describeStringArray(result, "eras", enUsData, localeData, null);
-        result.append('\n');
 
-        String[] previous;
+        result.append("<p>");
         previous = describeStringArray(result, "longMonthNames", enUsData, localeData, null);
         describeStringArray(result, "longStandAloneMonthNames", enUsData, localeData, previous);
         previous = describeStringArray(result, "shortMonthNames", enUsData, localeData, null);
         describeStringArray(result, "shortStandAloneMonthNames", enUsData, localeData, previous);
         previous = describeStringArray(result, "tinyMonthNames", enUsData, localeData, null);
         describeStringArray(result, "tinyStandAloneMonthNames", enUsData, localeData, previous);
-        result.append('\n');
 
+        result.append("<p>");
         previous = describeStringArray(result, "longWeekdayNames", enUsData, localeData, null);
         describeStringArray(result, "longStandAloneWeekdayNames", enUsData, localeData, previous);
         previous = describeStringArray(result, "shortWeekdayNames", enUsData, localeData, null);
         describeStringArray(result, "shortStandAloneWeekdayNames", enUsData, localeData, previous);
         previous = describeStringArray(result, "tinyWeekdayNames", enUsData, localeData, null);
         describeStringArray(result, "tinyStandAloneWeekdayNames", enUsData, localeData, previous);
-        result.append('\n');
 
+        result.append("<p>");
         describeString(result, "yesterday", enUsData, localeData);
         describeString(result, "today", enUsData, localeData);
         describeString(result, "tomorrow", enUsData, localeData);
-        result.append('\n');
 
+        result.append("<p>");
         describeString(result, "timeFormat12", enUsData, localeData);
         describeString(result, "timeFormat24", enUsData, localeData);
-        result.append('\n');
 
+        result.append("<p>");
         describeChar(result, "zeroDigit", enUsData, localeData);
         describeChar(result, "decimalSeparator", enUsData, localeData);
         describeChar(result, "groupingSeparator", enUsData, localeData);
@@ -218,10 +208,9 @@ public class LocaleActivity extends TextViewActivity {
         describeString(result, "exponentSeparator", enUsData, localeData);
         describeString(result, "infinity", enUsData, localeData);
         describeString(result, "NaN", enUsData, localeData);
-        result.append('\n');
 
       } catch (Exception ex) {
-        result.append("(" + ex.getClass().getSimpleName() + " thrown: " + ex.getMessage() + ")\n");
+        result.append("(" + ex.getClass().getSimpleName() + " thrown: " + ex.getMessage() + ")");
         System.err.println(ex);
       }
     }
@@ -237,43 +226,41 @@ public class LocaleActivity extends TextViewActivity {
         return values;
       }
 
+      sb.append("<p><b>").append(fieldName).append("</b>\n");
       String[] enUsValues = (String[]) localeData.getClass().getField(fieldName).get(enUsData);
-      sb.append(fieldName).append(":\n");
       for (int i = 0; i < values.length; ++i) {
         if (enUsValues[i].length() == 0) {
           continue; // Java's weekday names array has an empty first element.
         }
-        sb.append("    ").append(values[i]);
+        sb.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;");
+        sb.append(values[i]);
         if (!values[i].equals(enUsValues[i])) {
           sb.append("  (" + enUsValues[i] + ")");
         }
-        sb.append('\n');
       }
       return values;
     } catch (Exception ignored) {
-      sb.append(fieldName).append(": <missing>\n");
+      sb.append("<p><b>").append(fieldName).append("</b>: <font color='red'>missing</font>");
       return null;
     }
   }
 
   private static void describeString(StringBuilder sb, String fieldName, Object enUsData, Object localeData) {
-    String valueText = "<missing>";
+    String valueText = "<font color='red'>missing</font>";
     try {
       valueText = unicodeString((String) localeData.getClass().getField(fieldName).get(localeData));
     } catch (Exception ignored) {
     }
-
-    sb.append(fieldName + ": " + valueText + "\n");
+    append(sb, fieldName, valueText);
   }
 
   private static void describeChar(StringBuilder sb, String fieldName, Object enUsData, Object localeData) {
-    String valueText = "<missing>";
+    String valueText = "<font color='red'>missing</font>";
     try {
       valueText = unicodeString(localeData.getClass().getField(fieldName).getChar(localeData));
     } catch (Exception ignored) {
     }
-
-    sb.append(fieldName + ": " + valueText + "\n");
+    append(sb, fieldName, valueText);
   }
 
   private static Object getLocaleDataInstance(Locale locale) {
@@ -336,17 +323,17 @@ public class LocaleActivity extends TextViewActivity {
     } catch (Exception ex) {
       // DateFormatSymbols.getAvailableLocales and DecimalFormatSymbols.getAvailableLocales weren't added until Java 6.
     }
-    result.append(name + ": " + state + "\n");
+    append(result, name, state);
   }
 
   private static void describeDecimalFormatSymbols(StringBuilder result, DecimalFormatSymbols dfs) {
     result.append("Currency Symbol: " + unicodeString(dfs.getCurrencySymbol()) + "\n");
     result.append("International Currency Symbol: " + unicodeString(dfs.getInternationalCurrencySymbol()) + "\n");
-    result.append('\n');
+    result.append("<p>");
 
     result.append("Digit: " + unicodeString(dfs.getDigit()) + "\n");
     result.append("Pattern Separator: " + unicodeString(dfs.getPatternSeparator()) + "\n");
-    result.append('\n');
+    result.append("<p>");
 
     result.append("Decimal Separator: " + unicodeString(dfs.getDecimalSeparator()) + "\n");
     result.append("Monetary Decimal Separator: " + unicodeString(dfs.getMonetaryDecimalSeparator()) + "\n");
@@ -364,24 +351,26 @@ public class LocaleActivity extends TextViewActivity {
       digits.append((char) (dfs.getZeroDigit() + i));
     }
     result.append("Digits: " + digits.toString() + "\n");
-    result.append('\n');
-    result.append('\n');
+    result.append("<p>");
+    result.append("<p>");
   }
 
   private static void describeDateFormat(StringBuilder result, String description, DateFormat dateFormat, Date when) {
     if (dateFormat instanceof SimpleDateFormat) {
       SimpleDateFormat sdf = (SimpleDateFormat) dateFormat;
-      result.append(description + ": " + sdf.toPattern() + "\n");
-      result.append("    " + sdf.format(when) + "\n");
+      result.append("<p><b>" + description + "</b>");
+      result.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;" + sdf.toPattern());
+      result.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;" + sdf.format(when));
     }
   }
 
   private static void describeNumberFormat(StringBuilder result, String description, NumberFormat numberFormat, Number... values) {
     if (numberFormat instanceof DecimalFormat) {
       DecimalFormat df = (DecimalFormat) numberFormat;
-      result.append(description + ": " + df.toPattern() + "\n");
+      result.append("<p><b>" + description + "</b>");
+      result.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;" + df.toPattern());
       for (Number value : values) {
-        result.append("    " + df.format(value) + "\n");
+        result.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;" + df.format(value));
       }
     }
   }

@@ -11,20 +11,20 @@ import java.net.URLConnection;
 
 public class FileViewerActivity extends TextViewActivity {
     private static final int CONTEXT_MENU_VIEW = 2;
-    
+
     protected String extraName() {
         return "org.jessies.dalvikexplorer.Path";
     }
-    
+
     protected CharSequence title(String path) {
         return path;
     }
-    
-    protected CharSequence content(String path) {
+
+    protected String content(String path) {
         return readFile(path);
     }
-    
-    private CharSequence readFile(String path) {
+
+    private String readFile(String path) {
         StringBuilder result = new StringBuilder();
         try {
             BufferedReader in = new BufferedReader(new FileReader(path));
@@ -38,14 +38,14 @@ public class FileViewerActivity extends TextViewActivity {
             Toast.makeText(this, "Couldn't read '" + path + "'", Toast.LENGTH_SHORT).show();
             finish();
         }
-        return result;
+        return result.toString();
     }
-    
+
     @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(0, CONTEXT_MENU_VIEW,  0, "Send 'view' intent");
     }
-    
+
     @Override public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case CONTEXT_MENU_VIEW:
@@ -54,7 +54,7 @@ public class FileViewerActivity extends TextViewActivity {
             return super.onContextItemSelected(item);
         }
     }
-    
+
     private boolean sendViewIntent() {
         File file = new File(getExtraValue());
         Uri path = Uri.fromFile(file);
