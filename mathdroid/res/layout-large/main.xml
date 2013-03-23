@@ -5,10 +5,8 @@
         <include layout="@layout/text_area" />
     </LinearLayout>
 
-<!--    <FrameLayout android:id="@+id/on_screen_keyboard" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0" > -->
-        <LinearLayout android:id="@+id/on_screen_keyboard" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" >
-            <include layout="@layout/button_area_large" />
-        </LinearLayout>
-<!--    </FrameLayout> -->
+    <LinearLayout android:id="@+id/on_screen_keyboard" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" >
+        <include layout="@layout/button_area" />
+    </LinearLayout>
 
 </LinearLayout>
