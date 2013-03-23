@@ -52,7 +52,7 @@ JAVAC_FLAGS="${JAVAC_FLAGS} -encoding UTF-8"
 
 
 function usage() {
-    echo "usage: $0 [clean|debug|release|test]" > /dev/stderr
+    echo "usage: $0 [clean|debug|release|lint|test]" > /dev/stderr
     exit 1
 }
 
@@ -61,7 +61,7 @@ if [ $# -eq "0" ]; then
     target=debug
 elif [ $# -eq "1" ]; then
     target=$1
-    if [[ "$target" != "clean" && "$target" != "debug" && "$target" != "release" && "$target" != "test" ]]; then
+    if [[ "$target" != "clean" && "$target" != "debug" && "$target" != "release" && "$target" != "lint" && "$target" != "test" ]]; then
         usage
     fi
 else
@@ -86,6 +86,12 @@ JAVA_SOURCE_FILES=`find -L src gen -type f -name "*.java"`
 rm -rf .generated/classes && \
   mkdir -p .generated/classes && \
   ${JAVAC} ${JAVAC_FLAGS} ${JAVA_SOURCE_FILES} || exit 1
+
+if [ "$target" == "lint" ]; then
+  echo "-- Running lint..."
+  lint . --classpath .generated/classes
+  exit 0
+fi
 
 if [ "$target" == "test" ]; then
   echo "-- Running tests..."
@@ -128,16 +134,20 @@ if [ "$target" == "debug" ]; then
   exit 0
 fi
 
-# Sign the apk and check the signing worked.
-jarsigner_out=.generated/${APP_NAME}-signed.apk
-${JARSIGNER} -verbose -keystore ${RELEASE_KEYSTORE} -signedjar ${jarsigner_out} ${apkbuilder_out} android-release-key || exit 1
-${JARSIGNER} -verify ${jarsigner_out} || exit 1
+if [ "$target" == "release" ]; then
+  # Sign the apk and check the signing worked.
+  jarsigner_out=.generated/${APP_NAME}-signed.apk
+  ${JARSIGNER} -verbose -keystore ${RELEASE_KEYSTORE} -signedjar ${jarsigner_out} ${apkbuilder_out} android-release-key || exit 1
+  ${JARSIGNER} -verify ${jarsigner_out} || exit 1
 
-# Zipalign the signed apk.
-zipalign_out=.generated/${APP_NAME}-aligned.apk
-${ZIPALIGN} -v 4 ${jarsigner_out} ${zipalign_out} || exit 1
-${ZIPALIGN} -c -v 4 ${zipalign_out} || exit 1
+  # Zipalign the signed apk.
+  zipalign_out=.generated/${APP_NAME}-aligned.apk
+  ${ZIPALIGN} -v 4 ${jarsigner_out} ${zipalign_out} || exit 1
+  ${ZIPALIGN} -c -v 4 ${zipalign_out} || exit 1
 
-# Make a safe copy. The signed, aligned apk is something you want to keep.
-# FIXME: automated upload to code.google.com if applicable.
-mv ${zipalign_out} ${APP_NAME}-${APP_VERSION}.apk || exit 1
+  # Make a safe copy. The signed, aligned apk is something you want to keep.
+  # FIXME: automated upload to code.google.com if applicable.
+  mv ${zipalign_out} ${APP_NAME}-${APP_VERSION}.apk || exit 1
+
+  exit 0
+fi

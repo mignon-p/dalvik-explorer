@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- "basic" keys -->
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="vertical">
+
+        <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/digit7"   android:text="@string/digit_7_button"       style="@style/number_button_style" />
+            <Button android:id="@+id/digit8"   android:text="@string/digit_8_button"       style="@style/number_button_style" />
+            <Button android:id="@+id/digit9"   android:text="@string/digit_9_button"       style="@style/number_button_style" />
+            <ImageButton android:id="@+id/kbd" android:src="@drawable/sym_keyboard_show"   style="@style/number_button_style" />
+            <ImageButton android:id="@+id/del" android:src="@drawable/sym_keyboard_delete" style="@style/red_button_style" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/digit4"   android:text="@string/digit_4_button" style="@style/number_button_style" />
+            <Button android:id="@+id/digit5"   android:text="@string/digit_5_button" style="@style/number_button_style" />
+            <Button android:id="@+id/digit6"   android:text="@string/digit_6_button" style="@style/number_button_style" />
+            <Button android:id="@+id/times"    android:text="@string/times_button"   style="@style/symbol_button_style" />
+            <Button android:id="@+id/divide"   android:text="@string/divide_button"  style="@style/symbol_button_style" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/digit1"   android:text="@string/digit_1_button" style="@style/number_button_style" />
+            <Button android:id="@+id/digit2"   android:text="@string/digit_2_button" style="@style/number_button_style" />
+            <Button android:id="@+id/digit3"   android:text="@string/digit_3_button" style="@style/number_button_style" />
+            <Button android:id="@+id/plus"     android:text="@string/plus_button"    style="@style/symbol_button_style" />
+            <Button android:id="@+id/minus"    android:text="@string/minus_button"   style="@style/symbol_button_style" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/digit0"   android:text="@string/digit_0_button"  style="@style/number_button_style" />
+            <Button android:id="@+id/dot"      android:text="@string/dot_button"      style="@style/number_button_style" />
+            <Button android:id="@+id/eng"      android:text="@string/exp_button"      style="@style/exp_button_style" />
+            <Button android:id="@+id/ans"      android:text="@string/ans_button"      style="@style/text_button_style" />
+            <Button android:id="@+id/exe"      android:text="@string/exe_button"      style="@style/exe_button_style" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</merge>

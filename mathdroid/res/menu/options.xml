@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:id="@+id/menu_clear" android:icon="@android:drawable/ic_menu_close_clear_cancel" android:title="Clear" android:showAsAction="ifRoom|withText" />
-  <item android:id="@+id/menu_settings" android:icon="@android:drawable/ic_menu_preferences" android:title="Settings" android:showAsAction="ifRoom" />
-  <item android:id="@+id/menu_help" android:icon="@android:drawable/ic_menu_help" android:title="Help" android:showAsAction="ifRoom" />
+  <item android:id="@+id/menu_clear" android:icon="@android:drawable/ic_menu_close_clear_cancel" android:title="@string/menu_clear" android:showAsAction="ifRoom|withText" />
+  <item android:id="@+id/menu_settings" android:icon="@android:drawable/ic_menu_preferences" android:title="@string/menu_settings" android:showAsAction="ifRoom" />
+  <item android:id="@+id/menu_help" android:icon="@android:drawable/ic_menu_help" android:title="@string/menu_help" android:showAsAction="ifRoom" />
 </menu>

@@ -2,49 +2,49 @@
 <resources>
     <style name="button_style">
        <item name="android:textColor">#ffffff</item>
-       <item name="android:layout_width">fill_parent</item>
-       <item name="android:layout_height">fill_parent</item>
+       <item name="android:layout_width">match_parent</item>
+       <item name="android:layout_height">match_parent</item>
        <item name="android:layout_weight">1</item>
        <item name="android:focusable">false</item>
     </style>
 
     <style name="number_button_style" parent="button_style">
        <item name="android:background">@drawable/dark_button</item>
-       <item name="android:textSize">24dp</item>
+       <item name="android:textSize">24sp</item>
     </style>
 
     <style name="red_button_style" parent="button_style">
        <item name="android:background">@drawable/red_button</item>
-       <item name="android:textSize">16dp</item>
+       <item name="android:textSize">16sp</item>
     </style>
 
     <style name="exe_button_style" parent="button_style">
        <item name="android:background">@drawable/blue_button</item>
-       <item name="android:textSize">16dp</item>
+       <item name="android:textSize">16sp</item>
     </style>
 
     <style name="exp_button_style" parent="number_button_style">
-       <item name="android:textSize">16dp</item>
+       <item name="android:textSize">16sp</item>
     </style>
 
     <style name="more_button_style" parent="button_style">
        <item name="android:background">@drawable/purple_button</item>
-       <item name="android:textSize">16dp</item>
+       <item name="android:textSize">16sp</item>
     </style>
 
     <style name="text_button_style" parent="button_style">
        <item name="android:background">@drawable/gray_button</item>
        <item name="android:textColor">#000000</item>
-       <item name="android:textSize">16dp</item>
+       <item name="android:textSize">16sp</item>
     </style>
 
     <style name="symbol_button_style" parent="text_button_style">
-       <item name="android:textSize">24dp</item>
+       <item name="android:textSize">24sp</item>
     </style>
-    
+
     <style name="history_question_appearance" parent="@android:style/TextAppearance">
         <item name="android:textColor">#cdaa7d</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 </resources>

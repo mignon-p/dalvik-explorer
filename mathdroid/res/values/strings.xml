@@ -1,19 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mathdroid</string>
+  <string name="app_name">Mathdroid</string>
 
-    <string name="default_angle_mode">Radians</string>
-    <string-array name="angle_modes">
+  <string name="default_angle_mode">Radians</string>
+  <string-array name="angle_modes">
     <item>Degrees</item>
     <item>Radians</item>
-    </string-array>
+  </string-array>
 
-    <string name="default_output_base">10</string>
-    <string-array name="output_bases">
+  <string name="default_output_base">10</string>
+  <string-array name="output_bases">
     <item>2</item>
     <item>8</item>
     <item>10</item>
     <item>16</item>
-    </string-array>
+  </string-array>
+
+  <string name="less_button">1st</string>
+  <string name="more_button">2nd</string>
+  <string name="left_button">\u2190</string>
+  <string name="right_button">\u2192</string>
+  <string name="open_button">(</string>
+  <string name="comma_button">,</string>
+  <string name="close_button">)</string>
+  <string name="sin_button">sin</string>
+  <string name="cos_button">cos</string>
+  <string name="tan_button">tan</string>
+  <string name="asin_button">asin</string>
+  <string name="acos_button">acos</string>
+  <string name="atan_button">atan</string>
+  <string name="log_button">log</string>
+  <string name="sqrt_button">\u221a</string>
+  <string name="pow_button">^</string>
+  <string name="pi_button">\u03c0</string>
+  <string name="pling_button">!</string>
+  <string name="x_button">x</string>
+  <string name="ceil_button">ceil</string>
+  <string name="floor_button">floor</string>
+  <string name="ln_button">ln</string>
+  <string name="e_button">e</string>
+  <string name="rand_button">rand</string>
+  <string name="digit_0_button">0</string>
+  <string name="digit_1_button">1</string>
+  <string name="digit_2_button">2</string>
+  <string name="digit_3_button">3</string>
+  <string name="digit_4_button">4</string>
+  <string name="digit_5_button">5</string>
+  <string name="digit_6_button">6</string>
+  <string name="digit_7_button">7</string>
+  <string name="digit_8_button">8</string>
+  <string name="digit_9_button">9</string>
+  <string name="dot_button">.</string>
+  <string name="plus_button">+</string>
+  <string name="minus_button">\u2212</string>
+  <string name="times_button">\u00d7</string>
+  <string name="divide_button">\u00f7</string>
+  <string name="exp_button">EXP</string>
+  <string name="ans_button">Ans</string>
+  <string name="exe_button">EXE</string>
+
+  <string name="menu_clear">Clear</string>
+  <string name="menu_help">Help</string>
+  <string name="menu_settings">Settings</string>
 
 </resources>

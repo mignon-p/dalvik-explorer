@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- "scientific" keys -->
+    <org.jessies.mathdroid.BetterViewFlipper android:id="@+id/flipper" android:layout_width="wrap_content" android:layout_height="fill_parent" >
+
+        <!-- unshifted variants -->
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="fill_parent" android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/more"     android:text="@string/more_button"  style="@style/more_button_style" />
+                <Button android:id="@+id/left"     android:text="@string/left_button"  style="@style/text_button_style" />
+                <Button android:id="@+id/right"    android:text="@string/right_button" style="@style/text_button_style" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/open"     android:text="@string/open_button"  style="@style/text_button_style" />
+                <Button android:id="@+id/comma"    android:text="@string/comma_button" style="@style/text_button_style" />
+                <Button android:id="@+id/close"    android:text="@string/close_button" style="@style/text_button_style" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/sin"      android:text="@string/sin_button"   style="@style/text_button_style" />
+                <Button android:id="@+id/cos"      android:text="@string/cos_button"   style="@style/text_button_style" />
+                <Button android:id="@+id/tan"      android:text="@string/tan_button"   style="@style/text_button_style" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/log10"    android:text="@string/log_button"   style="@style/text_button_style" />
+                <Button android:id="@+id/sqrt"     android:text="@string/sqrt_button"  style="@style/text_button_style" />
+                <Button android:id="@+id/pow"      android:text="@string/pow_button"   style="@style/text_button_style" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- shifted variants -->
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="fill_parent" android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/less"     android:text="@string/less_button"  style="@style/more_button_style" />
+                <Button android:id="@+id/pi"       android:text="@string/pi_button"    style="@style/text_button_style" />
+                <Button android:id="@+id/pling"    android:text="@string/pling_button" style="@style/text_button_style" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/x"        android:text="@string/x_button"     style="@style/text_button_style" />
+                <Button android:id="@+id/ceil"     android:text="@string/ceil_button"  style="@style/text_button_style" />
+                <Button android:id="@+id/floor"    android:text="@string/floor_button" style="@style/text_button_style" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/asin"     android:text="@string/asin_button"  style="@style/text_button_style" />
+                <Button android:id="@+id/acos"     android:text="@string/acos_button"  style="@style/text_button_style" />
+                <Button android:id="@+id/atan"     android:text="@string/atan_button"  style="@style/text_button_style" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
+                <Button android:id="@+id/logE"     android:text="@string/ln_button"    style="@style/text_button_style" />
+                <Button android:id="@+id/e"        android:text="@string/e_button"     style="@style/text_button_style" />
+                <Button android:id="@+id/rand"     android:text="@string/rand_button"  style="@style/text_button_style" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </org.jessies.mathdroid.BetterViewFlipper>
+
+    <!-- "basic" keys -->
+    <include layout="@layout/button_area_basic_keys" />
+
+</merge>

@@ -3,6 +3,6 @@
 
     <ListView android:id="@+id/transcript" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_weight="1" android:stackFromBottom="true" android:transcriptMode="alwaysScroll" android:scrollbarStyle="outsideInset" android:focusable="false" />
 
-    <org.jessies.mathdroid.MathdroidEditText android:id="@+id/q" android:textSize="20dp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0" android:nextFocusUp="@+id/transcript" android:inputType="text|textNoSuggestions" android:imeActionLabel="EXE" />
+    <org.jessies.mathdroid.MathdroidEditText android:id="@+id/q" android:textSize="20sp" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0" android:nextFocusUp="@+id/transcript" android:inputType="text|textNoSuggestions" android:imeActionLabel="EXE" />
 
 </merge>
