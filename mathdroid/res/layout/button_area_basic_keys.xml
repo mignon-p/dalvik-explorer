@@ -33,7 +33,7 @@
             <Button android:id="@+id/dot"      android:text="@string/dot_button"      style="@style/number_button_style" />
             <Button android:id="@+id/eng"      android:text="@string/exp_button"      style="@style/exp_button_style" />
             <Button android:id="@+id/ans"      android:text="@string/ans_button"      style="@style/text_button_style" />
-            <Button android:id="@+id/exe"      android:text="@string/exe_button"      style="@style/exe_button_style" />
+            <Button android:id="@+id/exe"      android:text="@string/exe_button"      style="@style/blue_button_style" />
         </LinearLayout>
 
     </LinearLayout>

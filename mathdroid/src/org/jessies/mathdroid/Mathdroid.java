@@ -80,14 +80,19 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         });
         queryView.requestFocus();
 
-        final View onScreenKeyboard = findViewById(R.id.on_screen_keyboard);
-        if (onScreenKeyboard != null) {
-            // Prevent the soft keyboard from appearing unless the user presses our keyboard button.
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        } else {
-            // We don't have our own keyboard, so bring up the system one right away.
-            showSoftKeyboard(queryView);
-        }
+        // Prevent the soft keyboard from appearing unless the user presses our keyboard button.
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        // Android doesn't count the _soft_ keyboard appearing/disappearing as a configChange.
+        // This is the stackoverflow-approved hack for detecting soft keyboard visibility changes.
+        // http://stackoverflow.com/questions/2150078/how-to-check-visibility-of-software-keyboard-in-android
+        final View activityRootView = findViewById(android.R.id.content);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+          @Override public void onGlobalLayout() {
+            int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+            findViewById(R.id.on_screen_keyboard).setVisibility((heightDiff < 200) ? View.VISIBLE : View.GONE);
+          }
+        });
 
         initButtonMap();
 
@@ -118,17 +123,6 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         }
 
         onConfigurationChanged(getResources().getConfiguration());
-    }
-
-    // Called when one of the "configChanges" declared in our manifest occurs.
-    @Override public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Show our on-screen keyboard if there's no physical keyboard currently available, and hide it when there is.
-        final boolean keyboardHidden = (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES);
-        final View onScreenKeyboard = findViewById(R.id.on_screen_keyboard);
-        if (onScreenKeyboard != null) {
-            onScreenKeyboard.setVisibility(keyboardHidden ? View.VISIBLE : View.GONE);
-        }
     }
 
     private void initButtonClickListener(int id) {
@@ -166,6 +160,8 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         buttonMap.put(R.id.log10,  "Log10()");
         buttonMap.put(R.id.logE,   "LogE()");
         buttonMap.put(R.id.minus,  "-");
+        buttonMap.put(R.id.ncr,    "nCr()");
+        buttonMap.put(R.id.npr,    "nPr()");
         buttonMap.put(R.id.open,   "(");
         buttonMap.put(R.id.pi,     "\u03c0");
         buttonMap.put(R.id.pling,  "!");

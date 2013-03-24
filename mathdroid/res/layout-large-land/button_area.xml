@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+  <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="vertical">
+
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+      <Button android:id="@+id/left"     android:text="@string/left_button"  style="@style/blue_button_style" />
+      <Button android:id="@+id/right"    android:text="@string/right_button" style="@style/blue_button_style" />
+      <Button android:id="@+id/open"     android:text="@string/open_button"  style="@style/text_button_style" />
+      <Button android:id="@+id/comma"    android:text="@string/comma_button" style="@style/text_button_style" />
+      <Button android:id="@+id/close"    android:text="@string/close_button" style="@style/text_button_style" />
+      <Button android:id="@+id/x"        android:text="@string/x_button"     style="@style/text_button_style" />
+
+      <Button android:id="@+id/digit7"   android:text="@string/digit_7_button"       style="@style/number_button_style" />
+      <Button android:id="@+id/digit8"   android:text="@string/digit_8_button"       style="@style/number_button_style" />
+      <Button android:id="@+id/digit9"   android:text="@string/digit_9_button"       style="@style/number_button_style" />
+      <ImageButton android:id="@+id/kbd" android:src="@drawable/sym_keyboard_show"   style="@style/number_button_style" />
+      <ImageButton android:id="@+id/del" android:src="@drawable/sym_keyboard_delete" style="@style/red_button_style" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+      <Button android:id="@+id/ceil"     android:text="@string/ceil_button"  style="@style/text_button_style" />
+      <Button android:id="@+id/floor"    android:text="@string/floor_button" style="@style/text_button_style" />
+      <Button android:id="@+id/pi"       android:text="@string/pi_button"    style="@style/text_button_style" />
+      <Button android:id="@+id/pling"    android:text="@string/pling_button" style="@style/text_button_style" />
+      <Button android:id="@+id/ncr"      android:text="@string/ncr_button"   style="@style/text_button_style" />
+      <Button android:id="@+id/npr"      android:text="@string/npr_button"   style="@style/text_button_style" />
+
+      <Button android:id="@+id/digit4"   android:text="@string/digit_4_button" style="@style/number_button_style" />
+      <Button android:id="@+id/digit5"   android:text="@string/digit_5_button" style="@style/number_button_style" />
+      <Button android:id="@+id/digit6"   android:text="@string/digit_6_button" style="@style/number_button_style" />
+      <Button android:id="@+id/times"    android:text="@string/times_button"   style="@style/symbol_button_style" />
+      <Button android:id="@+id/divide"   android:text="@string/divide_button"  style="@style/symbol_button_style" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+      <Button android:id="@+id/sin"      android:text="@string/sin_button"   style="@style/text_button_style" />
+      <Button android:id="@+id/cos"      android:text="@string/cos_button"   style="@style/text_button_style" />
+      <Button android:id="@+id/tan"      android:text="@string/tan_button"   style="@style/text_button_style" />
+      <Button android:id="@+id/logE"     android:text="@string/ln_button"    style="@style/text_button_style" />
+      <Button android:id="@+id/e"        android:text="@string/e_button"     style="@style/text_button_style" />
+      <Button android:id="@+id/rand"     android:text="@string/rand_button"  style="@style/text_button_style" />
+
+      <Button android:id="@+id/digit1"   android:text="@string/digit_1_button" style="@style/number_button_style" />
+      <Button android:id="@+id/digit2"   android:text="@string/digit_2_button" style="@style/number_button_style" />
+      <Button android:id="@+id/digit3"   android:text="@string/digit_3_button" style="@style/number_button_style" />
+      <Button android:id="@+id/plus"     android:text="@string/plus_button"    style="@style/symbol_button_style" />
+      <Button android:id="@+id/minus"    android:text="@string/minus_button"   style="@style/symbol_button_style" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+      <Button android:id="@+id/asin"     android:text="@string/asin_button"  style="@style/text_button_style" />
+      <Button android:id="@+id/acos"     android:text="@string/acos_button"  style="@style/text_button_style" />
+      <Button android:id="@+id/atan"     android:text="@string/atan_button"  style="@style/text_button_style" />
+      <Button android:id="@+id/log10"    android:text="@string/log_button"   style="@style/text_button_style" />
+      <Button android:id="@+id/sqrt"     android:text="@string/sqrt_button"  style="@style/text_button_style" />
+      <Button android:id="@+id/pow"      android:text="@string/pow_button"   style="@style/text_button_style" />
+
+      <Button android:id="@+id/digit0"   android:text="@string/digit_0_button"  style="@style/number_button_style" />
+      <Button android:id="@+id/dot"      android:text="@string/dot_button"      style="@style/number_button_style" />
+      <Button android:id="@+id/eng"      android:text="@string/exp_button"      style="@style/exp_button_style" />
+      <Button android:id="@+id/ans"      android:text="@string/ans_button"      style="@style/text_button_style" />
+      <Button android:id="@+id/exe"      android:text="@string/exe_button"      style="@style/blue_button_style" />
+    </LinearLayout>
+
+  </LinearLayout>
+
+</merge>

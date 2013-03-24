@@ -11,8 +11,8 @@
                 <Button android:id="@+id/sin"      android:text="@string/sin_button"   style="@style/text_button_style" />
                 <Button android:id="@+id/cos"      android:text="@string/cos_button"   style="@style/text_button_style" />
                 <Button android:id="@+id/tan"      android:text="@string/tan_button"   style="@style/text_button_style" />
-                <Button android:id="@+id/left"     android:text="@string/left_button"  style="@style/text_button_style" />
-                <Button android:id="@+id/right"    android:text="@string/right_button" style="@style/text_button_style" />
+                <Button android:id="@+id/left"     android:text="@string/left_button"  style="@style/blue_button_style" />
+                <Button android:id="@+id/right"    android:text="@string/right_button" style="@style/blue_button_style" />
                 <Button android:id="@+id/more"     android:text="@string/more_button"  style="@style/more_button_style" />
             </LinearLayout>
 

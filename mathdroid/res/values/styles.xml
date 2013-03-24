@@ -18,9 +18,10 @@
        <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="exe_button_style" parent="button_style">
+    <style name="blue_button_style" parent="button_style">
        <item name="android:background">@drawable/blue_button</item>
        <item name="android:textSize">16sp</item>
+       <item name="android:textStyle">bold</item>
     </style>
 
     <style name="exp_button_style" parent="number_button_style">
@@ -47,4 +48,9 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="history_answer_appearance" parent="@android:style/TextAppearance">
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

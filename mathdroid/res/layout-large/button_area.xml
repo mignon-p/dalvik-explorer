@@ -8,8 +8,8 @@
         <LinearLayout android:layout_width="wrap_content" android:layout_height="fill_parent" android:orientation="vertical">
             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
                 <Button android:id="@+id/more"     android:text="@string/more_button"  style="@style/more_button_style" />
-                <Button android:id="@+id/left"     android:text="@string/left_button"  style="@style/text_button_style" />
-                <Button android:id="@+id/right"    android:text="@string/right_button" style="@style/text_button_style" />
+                <Button android:id="@+id/left"     android:text="@string/left_button"  style="@style/blue_button_style" />
+                <Button android:id="@+id/right"    android:text="@string/right_button" style="@style/blue_button_style" />
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1">
                 <Button android:id="@+id/open"     android:text="@string/open_button"  style="@style/text_button_style" />

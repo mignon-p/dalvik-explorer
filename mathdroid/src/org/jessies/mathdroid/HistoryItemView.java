@@ -11,22 +11,23 @@ import android.widget.*;
 public class HistoryItemView extends LinearLayout {
     private final TextView mQuestionView;
     private final TextView mAnswerView;
-    
+
     public HistoryItemView(Context context, HistoryItem item) {
         super(context);
-        
+
         this.setOrientation(VERTICAL);
-        
+
         mQuestionView = new TextView(context);
         mQuestionView.setTextAppearance(context, R.style.history_question_appearance);
         mQuestionView.setText(item.question);
         addView(mQuestionView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-        
+
         mAnswerView = new TextView(context);
+        mAnswerView.setTextAppearance(context, R.style.history_answer_appearance);
         mAnswerView.setText(" = " + item.answer);
         addView(mAnswerView, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
     }
-    
+
     // Allows reuse of a recycled HistoryItemView.
     public void setItem(HistoryItem item) {
         mQuestionView.setText(item.question);
