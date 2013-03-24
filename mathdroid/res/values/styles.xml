@@ -43,14 +43,12 @@
        <item name="android:textSize">24sp</item>
     </style>
 
-    <style name="history_question_appearance" parent="@android:style/TextAppearance">
+    <style name="history_question_appearance" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">#cdaa7d</item>
-        <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="history_answer_appearance" parent="@android:style/TextAppearance">
-        <item name="android:textSize">16sp</item>
+    <style name="history_answer_appearance" parent="@android:style/TextAppearance.Medium">
     </style>
 
 </resources>
