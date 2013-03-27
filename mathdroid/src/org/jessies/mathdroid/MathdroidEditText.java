@@ -12,5 +12,8 @@ public class MathdroidEditText extends EditText {
     super(context, attrs);
     Compatibility.get().fixEditText(this);
     setSelectAllOnFocus(true);
+
+    setImeActionLabel(context.getString(R.string.exe_button), EditorInfo.IME_ACTION_DONE);
+    setImeOptions(EditorInfo.IME_ACTION_DONE);
   }
 }
