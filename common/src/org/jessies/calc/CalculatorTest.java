@@ -470,6 +470,7 @@ public class CalculatorTest extends TestCase {
   public void testFactors() {
     check("[-3, 41]", "Factors(-123)");
     check("[2, 617]", "Factors(1234)");
+    check("[2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 7]", "Factors(9!)");
     check("[17]", "Factors(17)");
     check("[]", "Factors(1)");
     check("[]", "Factors(0)");

@@ -334,13 +334,11 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
       int n = Math.abs((int) fixnum);
 
       final ListNode result = new ListNode();
-
-      // TODO: divide n by each factor, so we can say Factors(9!) == [2,2,2,2,2,2,2,3,3,3,3,5,7].
-      for (int i = 1; i <= n; ++i) {
-        if ((n % i) == 0) {
-          if (isPrime(i) == BooleanNode.TRUE) {
-            result.add(IntegerNode.valueOf(i));
-          }
+      for (int factor = 2; factor <= n; ++factor) {
+        if ((n % factor) == 0) {
+          result.add(IntegerNode.valueOf(factor));
+          n /= factor;
+          --factor; // Try this factor again.
         }
       }
       if (fixnum < 0) {
