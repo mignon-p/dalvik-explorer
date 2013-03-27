@@ -132,9 +132,9 @@ public class CalculatorFunctions {
         final IntegerNode rowCount = (IntegerNode) lhsDimensions.get(0);
         final IntegerNode columnCount = (IntegerNode) rhsDimensions.get(1);
         final ListNode result = new ListNode();
-        for (IntegerNode i = IntegerNode.ZERO; cmp(i, rowCount) < 0; i = i.increment()) {
+        for (IntegerNode i = IntegerNode.ZERO; i.compareTo(rowCount) < 0; i = i.increment()) {
             final ListNode newRow = new ListNode();
-            for (IntegerNode j = IntegerNode.ZERO; cmp(j, columnCount) < 0; j = j.increment()) {
+            for (IntegerNode j = IntegerNode.ZERO; j.compareTo(columnCount) < 0; j = j.increment()) {
                 Node lhsNode = matrixElementAt(lhs, i, j);
                 Node rhsNode = matrixElementAt(rhs, i, j);
                 if (!isNumber(lhsNode) || !isNumber(rhsNode)) {
@@ -530,6 +530,19 @@ public class CalculatorFunctions {
         public String description() { return "Returns the quotient of its arguments."; }
     }
 
+    public static class Divisors extends CalculatorFunctionI {
+        public Divisors() {
+            super("Divisors");
+        }
+
+        public Node apply(Calculator environment, IntegerNode n) {
+            return n.divisors();
+        }
+
+        public String syntax() { return "(Integer)"; }
+        public String description() { return "Returns a list of the integers that divide into <i>n</i>."; }
+    }
+
     public static class Equal extends CalculatorFunction { // FIXME: CAS support.
         public Equal() {
             super("Equal", 2);
@@ -554,6 +567,19 @@ public class CalculatorFunctions {
 
         public String syntax() { return "(Number)"; }
         public String description() { return "Returns <i>e<sup>n</sup></i>."; }
+    }
+
+    public static class Factors extends CalculatorFunctionI {
+        public Factors() {
+            super("Factors");
+        }
+
+        public Node apply(Calculator environment, IntegerNode n) {
+            return n.primeFactors();
+        }
+
+        public String syntax() { return "(Integer)"; }
+        public String description() { return "Returns a list of the prime factors of <i>n</i>."; }
     }
 
     public static class Factorial extends CalculatorFunctionI {
@@ -664,10 +690,10 @@ public class CalculatorFunctions {
 
         public Node apply(Calculator environment, IntegerNode dimension) {
             final ListNode result = new ListNode();
-            for (NumberNode i = IntegerNode.ONE; cmp(i, dimension) <= 0; i = i.increment()) {
+            for (IntegerNode i = IntegerNode.ONE; i.compareTo(dimension) <= 0; i = i.increment()) {
                 final ListNode row = new ListNode();
-                for (NumberNode j = IntegerNode.ONE; cmp(j, dimension) <= 0; j = j.increment()) {
-                    row.add(cmp(j, i) == 0 ? IntegerNode.ONE : IntegerNode.ZERO);
+                for (IntegerNode j = IntegerNode.ONE; j.compareTo(dimension) <= 0; j = j.increment()) {
+                    row.add(j.compareTo(i) == 0 ? IntegerNode.ONE : IntegerNode.ZERO);
                 }
                 result.add(row);
             }
@@ -1445,9 +1471,9 @@ public class CalculatorFunctions {
             final IntegerNode rowCount = (IntegerNode) lhsDimensions.get(0);
             final IntegerNode columnCount = (IntegerNode) rhsDimensions.get(1);
             final ListNode result = new ListNode();
-            for (IntegerNode i = IntegerNode.ZERO; cmp(i, rowCount) < 0; i = i.increment()) {
+            for (IntegerNode i = IntegerNode.ZERO; i.compareTo(rowCount) < 0; i = i.increment()) {
                 final ListNode newRow = new ListNode();
-                for (IntegerNode j = IntegerNode.ZERO; cmp(j, columnCount) < 0; j = j.increment()) {
+                for (IntegerNode j = IntegerNode.ZERO; j.compareTo(columnCount) < 0; j = j.increment()) {
                     newRow.add(dotProduct(lhs, rhs, i, j, n));
                 }
                 result.add(newRow);
@@ -1460,7 +1486,7 @@ public class CalculatorFunctions {
         // http://en.wikipedia.org/wiki/Dot_product
         private static Node dotProduct(ListNode A, ListNode B, IntegerNode i, IntegerNode j, IntegerNode n) {
             NumberNode result = IntegerNode.ZERO;
-            for (IntegerNode r = IntegerNode.ZERO; cmp(r, n) < 0; r = r.increment()) {
+            for (IntegerNode r = IntegerNode.ZERO; r.compareTo(n) < 0; r = r.increment()) {
                 final NumberNode Air = (NumberNode) matrixElementAt(A, i, r);
                 final NumberNode Brj = (NumberNode) matrixElementAt(B, r, j);
                 result = result.plus(Air.times(Brj));
@@ -1530,9 +1556,9 @@ public class CalculatorFunctions {
             final IntegerNode rowCount = (IntegerNode) dimensions.get(1); // new row count == old column count.
             final IntegerNode columnCount = (IntegerNode) dimensions.get(0); // new column count == old row count.
             final ListNode result = new ListNode();
-            for (IntegerNode i = IntegerNode.ZERO; cmp(i, rowCount) < 0; i = i.increment()) {
+            for (IntegerNode i = IntegerNode.ZERO; i.compareTo(rowCount) < 0; i = i.increment()) {
                 final ListNode newRow = new ListNode();
-                for (IntegerNode j = IntegerNode.ZERO; cmp(j, columnCount) < 0; j = j.increment()) {
+                for (IntegerNode j = IntegerNode.ZERO; j.compareTo(columnCount) < 0; j = j.increment()) {
                     newRow.add(matrixElementAt(m, j, i));
                 }
                 result.add(newRow);

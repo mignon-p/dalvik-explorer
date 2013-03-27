@@ -443,6 +443,14 @@ public class CalculatorTest extends TestCase {
     }
   }
 
+  public void testDivisors() {
+    check("[1, 3, 41, 123]", "Divisors(-123)");
+    check("[1, 2, 617, 1234]", "Divisors(1234)");
+    check("[1, 17]", "Divisors(17)");
+    check("[1]", "Divisors(1)");
+    check("[]", "Divisors(0)");
+  }
+
   public void testFactorial() {
     check("1", "Factorial(0)");
     check("1", "Factorial(1)");
@@ -457,6 +465,14 @@ public class CalculatorTest extends TestCase {
 
     check("6", "3!");
     check("720", "3!!");
+  }
+
+  public void testFactors() {
+    check("[-3, 41]", "Factors(-123)");
+    check("[2, 617]", "Factors(1234)");
+    check("[17]", "Factors(17)");
+    check("[]", "Factors(1)");
+    check("[]", "Factors(0)");
   }
 
   public void testFilter() {

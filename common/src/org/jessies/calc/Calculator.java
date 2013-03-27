@@ -123,9 +123,11 @@ public class Calculator {
         addFunction(new CalculatorFunctions.DigitCount(),     "DigitCount");
         addFunction(new CalculatorFunctions.Dimensions(),     "Dimensions");
         addFunction(new CalculatorFunctions.Divide(),         "Divide");
+        addFunction(new CalculatorFunctions.Divisors(),       "Divisors");
         addFunction(new CalculatorFunctions.Equal(),          "Equal");
         addFunction(new CalculatorFunctions.Exp(),            "Exp");
         addFunction(new CalculatorFunctions.Factorial(),      "Factorial");
+        addFunction(new CalculatorFunctions.Factors(),        "Factors");
         addFunction(new CalculatorFunctions.Filter(),         "Filter");
         addFunction(new CalculatorFunctions.Floor(),          "Floor");
         addFunction(new CalculatorFunctions.FractionalPart(), "FractionalPart");

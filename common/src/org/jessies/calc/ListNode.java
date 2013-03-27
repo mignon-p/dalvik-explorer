@@ -3,17 +3,17 @@ package org.jessies.calc;
 /*
  * This file is part of org.jessies.calc.
  * Copyright (C) 2010 Elliott Hughes <enh@jessies.org>.
- * 
+ *
  * LittleHelper is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,24 +22,28 @@ import java.util.*;
 
 public class ListNode implements Iterable<Node>, Node {
     private final List<Node> values = new ArrayList<Node>();
-    
+
     public ListNode add(Node value) {
         values.add(value);
         return this;
     }
-    
+
     public Node get(IntegerNode index) {
         return values.get(index.intValue());
     }
-    
+
     public Node get(int index) {
         return values.get(index);
     }
-    
+
+    public void set(int index, Node value) {
+        values.set(index, value);
+    }
+
     public Iterator<Node> iterator() {
         return values.iterator();
     }
-    
+
     @Override public boolean equals(Object other) {
         if (this == other) {
             return true;
@@ -49,15 +53,15 @@ public class ListNode implements Iterable<Node>, Node {
         }
         return values.equals(((ListNode) other).values);
     }
-    
+
     @Override public int hashCode() {
         return values.hashCode();
     }
-    
+
     public int size() {
         return values.size();
     }
-    
+
     public ListNode reverse() {
         final ListNode result = new ListNode();
         for (int i = values.size() - 1; i >= 0; --i) {
@@ -65,7 +69,7 @@ public class ListNode implements Iterable<Node>, Node {
         }
         return result;
     }
-    
+
     public Node evaluate(Calculator environment) {
         ListNode result = new ListNode();
         for (Node value : values) {
@@ -73,7 +77,7 @@ public class ListNode implements Iterable<Node>, Node {
         }
         return result;
     }
-    
+
     public Node simplify(Calculator environment) {
         ListNode result = new ListNode();
         for (Node value : values) {
@@ -81,7 +85,7 @@ public class ListNode implements Iterable<Node>, Node {
         }
         return result;
     }
-    
+
     public String toInputString() {
         StringBuilder result = new StringBuilder();
         result.append("[");
@@ -94,7 +98,7 @@ public class ListNode implements Iterable<Node>, Node {
         result.append("]");
         return result.toString();
     }
-    
+
     public String toString() {
         return toInputString();
     }

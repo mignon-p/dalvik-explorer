@@ -302,25 +302,70 @@ public class IntegerNode implements Comparable<IntegerNode>, NumberNode {
         if (isBig() || fixnum > Integer.MAX_VALUE || fixnum <= Integer.MIN_VALUE) {
             throw new CalculatorError("IsPrime uses a naive algorithm unsuitable for huge numbers");
         }
+        return isPrime((int) fixnum);
+    }
 
-        // FIXME: replace the naive algorithm with something better.
-        int n = Math.abs((int) fixnum);
-        if (n == 1) {
-            return BooleanNode.FALSE;
-        }
-        if (n == 2) {
-            return BooleanNode.TRUE;
-        }
-        if ((n % 2) == 0) {
-            return BooleanNode.FALSE;
-        }
-        final int max = (int) Math.sqrt(n);
-        for (int i = 3; i <= max; i += 2) {
-            if (n % i == 0) {
-                return BooleanNode.FALSE;
-            }
-        }
+    private static BooleanNode isPrime(int n) {
+      // FIXME: replace the naive algorithm with something better.
+      if (n == 1) {
+        return BooleanNode.FALSE;
+      }
+      if (n == 2) {
         return BooleanNode.TRUE;
+      }
+      if ((n % 2) == 0) {
+        return BooleanNode.FALSE;
+      }
+      final int max = (int) Math.sqrt(n);
+      for (int i = 3; i <= max; i += 2) {
+        if (n % i == 0) {
+          return BooleanNode.FALSE;
+        }
+      }
+      return BooleanNode.TRUE;
+    }
+
+    public ListNode primeFactors() {
+      if (isBig() || fixnum > Integer.MAX_VALUE || fixnum <= Integer.MIN_VALUE) {
+        throw new CalculatorError("Factors uses a naive algorithm unsuitable for huge numbers");
+      }
+
+      // FIXME: replace the naive algorithm with something better.
+      int n = Math.abs((int) fixnum);
+
+      final ListNode result = new ListNode();
+
+      // TODO: divide n by each factor, so we can say Factors(9!) == [2,2,2,2,2,2,2,3,3,3,3,5,7].
+      for (int i = 1; i <= n; ++i) {
+        if ((n % i) == 0) {
+          if (isPrime(i) == BooleanNode.TRUE) {
+            result.add(IntegerNode.valueOf(i));
+          }
+        }
+      }
+      if (fixnum < 0) {
+        result.set(0, IntegerNode.ZERO.subtract((IntegerNode) result.get(0)));
+      }
+      return result;
+    }
+
+    public ListNode divisors() {
+      if (isBig() || fixnum > Integer.MAX_VALUE || fixnum <= Integer.MIN_VALUE) {
+        throw new CalculatorError("Factors uses a naive algorithm unsuitable for huge numbers");
+      }
+
+      // FIXME: replace the naive algorithm with something better.
+      int n = Math.abs((int) fixnum);
+
+      final ListNode result = new ListNode();
+
+      // TODO: only need to go to sqrt(n) if we build the list from both ends by actually dividing.
+      for (int i = 1; i <= n; ++i) {
+        if ((n % i) == 0) {
+          result.add(IntegerNode.valueOf(i));
+        }
+      }
+      return result;
     }
 
     public IntegerNode mod(IntegerNode rhs) {
