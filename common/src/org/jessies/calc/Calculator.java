@@ -71,7 +71,7 @@ public class Calculator {
         result.name = "Ans";
         result.value = null;
         result.isAssignable = false;
-        variables.put(result.name.toLowerCase(), result);
+        variables.put(result.name.toLowerCase(Locale.US), result);
         return result;
     }
 
@@ -92,7 +92,7 @@ public class Calculator {
         constant.name = name;
         constant.value = value;
         constant.isAssignable = false;
-        final String key = name.toLowerCase();
+        final String key = name.toLowerCase(Locale.US);
         variables.put(key, constant);
     }
 
@@ -211,11 +211,11 @@ public class Calculator {
         for (String name : names) {
             addUniqueFunction(function, name);
             basicFunctionNames.add(name);
-            final String lowerCaseName = name.toLowerCase();
+            final String lowerCaseName = name.toLowerCase(Locale.US);
             if (!lowerCaseName.equals(name)) {
                 addUniqueFunction(function, lowerCaseName);
             }
-            final String cStyleName = name.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
+            final String cStyleName = name.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase(Locale.US);
             if (!cStyleName.equals(lowerCaseName)) {
                 addUniqueFunction(function, cStyleName);
             }
@@ -262,12 +262,12 @@ public class Calculator {
     }
 
     public Node getVariable(String name) {
-        final Variable v = variables.get(name.toLowerCase());
+        final Variable v = variables.get(name.toLowerCase(Locale.US));
         return (v != null) ? v.value : null;
     }
 
     public void setVariable(String name, Node newValue) {
-        final String key = name.toLowerCase();
+        final String key = name.toLowerCase(Locale.US);
         Variable v = variables.get(key);
         if (v == null) {
             v = new Variable();

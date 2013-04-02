@@ -3,17 +3,17 @@ package org.jessies.calc;
 /*
  * This file is part of org.jessies.calc.
  * Copyright (C) 2009 Elliott Hughes <enh@jessies.org>.
- * 
+ *
  * LittleHelper is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,28 +24,28 @@ import java.util.*;
 
 public class CalculatorLexer {
     private static final int EOF = -1;
-    
+
     private final boolean DEBUG_LEXER = false;
-    
+
     private final MyPushbackReader reader;
-    
+
     private CalculatorToken token;
     private String identifier;
     private NumberNode number;
-    
+
     public CalculatorLexer(String expression) {
         this(new StringReader(expression), null);
     }
-    
+
     public CalculatorLexer(File file) throws IOException {
         this(new BufferedReader(new InputStreamReader(new FileInputStream(file))), file);
     }
-    
+
     private CalculatorLexer(Reader reader, File file) {
         this.reader = new MyPushbackReader(reader, file);
         nextToken();
     }
-    
+
     public void nextToken() {
         try {
             token = nextToken0();
@@ -56,7 +56,7 @@ public class CalculatorLexer {
             throw new CalculatorError("I/O error: " + ex.toString());
         }
     }
-    
+
     private CalculatorToken maybe(char expectedChar, CalculatorToken yesToken, CalculatorToken noToken) throws IOException {
         int ch = reader.read();
         if (ch == expectedChar) {
@@ -65,23 +65,23 @@ public class CalculatorLexer {
         reader.unread(ch);
         return noToken;
     }
-    
+
     private CalculatorToken nextToken0() throws IOException {
         int ch;
-        
+
         // Skip whitespace and control characters.
         while ((ch = reader.read()) != EOF && ch <= ' ') {
         }
-        
+
         switch (ch) {
         case EOF: return CalculatorToken.END_OF_INPUT;
-            
+
         case '(': return CalculatorToken.OPEN_PARENTHESIS;
         case '[': return CalculatorToken.OPEN_SQUARE;
         case ',': return CalculatorToken.COMMA;
         case ']': return CalculatorToken.CLOSE_SQUARE;
         case ')': return CalculatorToken.CLOSE_PARENTHESIS;
-            
+
         case '=': return maybe('=', CalculatorToken.EQ, CalculatorToken.ASSIGN);
         case '+': return CalculatorToken.PLUS;
         case '-': return CalculatorToken.MINUS;
@@ -92,16 +92,16 @@ public class CalculatorLexer {
         case '!': return maybe('=', CalculatorToken.NE, CalculatorToken.PLING);
         case '~': return CalculatorToken.B_NOT;
         case '^': return CalculatorToken.POW;
-            
+
         case '&': return maybe('&', CalculatorToken.L_AND, CalculatorToken.B_AND);
         case '|': return maybe('|', CalculatorToken.L_OR, CalculatorToken.B_OR);
-            
+
         case '*':
         case '\u00d7': // Unicode multiplication sign.
             return CalculatorToken.MUL;
-            
+
         case '\u221a': return CalculatorToken.SQRT;
-            
+
         case '<':
             {
                 int ch2 = reader.read();
@@ -126,12 +126,12 @@ public class CalculatorLexer {
                     return CalculatorToken.GT;
                 }
             }
-        
+
         default:
             if ((ch >= '0' && ch <= '9') || ch == '.') {
                 // Number.
                 StringBuilder text = new StringBuilder();
-                
+
                 // Work out the base.
                 int base = 10;
                 if (ch == '0') {
@@ -146,7 +146,7 @@ public class CalculatorLexer {
                         reader.unread(ch2);
                     }
                 }
-                
+
                 boolean isReal = (ch == '.');
                 while (ch != EOF && (isValidDigit((char) ch, base) || (base == 10 && ch == '.'))) {
                     text.append((char) ch);
@@ -155,7 +155,7 @@ public class CalculatorLexer {
                     }
                     ch = reader.read();
                 }
-                
+
                 boolean engineering = (ch == 'E' || ch == 'e');
                 if (engineering) {
                     isReal = true; // Because BigDecimal supports 'E' but BigInteger doesn't.
@@ -171,7 +171,7 @@ public class CalculatorLexer {
                     }
                 }
                 reader.unread(ch);
-                
+
                 if (isReal) {
                     BigDecimal bigDecimal = new BigDecimal(text.toString());
                     if (engineering) {
@@ -203,15 +203,15 @@ public class CalculatorLexer {
             }
         }
     }
-    
+
     public static String ensurePrintable(int ch) {
         if (ch >= ' ' && ch <= '~') {
             return  String.valueOf((char) ch);
         } else {
-            return String.format("\\u%04x", ch);
+            return String.format(Locale.US, "\\u%04x", ch);
         }
     }
-    
+
     private static boolean isValidDigit(char ch, int base) {
         if (base <= 10) {
             return (ch >= '0' && ch < ('0' + base));
@@ -224,33 +224,33 @@ public class CalculatorLexer {
             }
         }
     }
-    
+
     private static boolean isIdentifierStartCharacter(int ch) {
         return Character.isJavaIdentifierStart(ch);
     }
-    
+
     private static boolean isIdentifierCharacter(int ch) {
         return Character.isJavaIdentifierPart(ch);
     }
-    
+
     public CalculatorToken token() {
         return token;
     }
-    
+
     public String identifier() {
         if (token != CalculatorToken.IDENTIFIER) {
             throw new CalculatorError("Lexer.identifier called when current token was " + token);
         }
         return identifier;
     }
-    
+
     public Node number() {
         if (token != CalculatorToken.NUMBER) {
             throw new CalculatorError("Lexer.number called when current token was " + token);
         }
         return number;
     }
-    
+
     /**
      * Like the JDK PushbackReader, but with a larger default pushback buffer, and more intelligent behavior when pushing back EOF.
      */
@@ -259,19 +259,19 @@ public class CalculatorLexer {
         private static final int BUFFER_SIZE = 8;
         private final char[] buf = new char[BUFFER_SIZE];
         private int pos = buf.length;
-        
+
         // What file we're reading, or null if we're reading from a non-file source (such as a string).
         private final File file;
-        
+
         // Humans count lines from 1, and these are for error reporting.
         private int lineNumber = 1;
         private int columnNumber = 1;
-        
+
         public MyPushbackReader(Reader in, File file) {
             super(in);
             this.file = file;
         }
-        
+
         @Override public int read() throws IOException {
             synchronized (lock) {
                 int result = (pos < buf.length) ? buf[pos++] : super.read();
@@ -283,7 +283,7 @@ public class CalculatorLexer {
                 return result;
             }
         }
-        
+
         public void unread(int c) {
             if (c == EOF || c < ' ') {
                 // Don't push back stuff we'll only skip again anyway.
@@ -298,13 +298,13 @@ public class CalculatorLexer {
                 buf[--pos] = (char) c;
             }
         }
-        
+
         @Override public boolean ready() throws IOException {
             synchronized (lock) {
                 return (pos < buf.length) || super.ready();
             }
         }
-        
+
         @Override public void mark(int readAheadLimit) throws IOException { throw new UnsupportedOperationException(); }
         @Override public boolean markSupported() { return false; }
         @Override public int read(char cbuf[], int off, int len) throws IOException { throw new UnsupportedOperationException(); }

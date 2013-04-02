@@ -121,9 +121,8 @@ public class MathdroidTests extends Activity {
 
     public synchronized void updateSummary() {
       int failureCount = mFailures.size();
-      int testCount = mFinishedTests.size();
-      int passCount = testCount - failureCount;
-      String summary = String.format("Tested: %d  Passed: %d  Failed: %d", testCount, passCount, failureCount);
+      int passCount = mFinishedTests.size() - failureCount;
+      String summary = String.format(Locale.US, "Passed: %d/%d  Failed: %d", passCount, mTestSuiteSize, failureCount);
       setSummary(mFailedTests.isEmpty() ? GREEN : RED, summary);
     }
 
@@ -186,7 +185,7 @@ public class MathdroidTests extends Activity {
     }
 
     private static String prettyDurationMs(long ms) {
-      return String.format("%.1f s", ((double) ms) / 1000.0);
+      return String.format(Locale.US, "%.1f s", ((double) ms) / 1000.0);
     }
 
     private void appendHtml(final String text) {
