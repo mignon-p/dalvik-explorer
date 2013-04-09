@@ -16,6 +16,38 @@
     <item>16</item>
   </string-array>
 
+  <string name="del_button_description">Delete</string> <!-- same as IME -->
+  <string name="kbd_button_description">Show full keyboard</string>
+  <string name="open_button_description">Open parenthesis</string>
+  <string name="close_button_description">Close parenthesis</string>
+  <string name="left_button_description">Cursor left</string>
+  <string name="right_button_description">Cursor right</string>
+  <string name="comma_button_description">Comma</string>
+  <string name="ceil_button_description">Ceiling function</string>
+  <string name="floor_button_description">Floor function</string>
+  <string name="pi_button_description">Pi</string>
+  <string name="pling_button_description">Exclamation mark</string>
+  <string name="ncr_button_description">NCR function</string>
+  <string name="npr_button_description">NPR function</string>
+  <string name="times_button_description">Times</string>
+  <string name="divide_button_description">Divide</string>
+  <string name="sin_button_description">Sine function</string>
+  <string name="cos_button_description">Co sine function</string>
+  <string name="tan_button_description">Tangent function</string>
+  <string name="ln_button_description">Natural logarithm function</string>
+  <string name="e_button_description">e</string>
+  <string name="rand_button_description">Rand function</string>
+  <string name="plus_button_description">Plus</string>
+  <string name="minus_button_description">Minus</string>
+  <string name="asin_button_description">Arc sine function</string>
+  <string name="acos_button_description">Arc co sine function</string>
+  <string name="atan_button_description">Arc tangent function</string>
+  <string name="log10_button_description">Base 10 logarithm function</string>
+  <string name="sqrt_button_description">Square root</string>
+  <string name="pow_button_description">Power operator</string>
+  <string name="dot_button_description">Decimal point</string>
+  <string name="exe_button_description">Enter</string>
+
   <string name="acos_button">acos</string>
   <string name="ans_button">Ans</string>
   <string name="asin_button">asin</string>
