@@ -8,6 +8,7 @@ import android.view.*;
 import android.widget.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import junit.framework.*;
 
 public class MathdroidTests extends Activity {
@@ -38,15 +39,39 @@ public class MathdroidTests extends Activity {
     public void runTests() {
       textView().setText("");
 
-      TestResult result = new TestResult();
+      final TestResult result = new TestResult();
       result.addListener(this);
 
-      // Let junit run the tests.
       long t0 = System.currentTimeMillis();
-      mSuite.run(result);
-      long t1 = System.currentTimeMillis();
 
+      // Run the tests in parallel.
+      int threadCount = Runtime.getRuntime().availableProcessors();
+      ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+      submitTests(executor, mSuite, result);
+      executor.shutdown();
+      try {
+        executor.awaitTermination(1, TimeUnit.MINUTES);
+      } catch (InterruptedException ex) {
+        throw new RuntimeException(ex);
+      }
+
+      long t1 = System.currentTimeMillis();
       updateAtEnd(t1 - t0);
+    }
+
+    private static void submitTests(ExecutorService executor, TestSuite suite, final TestResult result) {
+      for (int i = 0; i < suite.testCount(); ++i) {
+        final Test test = suite.testAt(i);
+        if (test instanceof TestSuite) {
+          submitTests(executor, (TestSuite) test, result);
+        } else {
+          executor.execute(new Runnable() {
+            @Override public void run() {
+              test.run(result);
+            }
+          });
+        }
+      }
     }
 
     public synchronized void addError(Test test, Throwable failure) {
