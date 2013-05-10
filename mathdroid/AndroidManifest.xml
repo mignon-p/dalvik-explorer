@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.jessies.mathdroid" android:versionCode="292" android:versionName="2.9.2">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.jessies.mathdroid" android:versionCode="293" android:versionName="2.9.3">
     <!-- API 3 == 1.5 cupcake, API 17 == 4.2 jelly bean mr1 http://developer.android.com/guide/appendix/api-levels.html -->
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="17" />
     <application android:label="@string/app_name" android:icon="@drawable/icon">
