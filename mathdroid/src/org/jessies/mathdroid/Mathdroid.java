@@ -90,7 +90,7 @@ public class Mathdroid extends Activity implements AdapterView.OnItemClickListen
         activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
           @Override public void onGlobalLayout() {
             int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
-            findViewById(R.id.on_screen_keyboard).setVisibility((heightDiff < 200) ? View.VISIBLE : View.GONE);
+            findViewById(R.id.on_screen_keyboard).setVisibility((heightDiff < activityRootView.getHeight()/3) ? View.VISIBLE : View.GONE);
           }
         });
 
