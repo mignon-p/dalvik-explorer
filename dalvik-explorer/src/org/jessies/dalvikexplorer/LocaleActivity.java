@@ -131,10 +131,11 @@ public class LocaleActivity extends TextViewActivity {
     int firstDayOfWeek = c.getFirstDayOfWeek();
     String firstDayOfWeekString = new DateFormatSymbols(locale).getWeekdays()[firstDayOfWeek];
     String englishFirstDayOfWeekString = new DateFormatSymbols(Locale.US).getWeekdays()[firstDayOfWeek];
-    append(result, "First Day of the Week", firstDayOfWeek + " '" + firstDayOfWeekString + "'");
+    String firstDayOfWeekDetails = firstDayOfWeek + " '" + firstDayOfWeekString + "'";
     if (!englishFirstDayOfWeekString.equals(firstDayOfWeekString)) {
-      result.append(" (" + englishFirstDayOfWeekString + ")");
+      firstDayOfWeekDetails += " (" + englishFirstDayOfWeekString + ")";
     }
+    append(result, "First Day of the Week", firstDayOfWeekDetails);
     append(result, "Minimal Days in First Week", c.getMinimalDaysInFirstWeek());
 
     // If this locale specifies a country, check out the currency.
