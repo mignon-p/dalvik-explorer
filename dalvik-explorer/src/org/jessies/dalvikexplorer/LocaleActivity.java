@@ -145,7 +145,7 @@ public class LocaleActivity extends TextViewActivity {
       try {
         Currency currency = Currency.getInstance(locale);
         append(result, "ISO 4217 Currency Code", currency.getCurrencyCode());
-        append(result, "Currency Symbol", currency.getSymbol(locale) + " (" + currency.getSymbol(Locale.US) + ")");
+        append(result, "Currency Symbol", unicodeString(currency.getSymbol(locale)) + " (" + currency.getSymbol(Locale.US) + ")");
         append(result, "Default Fraction Digits", currency.getDefaultFractionDigits());
       } catch (IllegalArgumentException ex) {
         result.append("<p>(This version of Android is unable to return a Currency for this Locale.)");
