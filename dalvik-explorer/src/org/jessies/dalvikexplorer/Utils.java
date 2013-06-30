@@ -136,7 +136,7 @@ public class Utils {
     return String.format("%.1f %sB", n, unit);
   }
 
-  public static String prettyHz(int hz) {
+  public static String prettyHz(long hz) {
     String unit = "";
     double n = hz;
     if (n > 1000) {
