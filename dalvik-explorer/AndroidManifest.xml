@@ -30,6 +30,7 @@
         <activity android:name=".LocalesActivity" />
         <activity android:name=".LocaleCountriesActivity" />
         <activity android:name=".LocaleActivity" />
+        <activity android:name=".SensorsActivity" />
         <activity android:name=".SystemPropertiesActivity" />
         <activity android:name=".TimeZonesActivity" />
         <activity android:name=".TimeZoneActivity" />
