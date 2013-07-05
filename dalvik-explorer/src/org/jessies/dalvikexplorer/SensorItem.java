@@ -29,7 +29,7 @@ public class SensorItem {
       case Sensor.TYPE_ACCELEROMETER:
       case Sensor.TYPE_GRAVITY:
       case Sensor.TYPE_LINEAR_ACCELERATION:
-        return String.format(Locale.US, "res=%f x=%+.1f m/s\u00b2, y=%+.1f m/s\u00b2, z=%+.1f m/s\u00b2", e.values[0], e.values[1], e.values[2]);
+        return String.format(Locale.US, "x=%+.1f m/s\u00b2, y=%+.1f m/s\u00b2, z=%+.1f m/s\u00b2", e.values[0], e.values[1], e.values[2]);
       case Sensor.TYPE_MAGNETIC_FIELD:
         return String.format(Locale.US, "x=%.1f \u00b5T, y=%.1f \u00b5T, z=%.1f \u00b5T", e.values[0], e.values[1], e.values[2]);
       case Sensor.TYPE_GYROSCOPE:
