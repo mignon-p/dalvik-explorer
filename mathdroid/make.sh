@@ -5,22 +5,23 @@ if [ "$(uname)" == "Darwin" ]; then
 else
   os=linux
 fi
-ASDK_ROOT=~/Downloads/android-sdk-${os}
-MIN_ANDROID_RELEASE=16
-MAX_ANDROID_RELEASE=16
+ASDK_ROOT=~/Development/adt-bundle-linux-x86_64-20130729/sdk
+MIN_ANDROID_RELEASE=18
+MAX_ANDROID_RELEASE=18
 JAVA_ROOT=/usr/bin #JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
 
 
 # Various Android tools.
-AAPT=${ASDK_ROOT}/platform-tools/aapt
+AAPT=${ASDK_ROOT}/build-tools/android-4.3/aapt
 ADB=${ASDK_ROOT}/platform-tools/adb
-APKBUILDER=${ASDK_ROOT}/tools/apkbuilder
-DX=${ASDK_ROOT}/platform-tools/dx
+SDKLIB=${ASDK_ROOT}/tools/lib/sdklib.jar
+DX=${ASDK_ROOT}/build-tools/android-4.3/dx
 ZIPALIGN=${ASDK_ROOT}/tools/zipalign
 
 # Various JDK tools.
 JAVAC=${JAVA_ROOT}/javac
+JAVA=${JAVA_ROOT}/java
 JARSIGNER=${JAVA_ROOT}/jarsigner
 
 # The Android class library.
@@ -122,7 +123,7 @@ else
   apk_suffix=debug
 fi
 apkbuilder_out=.generated/${APP_NAME}-${apk_suffix}.apk
-${APKBUILDER} ${apkbuilder_out} ${extra_apkbuilder_flags} -v -f ${dex_out} -z ${aapt_out} || exit 1
+${JAVA} -classpath ${SDKLIB} com.android.sdklib.build.ApkBuilderMain ${apkbuilder_out} ${extra_apkbuilder_flags} -v -f ${dex_out} -z ${aapt_out} || exit 1
 
 if [ "$target" == "debug" ]; then
   # FIXME: does debug always imply install, or should they be two separate targets?
