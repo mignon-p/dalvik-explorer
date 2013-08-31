@@ -41,7 +41,7 @@ public class SensorItem {
       case Sensor.TYPE_PROXIMITY:
         return String.format(Locale.US, "%.1f cm", e.values[0]);
       case Sensor.TYPE_RELATIVE_HUMIDITY:
-        return String.format(Locale.US, "%.1f %", e.values[0]);
+        return String.format(Locale.US, "%.1f %%", e.values[0]);
       case Sensor.TYPE_AMBIENT_TEMPERATURE:
         return String.format(Locale.US, "%.1f C", e.values[0]);
       case Sensor.TYPE_ROTATION_VECTOR:
