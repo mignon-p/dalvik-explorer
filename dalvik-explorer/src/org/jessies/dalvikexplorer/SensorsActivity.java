@@ -9,7 +9,7 @@ import android.view.*;
 import java.util.*;
 
 public class SensorsActivity extends BetterListActivity implements SensorEventListener {
-  private final HashMap<Sensor, SensorEvent> mData = new HashMap<Sensor, SensorEvent>();
+  private final Map<Sensor, FakeSensorEvent> mData = new HashMap<Sensor, FakeSensorEvent>();
 
   @Override protected void onResume() {
     super.onResume();
@@ -32,7 +32,7 @@ public class SensorsActivity extends BetterListActivity implements SensorEventLi
   }
 
   public void onSensorChanged(SensorEvent event) {
-    mData.put(event.sensor, event);
+    mData.put(event.sensor, new FakeSensorEvent(event));
     getListView().invalidateViews();
   }
 

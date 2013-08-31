@@ -4,10 +4,10 @@ import android.hardware.*;
 import java.util.*;
 
 public class SensorItem {
-  private final HashMap<Sensor, SensorEvent> events;
+  private final Map<Sensor, FakeSensorEvent> events;
   private final Sensor sensor;
 
-  public SensorItem(HashMap<Sensor, SensorEvent> events, Sensor sensor) {
+  public SensorItem(Map<Sensor, FakeSensorEvent> events, Sensor sensor) {
     this.events = events;
     this.sensor = sensor;
   }
@@ -17,14 +17,14 @@ public class SensorItem {
   }
 
   public String toSubtitle() {
-    SensorEvent sensorEvent = events.get(sensor);
+    FakeSensorEvent sensorEvent = events.get(sensor);
     if (sensorEvent != null) {
       return toString(sensorEvent);
     }
     return "No data.";
   }
 
-  private String toString(SensorEvent e) {
+  private String toString(FakeSensorEvent e) {
     switch (e.sensor.getType()) {
       case Sensor.TYPE_ACCELEROMETER:
       case Sensor.TYPE_GRAVITY:
