@@ -32,6 +32,10 @@ public class BuildActivity extends TextViewActivity {
     final String hardware = getFieldReflectively(build, "HARDWARE"); // API 8.
     final String serial = getFieldReflectively(build, "SERIAL"); // API 9.
 
+    final Build.VERSION bvers = new Build.VERSION();
+    final String codename = getFieldReflectively(bvers, "CODENAME"); // API 4.
+    final String sdkInt = getFieldReflectively(bvers, "SDK_INT"); // API 4.
+
     final StringBuilder result = new StringBuilder();
     result.append("<html>");
     append(result, "Manufacturer", manufacturer); // "samsung"
@@ -59,6 +63,12 @@ public class BuildActivity extends TextViewActivity {
     append(result, "Build Tags", Build.TAGS); // "dev-keys"
     append(result, "Build Date", DateFormat.format("yyyy-MM-dd", Build.TIME)); // "2012-02-07"
     append(result, "Built By", Build.USER + "@" + Build.HOST);
+
+    result.append("<p>");
+    append(result, "Codename", codename);
+    append(result, "Incremental", Build.VERSION.INCREMENTAL);
+    append(result, "Release", Build.VERSION.RELEASE);
+    append(result, "API level", sdkInt);
 
     result.append("<p>");
     append(result, "CPU ABIs", cpuAbi + " " + cpuAbi2); // "armeabi-v7a"
@@ -106,6 +116,15 @@ public class BuildActivity extends TextViewActivity {
     try {
       final Field field = Build.class.getField(fieldName);
       return field.get(build).toString();
+    } catch (Exception ex) {
+      return "unknown";
+    }
+  }
+
+  private static String getFieldReflectively(Build.VERSION v, String fieldName) {
+    try {
+      final Field field = Build.VERSION.class.getField(fieldName);
+      return field.get(v).toString();
     } catch (Exception ex) {
       return "unknown";
     }
