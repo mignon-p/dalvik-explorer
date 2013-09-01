@@ -34,5 +34,6 @@
         <activity android:name=".SystemPropertiesActivity" />
         <activity android:name=".TimeZonesActivity" />
         <activity android:name=".TimeZoneActivity" />
+        <activity android:name=".TlsActivity" />
     </application>
 </manifest>

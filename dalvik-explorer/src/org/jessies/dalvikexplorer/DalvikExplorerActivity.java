@@ -32,7 +32,8 @@ public class DalvikExplorerActivity extends ListActivity {
     new NamedActivity("Locales", LocalesActivity.class),
     new NamedActivity("Sensors", SensorsActivity.class),
     new NamedActivity("System Properties", SystemPropertiesActivity.class),
-    new NamedActivity("Time Zones", TimeZonesActivity.class)
+    new NamedActivity("Time Zones", TimeZonesActivity.class),
+    new NamedActivity("Transport Layer Security", TlsActivity.class)
   };
 
   @Override public void onCreate(Bundle savedInstanceState) {
