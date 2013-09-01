@@ -6,8 +6,8 @@ else
   os=linux
 fi
 ASDK_ROOT=~/Development/adt-bundle-linux-x86_64-20130729/sdk
-MIN_ANDROID_RELEASE=18
-MAX_ANDROID_RELEASE=18
+MIN_ANDROID_RELEASE=14
+MAX_ANDROID_RELEASE=14
 JAVA_ROOT=/usr/bin #JAVA_ROOT=/usr/lib/jvm/java-6-sun/bin
 RELEASE_KEYSTORE=~/android-market.keystore
 
