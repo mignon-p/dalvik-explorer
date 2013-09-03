@@ -138,7 +138,8 @@ fi
 if [ "$target" == "release" ]; then
   # Sign the apk and check the signing worked.
   jarsigner_out=.generated/${APP_NAME}-signed.apk
-  ${JARSIGNER} -verbose -keystore ${RELEASE_KEYSTORE} -signedjar ${jarsigner_out} ${apkbuilder_out} android-release-key || exit 1
+  # JDK 7 suckage; see gravitron's comment at http://stackoverflow.com/a/7114575/2666524
+  ${JARSIGNER} -digestalg SHA1 -sigalg MD5withRSA -verbose -keystore ${RELEASE_KEYSTORE} -signedjar ${jarsigner_out} ${apkbuilder_out} android-release-key || exit 1
   ${JARSIGNER} -verify ${jarsigner_out} || exit 1
 
   # Zipalign the signed apk.
