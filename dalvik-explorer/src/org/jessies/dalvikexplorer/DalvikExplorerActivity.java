@@ -41,7 +41,7 @@ public class DalvikExplorerActivity extends ListActivity {
     super.onCreate(savedInstanceState);
     setListAdapter(new BetterArrayAdapter<NamedActivity>(this, Arrays.asList(ACTIVITIES)));
 
-    String title = "Dalvik Explorer";
+    String title = "Patrick's Dalvik Explorer";
     try {
       title += " " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
     } catch (PackageManager.NameNotFoundException ignored) {
