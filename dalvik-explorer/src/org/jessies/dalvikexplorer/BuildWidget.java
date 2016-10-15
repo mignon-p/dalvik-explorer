@@ -17,50 +17,34 @@
 package org.jessies.dalvikexplorer;
 
 import android.app.PendingIntent;
-import android.app.Service;
-import android.appwidget.*;
-import android.content.*;
-import android.os.IBinder;
-import android.text.format.*;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
+import android.content.Context;
+import android.content.Intent;
+import android.text.format.DateFormat;
 import android.widget.RemoteViews;
 
 public class BuildWidget extends AppWidgetProvider {
   @Override public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-    // To prevent any ANR timeouts, we perform the update in a service
-    context.startService(new Intent(context, UpdateService.class));
+    for (int appWidgetId : appWidgetIds) {
+      updateAppWidget(context, appWidgetManager, appWidgetId);
+    }
   }
 
-  public static class UpdateService extends Service {
-    @Override public int onStartCommand(Intent intent, int flags, int startId) {
-      // Build the widget update
-      RemoteViews updateViews = buildUpdate(this);
+  public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+    RemoteViews updateViews = new RemoteViews(context.getPackageName(), R.layout.build_widget);
 
-      // Push update for this widget to the home screen
-      ComponentName thisWidget = new ComponentName(this, BuildWidget.class);
-      AppWidgetManager manager = AppWidgetManager.getInstance(this);
-      manager.updateAppWidget(thisWidget, updateViews);
+    PendingIntent pendingIntent = PendingIntent.getActivity(context,
+                                                            0 /* no requestCode */,
+                                                            new Intent("android.settings.SYSTEM_UPDATE_SETTINGS"),
+                                                            0 /* no flags */);
+    updateViews.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
-      return START_STICKY;
-    }
+    updateViews.setTextViewText(R.id.build_info, android.os.Build.ID);
+    updateViews.setTextViewText(R.id.build_product, android.os.Build.PRODUCT);
+    updateViews.setTextViewText(R.id.build_type, android.os.Build.TYPE);
+    updateViews.setTextViewText(R.id.build_date, DateFormat.format("yyyy-MM-dd", android.os.Build.TIME));
 
-    public RemoteViews buildUpdate(Context context) {
-      RemoteViews updateViews = new RemoteViews(context.getPackageName(), R.layout.build_widget);
-
-      PendingIntent pendingIntent = PendingIntent.getActivity(context,
-                                                              0 /* no requestCode */,
-                                                              new Intent("android.settings.SYSTEM_UPDATE_SETTINGS"),
-                                                              0 /* no flags */);
-      updateViews.setOnClickPendingIntent(R.id.widget, pendingIntent);
-
-      updateViews.setTextViewText(R.id.build_info, android.os.Build.ID);
-      updateViews.setTextViewText(R.id.build_product, android.os.Build.PRODUCT);
-      updateViews.setTextViewText(R.id.build_type, android.os.Build.TYPE);
-      updateViews.setTextViewText(R.id.build_date, DateFormat.format("yyyy-MM-dd", android.os.Build.TIME));
-      return updateViews;
-    }
-
-    @Override public IBinder onBind(Intent intent) {
-      return null;
-    }
+    appWidgetManager.updateAppWidget(appWidgetId, updateViews);
   }
 }
