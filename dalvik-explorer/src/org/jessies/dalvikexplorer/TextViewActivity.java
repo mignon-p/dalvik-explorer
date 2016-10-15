@@ -1,16 +1,26 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
 import android.text.ClipboardManager;
-import android.text.*;
-import android.text.style.*;
-import android.text.util.*;
-import android.view.*;
-import android.widget.*;
-import java.math.*;
-import java.util.regex.*;
+import android.text.Editable;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextWatcher;
+import android.text.style.BackgroundColorSpan;
+import android.text.util.Linkify;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An abstract superclass for our TextView-based activities.

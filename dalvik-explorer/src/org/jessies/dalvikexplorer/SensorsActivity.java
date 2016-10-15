@@ -1,15 +1,19 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.hardware.*;
-import android.os.*;
-import android.widget.*;
-import android.view.*;
-import java.util.*;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class SensorsActivity extends BetterListActivity implements SensorEventListener {
-  private final HashMap<Sensor, SensorEvent> mData = new HashMap<Sensor, SensorEvent>();
+  private final HashMap<Sensor, ImmutableSensorEvent> mData = new HashMap<Sensor, ImmutableSensorEvent>();
 
   @Override protected void onResume() {
     super.onResume();
@@ -23,7 +27,6 @@ public class SensorsActivity extends BetterListActivity implements SensorEventLi
   @Override protected void onPause() {
     super.onPause();
     SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-    final List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
     sensorManager.unregisterListener(this);
   }
 
@@ -32,14 +35,14 @@ public class SensorsActivity extends BetterListActivity implements SensorEventLi
   }
 
   public void onSensorChanged(SensorEvent event) {
-    mData.put(event.sensor, event);
+    mData.put(event.sensor, new ImmutableSensorEvent(event));
     getListView().invalidateViews();
   }
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     final List<SensorItem> sensors = gatherSensors();
-    setListAdapter(new BetterArrayAdapter<SensorItem>(this, sensors, SensorItem.class, "toSubtitle"));
+    setListAdapter(new BetterArrayAdapter<SensorItem>(this, sensors, true));
     setTitle("Sensors (" + sensors.size() + ")");
   }
 

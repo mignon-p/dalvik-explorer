@@ -1,13 +1,16 @@
 package org.jessies.dalvikexplorer;
 
-import android.hardware.*;
-import java.util.*;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 
-public class SensorItem {
-  private final HashMap<Sensor, SensorEvent> events;
+import java.util.HashMap;
+import java.util.Locale;
+
+public class SensorItem implements BetterArrayAdapter.Subtitleable {
+  private final HashMap<Sensor, ImmutableSensorEvent> events;
   private final Sensor sensor;
 
-  public SensorItem(HashMap<Sensor, SensorEvent> events, Sensor sensor) {
+  public SensorItem(HashMap<Sensor, ImmutableSensorEvent> events, Sensor sensor) {
     this.events = events;
     this.sensor = sensor;
   }
@@ -17,14 +20,14 @@ public class SensorItem {
   }
 
   public String toSubtitle() {
-    SensorEvent sensorEvent = events.get(sensor);
+    ImmutableSensorEvent sensorEvent = events.get(sensor);
     if (sensorEvent != null) {
       return toString(sensorEvent);
     }
     return "No data.";
   }
 
-  private String toString(SensorEvent e) {
+  private String toString(ImmutableSensorEvent e) {
     switch (e.sensor.getType()) {
       case Sensor.TYPE_ACCELEROMETER:
       case Sensor.TYPE_GRAVITY:
@@ -41,7 +44,7 @@ public class SensorItem {
       case Sensor.TYPE_PROXIMITY:
         return String.format(Locale.US, "%.1f cm", e.values[0]);
       case Sensor.TYPE_RELATIVE_HUMIDITY:
-        return String.format(Locale.US, "%.1f %", e.values[0]);
+        return String.format(Locale.US, "%.1f %%", e.values[0]);
       case Sensor.TYPE_AMBIENT_TEMPERATURE:
         return String.format(Locale.US, "%.1f C", e.values[0]);
       case Sensor.TYPE_ROTATION_VECTOR:

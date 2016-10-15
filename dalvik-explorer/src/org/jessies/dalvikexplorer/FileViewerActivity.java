@@ -1,12 +1,18 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-import java.io.*;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URLConnection;
 
 public class FileViewerActivity extends TextViewActivity {

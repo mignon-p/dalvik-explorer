@@ -1,11 +1,13 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.widget.*;
-import android.view.*;
-import java.util.*;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class LocaleCountriesActivity extends BetterListActivity {    
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -13,7 +15,7 @@ public class LocaleCountriesActivity extends BetterListActivity {
         
         String languageCode = getIntent().getStringExtra("org.jessies.dalvikexplorer.Language");
         List<LocaleListItem> locales = gatherLocales(languageCode);
-        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, locales, LocaleListItem.class, "toSubtitle"));
+        setListAdapter(new BetterArrayAdapter<LocaleListItem>(this, locales, true));
         setTitle(new Locale(languageCode).getDisplayLanguage() + " Locales (" + locales.size() + ")");
     }
     

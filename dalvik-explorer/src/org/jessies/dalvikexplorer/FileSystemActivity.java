@@ -1,15 +1,19 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-import java.io.*;
-import java.util.*;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class FileSystemActivity extends BetterListActivity {
-    private static class FileListItem {
+    private static class FileListItem implements BetterArrayAdapter.Subtitleable {
         private final File file;
         private final String label;
         
@@ -44,7 +48,7 @@ public class FileSystemActivity extends BetterListActivity {
             path = "/";
         }
         
-        setListAdapter(new BetterArrayAdapter<FileListItem>(this, directoryItems(path), FileListItem.class, "toSubtitle"));
+        setListAdapter(new BetterArrayAdapter<FileListItem>(this, directoryItems(path), true));
         setTitle(path + " (" + getListAdapter().getCount() + ")");
     }
     

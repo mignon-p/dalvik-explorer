@@ -1,13 +1,13 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.content.pm.*;
-import android.net.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-import java.util.*;
+import android.app.ListActivity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+
+import java.util.Arrays;
 
 public class DalvikExplorerActivity extends ListActivity {
   // A (list view label, activity class) pair.
@@ -37,7 +37,7 @@ public class DalvikExplorerActivity extends ListActivity {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setListAdapter(new BetterArrayAdapter<NamedActivity>(this, Arrays.asList(ACTIVITIES)));
+    setListAdapter(new BetterArrayAdapter<NamedActivity>(this, Arrays.asList(ACTIVITIES), false));
 
     String title = "Dalvik Explorer";
     try {

@@ -1,9 +1,9 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.os.*;
-import android.widget.*;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class SystemPropertiesActivity extends TextViewActivity {
     protected CharSequence title(String unused) {

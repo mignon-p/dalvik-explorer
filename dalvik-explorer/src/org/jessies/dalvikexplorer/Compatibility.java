@@ -1,11 +1,13 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-import java.io.*;
+import android.app.Activity;
+import android.app.ListActivity;
+import android.os.Build;
+import android.view.Menu;
+import android.widget.ListView;
+import android.widget.SearchView;
+
+import java.io.File;
 
 public abstract class Compatibility {
   public static Compatibility get() {
@@ -21,6 +23,7 @@ public abstract class Compatibility {
   }
 
   public abstract void configureActionBar(Activity activity);
+  public abstract void configureFastScroll(ListView listView);
   public abstract void configureSearchView(ListActivity listActivity, Menu menu);
   public abstract void configureSearchView(TextViewActivity textViewActivity, Menu menu);
   public abstract String describeFs(String mountPoint, String type);
@@ -29,6 +32,9 @@ public abstract class Compatibility {
   public static class PreGingerbreadCompatibility extends Compatibility {
     public void configureActionBar(Activity activity) {
       // Nothing to do, since there was no ActionBar pre-honeycomb.
+    }
+    public void configureFastScroll(ListView listView) {
+      listView.setFastScrollEnabled(true);
     }
     public void configureSearchView(ListActivity listActivity, Menu menu) {
       // Nothing to do, since a SearchView couldn't possibly exist pre-honeycomb.
@@ -61,6 +67,11 @@ public abstract class Compatibility {
   }
 
   public static class HoneycombCompatibility extends GingerbreadCompatibility {
+    @Override public void configureFastScroll(ListView listView) {
+      listView.setFastScrollEnabled(true);
+      listView.setFastScrollAlwaysVisible(true);
+    }
+
     @Override public void configureSearchView(final ListActivity listActivity, Menu menu) {
       SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
       searchView.setSubmitButtonEnabled(false);

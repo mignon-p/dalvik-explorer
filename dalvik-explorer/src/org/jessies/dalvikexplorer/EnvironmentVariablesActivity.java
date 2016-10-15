@@ -1,10 +1,5 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.os.*;
-import android.widget.*;
-import java.util.*;
-
 public class EnvironmentVariablesActivity extends TextViewActivity {
     protected CharSequence title(String unused) {
         return "Environment Variables (" + System.getenv().size() + ")";

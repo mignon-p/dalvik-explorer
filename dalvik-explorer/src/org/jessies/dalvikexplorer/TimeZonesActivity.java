@@ -1,15 +1,16 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.util.*;
-import android.view.*;
-import android.widget.*;
-import java.util.*;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
 
 public class TimeZonesActivity extends BetterListActivity {
-    private static class TimeZoneListItem {
+    private static class TimeZoneListItem implements BetterArrayAdapter.Subtitleable {
         private final TimeZone timeZone;
         
         private TimeZoneListItem(TimeZone timeZone) {
@@ -41,7 +42,7 @@ public class TimeZonesActivity extends BetterListActivity {
     
     private void updateTimeZones() {
         final List<TimeZoneListItem> timeZones = gatherTimeZones();
-        setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, timeZones, TimeZoneListItem.class, "toSubtitle"));
+        setListAdapter(new BetterArrayAdapter<TimeZoneListItem>(this, timeZones, true));
         setTitle("Time Zones (" + timeZones.size() + ")");
     }
     

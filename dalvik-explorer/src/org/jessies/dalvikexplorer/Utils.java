@@ -2,8 +2,15 @@ package org.jessies.dalvikexplorer;
 
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
-import java.io.*;
-import java.util.*;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 public class Utils {
     // Original in salma-hayek "DebugMenu.java".

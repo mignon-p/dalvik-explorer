@@ -1,11 +1,7 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import java.nio.charset.*;
-import java.util.*;
+import java.nio.charset.Charset;
+import java.util.Set;
 
 public class CharsetActivity extends TextViewActivity {
   protected String extraName() {

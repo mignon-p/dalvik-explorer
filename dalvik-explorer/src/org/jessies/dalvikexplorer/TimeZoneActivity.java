@@ -1,15 +1,18 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.util.*;
-import android.view.*;
-import android.widget.*;
-import java.io.*;
-import java.lang.reflect.*;
-import java.text.*;
-import java.util.*;
+import android.util.TimeUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Formatter;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class TimeZoneActivity extends TextViewActivity {
   protected String extraName() {

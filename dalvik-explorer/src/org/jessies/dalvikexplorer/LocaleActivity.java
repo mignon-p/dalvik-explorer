@@ -1,12 +1,19 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-import java.text.*;
-import java.util.*;
+import java.text.BreakIterator;
+import java.text.Collator;
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.Date;
+import java.util.Locale;
+import java.util.MissingResourceException;
 
 public class LocaleActivity extends TextViewActivity {
   protected String extraName() {
@@ -56,18 +63,30 @@ public class LocaleActivity extends TextViewActivity {
     append(result, "Localized Display Name", locale.getDisplayName(locale));
 
     if (locale.getLanguage().length() > 0) {
+      String iso3Language = "(not available)";
+      try {
+        iso3Language = locale.getISO3Language();
+      } catch (MissingResourceException ignored) {
+      }
+
       result.append("<p>");
       append(result, "Display Language", locale.getDisplayLanguage());
       append(result, "Localized Display Language", locale.getDisplayLanguage(locale));
       append(result, "2-Letter Language Code", locale.getLanguage());
-      append(result, "3-Letter Language Code", locale.getISO3Language());
+      append(result, "3-Letter Language Code", iso3Language);
     }
     if (locale.getCountry().length() > 0) {
+      String iso3Country = "(not available)";
+      try {
+        iso3Country = locale.getISO3Country();
+      } catch (MissingResourceException ignored) {
+      }
+
       result.append("<p>");
       append(result, "Display Country", locale.getDisplayCountry());
       append(result, "Localized Display Country", locale.getDisplayCountry(locale));
       append(result, "2-Letter Country Code", locale.getCountry());
-      append(result, "3-Letter Country Code", locale.getISO3Country());
+      append(result, "3-Letter Country Code", iso3Country);
     }
     if (locale.getVariant().length() > 0) {
       result.append("<p>");

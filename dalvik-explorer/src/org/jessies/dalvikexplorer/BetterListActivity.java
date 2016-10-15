@@ -16,12 +16,15 @@
 
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.view.inputmethod.*;
-import android.widget.*;
+import android.app.ListActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Parcelable;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ListView;
 
 /**
  * A ListActivity that:
@@ -38,7 +41,9 @@ public class BetterListActivity extends ListActivity {
   
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    getListView().setTextFilterEnabled(true);
+    ListView listView = getListView();
+    listView.setTextFilterEnabled(true);
+    Compatibility.get().configureFastScroll(listView);
   }
   
   @Override public boolean onCreateOptionsMenu(Menu menu) {

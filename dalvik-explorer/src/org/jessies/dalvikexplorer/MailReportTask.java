@@ -1,8 +1,10 @@
 package org.jessies.dalvikexplorer;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
 
 public class MailReportTask extends AsyncTask<Void, Void, String> implements DialogInterface.OnCancelListener {
     private final Activity activity;
