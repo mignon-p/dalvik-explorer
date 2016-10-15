@@ -1,6 +1,7 @@
 package org.jessies.dalvikexplorer;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.graphics.Point;
 import android.os.Build;
 import android.util.DisplayMetrics;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -165,7 +167,7 @@ public class DeviceActivity extends TextViewActivity {
     }
   }
 
-  static String getDeviceDetailsAsString(Activity context, WindowManager wm) {
+  String getDeviceDetailsAsString(Activity context, WindowManager wm) {
     final StringBuilder result = new StringBuilder();
     result.append("<html>");
 
@@ -248,6 +250,14 @@ public class DeviceActivity extends TextViewActivity {
     result.append("<br>&nbsp;&nbsp;Used: " + Utils.prettySize(memInfo.used));
     result.append("<br>&nbsp;&nbsp;Free: " + Utils.prettySize(memInfo.free));
     result.append("<br>&nbsp;&nbsp;Buffers: " + Utils.prettySize(memInfo.buffers));
+
+    try {
+      ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+      Method isLowRamDeviceMethod = ActivityManager.class.getMethod("isLowRamDevice");
+      boolean isLowRamDevice = (Boolean) isLowRamDeviceMethod.invoke(activityManager);
+      result.append("<p><b>Is Low Memory Device:</b> " + isLowRamDevice);
+    } catch (Exception ignored) {
+    }
 
     Display display = wm.getDefaultDisplay();
     DisplayMetrics metrics = new DisplayMetrics();

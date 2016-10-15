@@ -259,9 +259,7 @@ public class BetterArrayAdapter<T> extends BaseAdapter implements Filterable {
           final String valueText = value.toString().toLowerCase(Locale.getDefault());
           if (valueText.contains(needle)) {
             newValues.add(value);
-          }
-
-          if (value instanceof Subtitleable) {
+          } else if (value instanceof Subtitleable) {
             final String subtitleText = ((Subtitleable) value).toSubtitle().toLowerCase(Locale.getDefault());
             if (subtitleText.contains(needle)) {
               newValues.add(value);
