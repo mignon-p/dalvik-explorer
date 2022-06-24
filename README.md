@@ -22,6 +22,4 @@ running on my phone and said, "Hey, I want that app!"
 
 Although this is not a release, an APK is available here:
 
-<http://v.gd/6espd0>
-
-![QR code](http://chart.apis.google.com/chart?cht=qr&chs=100x100&choe=UTF-8&chld=H|0&chl=http://v.gd/6espd0)
+<https://drive.google.com/file/d/0B5r0hgpcUNe7cUUzOXpMdlJLUFU/view?usp=sharing&resourcekey=0-OaRNLpyPEGcgKaqS7_Wtrg>
